@@ -2,7 +2,7 @@
 "use client"; // Directiva para habilitar el cliente en este archivo
 
 import React from 'react';
-import LoginForm from '../../components/loginForm';
+import LoginForm from '@/components/LoginForm';
 
 const LoginPage = () => {
   return (

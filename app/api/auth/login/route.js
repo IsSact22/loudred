@@ -1,5 +1,5 @@
 // app/api/auth/login/route.js
-import db from '../../../lib/db';  // Ruta correcta de db
+import db from '@/app/lib/db';  // Ruta correcta de db
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 

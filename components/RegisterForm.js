@@ -2,9 +2,9 @@
 "use client";
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // Usa next/navigation
-import '../styles/globals.css';
-import Navbar from './header';
+// import { useRouter } from 'next/navigation'; // Usa next/navigation
+import '@/styles/globals.css';
+import Navbar from '@/components/header';
 
 export default function Register() {
   const [formData, setFormData] = useState({

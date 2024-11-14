@@ -3,8 +3,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'; // Usa next/navigation
-import '../styles/globals.css'; // Importa los estilos globales
-import Navbar from './header';
+import '@/styles/globals.css'; // Importa los estilos globales
+import Navbar from '@/components/header';
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -21,7 +21,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch('/api/auth/login', {
+    const res = await fetch('@/app/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
