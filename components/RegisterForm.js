@@ -1,12 +1,16 @@
 // components/RegisterForm.js
 "use client";
 
+
 import { useState } from 'react';
-// import { useRouter } from 'next/navigation'; // Usa next/navigation
+import { useRouter } from 'next/navigation'; // Usa next/navigation
 import '@/styles/globals.css';
 import Navbar from '@/components/header';
 
+
+
 export default function Register() {
+  const router= useRouter();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
