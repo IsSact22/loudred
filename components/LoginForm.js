@@ -20,20 +20,16 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Llama al método signIn con el proveedor "credentials"
-    const res = await signIn('credentials', {
+    const result = await signIn('credentials', {
       redirect: false,
-      email,
-      password,
+      email: formData.email,
+      password: formData.password,
     });
 
-    if (res.error) {
-      // Maneja el error de autenticación
-      setError(res.error);
+    if (result.error) {
+      setMessage(result.error);
     } else {
-      // Autenticación exitosa, redirige al usuario
-      router.push('/home'); // Cambia '/dashboard' por la ruta que desees
+      router.push('/home');
     }
   };
 
