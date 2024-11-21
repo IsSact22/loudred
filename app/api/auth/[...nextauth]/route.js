@@ -1,11 +1,10 @@
-import axios from "axios";
+// app/api/auth/[...nextauth]/route.js
+import mysql from 'mysql2/promise';
+import bcrypt from 'bcrypt';
 
 /* Next Auth */
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-
-/* Utils */
-import { endpoint } from "@/src/utils/helpers";
 
 const authOptions = {
   providers: [
@@ -17,44 +16,45 @@ const authOptions = {
       },
       authorize: async (credentials) => {
         try {
-          // Realiza la solicitud a tu endpoint de autenticación
-          const response = await axios.post($,{endpoint}/login, {
-            email: credentials.email,
-            password: credentials.password,
+          // Crear una conexión a la base de datos
+          const connection = await mysql.createConnection({
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME,
           });
 
-          const user = response.data.data;
+          // Buscar al usuario en la base de datos
+          const [rows] = await connection.execute(
+            'SELECT * FROM users WHERE email = ?',
+            [credentials.email]
+          );
 
-          // Si la autenticación es exitosa, devuelve los datos del usuario
+          // Cerrar la conexión
+          await connection.end();
+
+          const user = rows[0];
+
+          // Verificar si el usuario existe y la contraseña es correcta
           if (user) {
-            return {
-              id: user.id,
-              name: user.name,
-              email: user.email,
-              active: user.active,
-              accessToken: user.token,
-              roles: user.roles,
-              permissions: user.permissions,
-              last_login: new Date().toISOString(), // Establece como la hora actual
-            };
+            const isValidPassword = await bcrypt.compare(credentials.password, user.password);
+
+            if (isValidPassword) {
+              // Retornar los datos del usuario
+              return {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                //roles: user.roles, // Asegúrate de parsear esto si es necesario
+              };
+            } else {
+              throw new Error("Credenciales inválidas");
+            }
           } else {
             throw new Error("Credenciales inválidas");
           }
         } catch (error) {
           console.error("Error durante la autenticación:", error);
-
-          if (error.response) {
-            if (error.response.status === 422) {
-              // Extraer y formatear los mensajes de error desde "messages"
-              const validationErrors = error.response.data.messages;
-              const errorMessage = Object.values(validationErrors)
-                .flat()
-                .join(" ");
-              throw new Error(errorMessage);
-            } else if (error.response.status === 401) {
-              throw new Error("Credenciales inválidas");
-            }
-          }
           throw new Error("Error de autenticación");
         }
       },
@@ -63,28 +63,18 @@ const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        // Inicio de sesión inicial
         token.email = user.email;
         token.name = user.name;
-        token.active = user.active;
-        token.accessToken = user.accessToken; // Guardamos el accessToken en el JWT
-        token.roles = user.roles;
-        token.permissions = user.permissions;
-        token.last_login = user.last_login; // Añadir last_login
+        //token.roles = user.roles;
       }
-
       return token;
     },
     async session({ session, token }) {
       session.user = {
         email: token.email,
         name: token.name,
-        active: token.active,
-        roles: token.roles,
-        permissions: token.permissions,
-        last_login: token.last_login, // Añadir last_login
+       // roles: token.roles;
       };
-      // No pasamos el accessToken al cliente
       return session;
     },
   },

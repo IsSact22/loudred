@@ -1,6 +1,6 @@
 // components/loginForm.js
 "use client";
-
+import { signIn } from 'next-auth';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'; // Usa next/navigation
 import '@/styles/globals.css'; // Importa los estilos globales
@@ -21,21 +21,19 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
+    // Llama al método signIn con el proveedor "credentials"
+    const res = await signIn('credentials', {
+      redirect: false,
+      email,
+      password,
     });
 
-    const data = await res.json();
-
-    if (res.ok) {
-      setMessage('Login exitoso');
-      router.push('/home');
+    if (res.error) {
+      // Maneja el error de autenticación
+      setError(res.error);
     } else {
-      setMessage(data.message || 'Error en el login');
+      // Autenticación exitosa, redirige al usuario
+      router.push('/home'); // Cambia '/dashboard' por la ruta que desees
     }
   };
 
