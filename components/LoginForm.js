@@ -1,6 +1,6 @@
 // components/loginForm.js
 "use client";
-import { signIn } from 'next-auth';
+import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'; // Usa next/navigation
 import '@/styles/globals.css'; // Importa los estilos globales
