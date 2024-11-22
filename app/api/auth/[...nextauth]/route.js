@@ -64,7 +64,7 @@ const authOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.email = user.email;
-        token.name = user.name;
+        token.password = user.password;
         //token.roles = user.roles;
       }
       return token;
