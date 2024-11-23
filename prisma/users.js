@@ -1,5 +1,6 @@
 
-export const user = [{
+export const users = [
+    {
     name: 'Anthony',
     email: 'anthony@gmail.com',
     password: 'Hola123'
@@ -8,5 +9,15 @@ export const user = [{
     name:'Liz',
     email:'liz@gmail.com',
     password:'gorditO21'
-}
+},
+     {
+        name:'carlos',
+        email:'tuputamadre@gmail.com',
+        password:'javientanga21'
+    },
+    {
+        name:'chino',
+        email:'yakuza@gmail.com',
+        password:'chanwiS134'
+    }
 ];

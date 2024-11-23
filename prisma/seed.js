@@ -1,10 +1,10 @@
-import { user } from "./users.js";
+import { users } from "./users.js";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  for (let u of user) {
+  for (let u of users) {
     await prisma.users.create({
       data: u,
     });
