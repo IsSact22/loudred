@@ -1,6 +1,7 @@
 import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
 
+
 // Validación de entrada
 function validacionInput({ name, email, password, confirmPassword }) {
   if (!name || !email || !password || !confirmPassword) {

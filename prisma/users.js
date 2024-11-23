@@ -3,21 +3,21 @@ export const users = [
     {
     name: 'Anthony',
     email: 'anthony@gmail.com',
-    password: 'Hola123'
+    password: 'Hola1234'
 },
 {
     name:'Liz',
     email:'liz@gmail.com',
-    password:'gorditO21'
+    password:'Taylor123'
 },
      {
         name:'carlos',
-        email:'tuputamadre@gmail.com',
-        password:'javientanga21'
+        email:'carlos@gmail.com',
+        password:'Dembow123'
     },
     {
         name:'chino',
         email:'yakuza@gmail.com',
-        password:'chanwiS134'
+        password:'Chanwis123'
     }
 ];
