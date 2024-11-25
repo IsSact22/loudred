@@ -73,7 +73,7 @@ export default function Register() {
               type="text"
               name="lastname"
               placeholder="Apellido"
-              value={formData.name}
+              value={formData.lastname}
               onChange={handleChange}
               required
               className="input"
@@ -82,7 +82,7 @@ export default function Register() {
               type="usuario"
               name="usuario"
               placeholder="Usuario"
-              value={formData.email}
+              value={formData.usuario}
               onChange={handleChange}
               required
               className="input"

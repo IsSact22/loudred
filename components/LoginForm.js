@@ -46,7 +46,7 @@ export default function Login() {
               type="usuario"
               name="usuario"
               placeholder="ingresar usuario"
-              value={formData.email}
+              value={formData.usuario}
               onChange={handleChange}
               required
               className="input"

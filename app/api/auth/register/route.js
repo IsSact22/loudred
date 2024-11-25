@@ -65,7 +65,7 @@ export async function POST(req) {
     // Crear el usuario con contraseña encriptada
     const hashedPassword = await bcrypt.hash(password, 10);
     await connection.execute(
-      "INSERT INTO users (name, lastname, usuario, password) VALUES (?, ?, ?)",
+      "INSERT INTO users (name, lastname, usuario, password) VALUES (?, ?, ?, ?)",
       [name, lastname, usuario, hashedPassword]
     );
 
