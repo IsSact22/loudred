@@ -11,7 +11,7 @@ const authOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "email", type: "text" },
+        usuario: { label: "usuario", type: "text" },
         password: { label: "password", type: "password" },
       },
       authorize: async (credentials) => {
@@ -26,8 +26,8 @@ const authOptions = {
 
           // Buscar al usuario en la base de datos
           const [rows] = await connection.execute(
-            'SELECT * FROM users WHERE email = ?',
-            [credentials.email]
+            'SELECT * FROM users WHERE usuario = ?',
+            [credentials.usuario]
           );
 
           // Cerrar la conexión
@@ -44,7 +44,8 @@ const authOptions = {
               return {
                 id: user.id,
                 name: user.name,
-                email: user.email,
+                lastname: user.lastname,
+                usuario: user.usuario,
                 //roles: user.roles, // Asegúrate de parsear esto si es necesario
               };
             } else {
@@ -63,7 +64,7 @@ const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.email = user.email;
+        token.usuario = user.usuario;
         token.password = user.password;
         //token.roles = user.roles;
       }
@@ -71,7 +72,7 @@ const authOptions = {
     },
     async session({ session, token }) {
       session.user = {
-        email: token.email,
+        usuario: token.usuario,
         name: token.name,
        // roles: token.roles;
       };

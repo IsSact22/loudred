@@ -3,13 +3,13 @@ import bcrypt from "bcryptjs";
 
 
 // Validación de entrada
-function validacionInput({ name, email, password, confirmPassword }) {
-  if (!name || !email || !password || !confirmPassword) {
+function validacionInput({ name, lastname, usuario, password, confirmPassword }) {
+  if (!name ||!lastname || !usuario || !password || !confirmPassword) {
     return "Todos los campos son necesarios";
   }
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return "El email no es válido";
+  const UsuarRegex = /^[A-Z][a-z]*\d+$/;
+  if (!UsuarRegex.test(usuario)) {
+    return "El Usuario no es válido. Debe comenzar con una letra mayúscula, seguir con minúsculas y contener al menos un número.";
   }
   if (password !== confirmPassword) {
     return "Las contraseñas no coinciden";
@@ -31,9 +31,9 @@ function isStrongPassword(password) {
 export async function POST(req) {
   try {
     // Parsear y validar la entrada
-    const { name, email, password, confirmPassword } = await req.json();
+    const { name, lastname, usuario, password, confirmPassword } = await req.json();
 
-    const validationError = validacionInput({ name, email, password, confirmPassword });
+    const validationError = validacionInput({ name, lastname, usuario, password, confirmPassword });
     if (validationError) {
       return new Response(
         JSON.stringify({ message: validationError }),
@@ -51,8 +51,8 @@ export async function POST(req) {
 
     // Verificar si el usuario ya existe
     const [existingUser] = await connection.execute(
-      "SELECT * FROM users WHERE email = ?",
-      [email]
+      "SELECT * FROM users WHERE usuario = ?",
+      [usuario]
     );
     if (existingUser.length > 0) {
       await connection.end(); // Cerrar conexión
@@ -65,8 +65,8 @@ export async function POST(req) {
     // Crear el usuario con contraseña encriptada
     const hashedPassword = await bcrypt.hash(password, 10);
     await connection.execute(
-      "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-      [name, email, hashedPassword]
+      "INSERT INTO users (name, lastname, usuario, password) VALUES (?, ?, ?)",
+      [name, lastname, usuario, hashedPassword]
     );
 
     // Cerrar la conexión

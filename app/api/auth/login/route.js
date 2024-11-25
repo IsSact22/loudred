@@ -13,7 +13,7 @@ export async function POST(req) {
   }
 
   try {
-    const [user] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+    const [user] = await db.query('SELECT * FROM users WHERE usuario = ?', [usuario]);
 
     if (user.length === 0) {
       return new Response(JSON.stringify({ message: 'Credenciales incorrectas' }), { status: 401 });

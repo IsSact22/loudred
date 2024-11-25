@@ -13,7 +13,8 @@ export default function Register() {
   const router= useRouter();
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    lastname: '',
+    usuario: '',
     password: '',
     confirmPassword: '',
   });
@@ -69,9 +70,18 @@ export default function Register() {
               className="input"
             />
             <input
-              type="email"
-              name="email"
-              placeholder="Email"
+              type="text"
+              name="lastname"
+              placeholder="Apellido"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="input"
+            />
+            <input
+              type="usuario"
+              name="usuario"
+              placeholder="Usuario"
               value={formData.email}
               onChange={handleChange}
               required

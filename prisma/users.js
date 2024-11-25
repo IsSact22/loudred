@@ -2,22 +2,31 @@
 export const users = [
     {
     name: 'Anthony',
-    email: 'anthony@gmail.com',
+    lastname: ' Goncalves',
+    usuario:'Rollin',
+    // email: 'anthony@gmail.com',
     password: 'Hola1234'
 },
 {
     name:'Liz',
-    email:'liz@gmail.com',
+    lastname: 'Ovalles',
+    usuario:'Rose',
+    // email:'liz@gmail.com',
     password:'Taylor123'
 },
-     {
-        name:'carlos',
-        email:'carlos@gmail.com',
-        password:'Dembow123'
-    },
-    {
-        name:'chino',
-        email:'yakuza@gmail.com',
-        password:'Chanwis123'
-    }
+{
+    name:'carlos',
+    lastname: 'Gonzalez',
+    usuario:'Carluno',
+    // email:'carlos@gmail.com',
+    password:'Dembow123'
+},
+{
+    name:'isaac',
+    lastname: 'Hung',
+    usuario:'Chino',
+        // email:'yakuza@gmail.com',
+    password:'Chanwis123'
+        
+}
 ];

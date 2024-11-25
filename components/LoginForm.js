@@ -8,7 +8,7 @@ import Navbar from '@/components/header';
 
 export default function Login() {
   const [formData, setFormData] = useState({
-    email: '',
+    usuario: '',
     password: '',
   });
   const [message, setMessage] = useState('');
@@ -22,7 +22,7 @@ export default function Login() {
     e.preventDefault();
     const result = await signIn('credentials', {
       redirect: false,
-      email: formData.email,
+      usuario: formData.usuario,
       password: formData.password,
     });
 
@@ -43,9 +43,9 @@ export default function Login() {
           {message && <p className="message">{message}</p>}
           <form onSubmit={handleSubmit}>
             <input
-              type="email"
-              name="email"
-              placeholder="Email"
+              type="usuario"
+              name="usuario"
+              placeholder="ingresar usuario"
               value={formData.email}
               onChange={handleChange}
               required

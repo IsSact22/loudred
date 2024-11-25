@@ -10,7 +10,8 @@ datasource db {
 model users {
   id         Int       @id @default(autoincrement())
   name       String    @db.VarChar(100)
-  email      String    @unique(map: "email") @db.VarChar(255)
+  lastname       String    @db.VarChar(100)
+  usuario      String    @unique(map: "user") @db.VarChar(255)
   password   String    @db.VarChar(255)
   created_at DateTime? @default(now()) @db.Timestamp(0)
 }
