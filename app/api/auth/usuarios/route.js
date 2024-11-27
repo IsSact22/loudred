@@ -1,30 +1,41 @@
 import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
 
+function validatePassword(password) {
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  if (!password || !strongPasswordRegex.test(password)) {
+    return "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.";
+  }
+  return null;
+}
+
+function createErrorResponse(message, status = 400) {
+  return new Response(
+    JSON.stringify({ message:"Verifica que las contraseñas son iguales" }),
+    { status, headers: { "Content-Type": "application/json" } }
+  );
+}
+
+
+
 //Crear (CREATE)
-export async function POST(req){
+export async function POST(req) {
   try {
-    const { id, name, lastname, usuario, password, confirmPassword } = await req.json();
+    const { name, lastname, usuario, password } = await req.json();
 
     // Validaciones
     if (!name || !lastname || !usuario || !password) {
-      return new Response(
-        JSON.stringify({ message: "Todos los campos son requeridos" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+      return createErrorResponse("Todos los campos son requeridos");
     }
 
-    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    if (!strongPasswordRegex.test(password)) {
-      return new Response(
-        JSON.stringify({
-          message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.",
-        }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      return createErrorResponse(passwordError);
     }
 
-    // Crear conexión
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Crear conexión y guardar datos
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USERNAME,
@@ -32,9 +43,6 @@ export async function POST(req){
       database: process.env.DB_DATABASE,
     });
 
-    // Encriptar la contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
-    // Crear usuarios
     await connection.execute(
       "INSERT INTO users (name, lastname, usuario, password) VALUES (?, ?, ?, ?)",
       [name, lastname, usuario, hashedPassword]
@@ -44,16 +52,14 @@ export async function POST(req){
 
     return new Response(
       JSON.stringify({ message: "Usuario creado exitosamente" }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
+      { status: 201, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Error al actualizar usuario:", error);
-    return new Response(
-      JSON.stringify({ message: "Error interno del servidor", error: error.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    console.error("Error al crear usuario:", error);
+    return createErrorResponse("Error interno del servidor", 500);
   }
 }
+
 
 //Leer (READ)
 export async function GET(req) {
@@ -107,34 +113,41 @@ export async function GET(req) {
 //Actualizar (UPDATE)
 export async function PUT(req) {
   try {
-    const { id, name, lastname, password, confirmPassword } = await req.json();
+    const { name, lastname, password } = await req.json();
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
 
-    // Validaciones
-    if (!id || !name || !lastname || !password || !confirmPassword) {
-      return new Response(
-        JSON.stringify({ message: "Todos los campos son requeridos" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+    if (!id) {
+      return createErrorResponse("El ID es requerido");
     }
 
-    if (password !== confirmPassword) {
-      return new Response(
-        JSON.stringify({ message: "Las contraseñas no coinciden" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+    if (!name && !lastname && !password) {
+      return createErrorResponse("Debe proporcionar al menos un campo para actualizar");
     }
 
-    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    if (!strongPasswordRegex.test(password)) {
-      return new Response(
-        JSON.stringify({
-          message: "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.",
-        }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+    let updates = [];
+    let values = [];
+
+    if (name) {
+      updates.push("name = ?");
+      values.push(name);
+    }
+    if (lastname) {
+      updates.push("lastname = ?");
+      values.push(lastname);
+    }
+    if (password) {
+      const passwordError = validatePassword(password);
+      if (passwordError) {
+        return createErrorResponse(passwordError);
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updates.push("password = ?");
+      values.push(hashedPassword);
     }
 
-    // Crear conexión
+    values.push(id);
+
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USERNAME,
@@ -144,30 +157,19 @@ export async function PUT(req) {
 
     // Verificar si el usuario existe
     const [existingUser] = await connection.execute(
-      "SELECT * FROM users WHERE id = ?",
+      "SELECT id FROM users WHERE id = ?",
       [id]
     );
 
     if (existingUser.length === 0) {
       await connection.end();
-      return new Response(
-        JSON.stringify({ message: "Usuario no encontrado" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
+      return createErrorResponse("Usuario no encontrado", 404);
     }
 
-    // Encriptar la contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
-    // Crear usuarios
+    // Actualizar usuario
     await connection.execute(
-      "INSERT INTO users (name, lastname, usuario, password) VALUES (?, ?, ?, ?)",
-      [name, lastname, usuario, hashedPassword]
-    );
-
-    // Actualizar el usuario
-    await connection.execute(
-      "UPDATE users SET name = ?, lastname = ?, password = ? WHERE id = ?",
-      [name, lastname, hashedPassword, id]
+      `UPDATE users SET ${updates.join(", ")} WHERE id = ?`,
+      values
     );
 
     await connection.end();
@@ -178,12 +180,10 @@ export async function PUT(req) {
     );
   } catch (error) {
     console.error("Error al actualizar usuario:", error);
-    return new Response(
-      JSON.stringify({ message: "Error interno del servidor", error: error.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return createErrorResponse("Error interno del servidor", 500);
   }
 }
+
 
 //Borrar (DELETE)
 export async function DELETE(req) {
