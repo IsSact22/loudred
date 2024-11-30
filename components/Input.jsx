@@ -16,11 +16,12 @@ const Input = ({
       {label && (
         <label
           htmlFor={name}
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm/6 font-medium text-gray-900"
         >
           {label}
         </label>
       )}
+
       <Controller
         name={name}
         control={control}
@@ -38,6 +39,7 @@ const Input = ({
           />
         )}
       />
+      
       {errors[name] && (
         <p className="text-sm text-red-500 mt-1">{errors[name].message}</p>
       )}

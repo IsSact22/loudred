@@ -7,6 +7,13 @@ function validacionInput({ name, lastname, usuario, password, confirmPassword })
   if (!name ||!lastname || !usuario || !password || !confirmPassword) {
     return "Todos los campos son necesarios";
   }
+  const nameRegex = /^[a-zA-Z\s]+$/;
+  if (!nameRegex.test(name)) {
+    return "El nombre no puede contener números ni caracteres especiales";
+  }
+  if (!nameRegex.test(lastname)) {
+    return "El apellido no puede contener números ni caracteres especiales";
+  }
   const UsuarRegex = /^[A-Z][a-z]*\d+$/;
   if (!UsuarRegex.test(usuario)) {
     return "El Usuario no es válido. Debe comenzar con una letra mayúscula, seguir con minúsculas y contener al menos un número.";

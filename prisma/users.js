@@ -3,28 +3,28 @@ export const users = [
     {
     name: 'Anthony',
     lastname: ' Goncalves',
-    usuario:'Rollin',
+    usuario:'Rollin21',
     // email: 'anthony@gmail.com',
     password: 'Hola1234'
 },
 {
     name:'Liz',
     lastname: 'Ovalles',
-    usuario:'Rose',
+    usuario:'Rose19',
     // email:'liz@gmail.com',
     password:'Taylor123'
 },
 {
     name:'carlos',
     lastname: 'Gonzalez',
-    usuario:'Carluno',
+    usuario:'Carluno13',
     // email:'carlos@gmail.com',
     password:'Dembow123'
 },
 {
     name:'isaac',
     lastname: 'Hung',
-    usuario:'Chino',
+    usuario:'Chino04',
         // email:'yakuza@gmail.com',
     password:'Chanwis123'
         

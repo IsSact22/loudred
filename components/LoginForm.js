@@ -1,17 +1,16 @@
-// components/loginForm.js
 "use client";
-import { signIn } from 'next-auth/react';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // Usa next/navigation
-import '@/styles/globals.css'; // Importa los estilos globales
-import Navbar from '@/components/header';
+import { signIn } from "next-auth/react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Navbar from "@/components/header";
+import "@/styles/globals.css";
 
 export default function Login() {
   const [formData, setFormData] = useState({
-    usuario: '',
-    password: '',
+    usuario: "",
+    password: "",
   });
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -20,19 +19,19 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await signIn('credentials', {
+
+    const result = await signIn("credentials", {
       redirect: false,
       usuario: formData.usuario,
       password: formData.password,
     });
 
-    if (result.error) {
+    if (result?.error) {
       setMessage(result.error);
     } else {
-      router.push('/home');
+      router.push("/home");
     }
   };
-  
 
   return (
     <>
@@ -43,9 +42,9 @@ export default function Login() {
           {message && <p className="message">{message}</p>}
           <form onSubmit={handleSubmit}>
             <input
-              type="usuario"
+              type="text"
               name="usuario"
-              placeholder="ingresar usuario"
+              placeholder="Usuario"
               value={formData.usuario}
               onChange={handleChange}
               required
@@ -60,8 +59,12 @@ export default function Login() {
               required
               className="input"
             />
-            <button type="submit" className="button">Iniciar sesión</button>
-            <p className="link">¿Ya tienes cuenta? <a href="/register">Registrar</a></p>
+            <button type="submit" className="button">
+              Iniciar sesión
+            </button>
+            <p className="link">
+              ¿No tienes cuenta? <a href="/register">Registrar</a>
+            </p>
           </form>
         </div>
       </div>

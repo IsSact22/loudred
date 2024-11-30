@@ -1,26 +1,9 @@
-// //api/home/page.
-// "use client";
-// import Navbar from "@/components/header";
 
-// export default function Home() {
-//     return (
-//         <>
-//       <Navbar /> {/* Coloca el Navbar al inicio de la página */}
-//       <div>
-//         <h1>Bienvenido a la página principal</h1>
-//         <p>Has iniciado sesión correctamente.</p>
-//       </div>
-//   </>
-//     );
-//   }
-
-
-// app/home/page.js
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession, signOut } from "next-auth/react"; // Importa signOut
+import { useRouter } from "next/navigation"; // Importa useRouter
 import Navbar from "@/components/header";
-
-import { useSession } from "next-auth/react";
 
 export default function Home() {
   const { data: session } = useSession(); // Obtener la sesión del usuario
@@ -32,6 +15,7 @@ export default function Home() {
     status: "",
   });
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -60,15 +44,26 @@ export default function Home() {
     }
   };
 
+  // Redirigir si no hay sesión, pero usando useEffect para evitar el error
+  useEffect(() => {
+    if (!session) {
+      router.push("/login"); // Redirige al login si no está autenticado
+    }
+  }, [session, router]); // Dependencias: se ejecuta cuando cambia la sesión
+
   if (!session) {
-    return <p>No estás autenticado. Por favor, inicia sesión.</p>;
+    return <p>Redirigiendo al login...</p>; // Mostrar mensaje de redirección
   }
 
   return (
     <>
       <Navbar />
       <div>
-        <h1>Bienvenido a la página principal</h1>
+        <h1>Bienvenido a la página principal, {session.user.name}</h1>
+        
+        {/* Botón para cerrar sesión */}
+        <button onClick={() => signOut({ callbackUrl: "/login" })}>Cerrar Sesión</button>
+
         <button onClick={() => setShowModal(true)}>Subir Canción</button>
 
         {showModal && (

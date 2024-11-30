@@ -6,18 +6,21 @@ const prisma = new PrismaClient();
 
 export async function POST(req) {
   try {
+    // Obtener la sesión del usuario
     const session = await getServerSession(authOptions);
 
+    // Verificar si el usuario está autenticado
     if (!session || !session.user?.id) {
-      console.error("Usuario no autenticado o ID no encontrado");
       return new Response(
         JSON.stringify({ error: "No estás autenticado" }),
         { status: 401, headers: { "Content-Type": "application/json" } }
       );
     }
+
+    // Obtener los datos del cuerpo de la solicitud
     const { nombre, artista, categoria, status } = await req.json();
 
-    // Validar campos
+    // Validar que los campos estén presentes
     if (!nombre || !artista || !categoria || !status) {
       return new Response(
         JSON.stringify({ error: "Todos los campos son obligatorios" }),
@@ -25,7 +28,7 @@ export async function POST(req) {
       );
     }
 
-    // Crear canción en la base de datos
+    // Crear la canción en la base de datos, asociando el userId
     const newSong = await prisma.canciones.create({
       data: {
         nombre,

@@ -2,7 +2,7 @@ import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
 
 function validatePassword(password) {
-  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  const strongPasswordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
   if (!password || !strongPasswordRegex.test(password)) {
     return "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.";
   }
@@ -11,31 +11,52 @@ function validatePassword(password) {
 
 function createErrorResponse(message, status = 400) {
   return new Response(
-    JSON.stringify({ message:"Verifica que las contraseñas son iguales" }),
+    JSON.stringify({ message}),
     { status, headers: { "Content-Type": "application/json" } }
   );
+}
+function validateNameField(field, fieldName) {
+  const nameRegex = /^[a-zA-Z\s]+$/;
+  if (!field || !nameRegex.test(field)) {
+    return '${fieldName} no puede contener números ni caracteres especiales;'
+  }
+  return null;
 }
 
 
 
 //Crear (CREATE)
+// Crear (CREATE)
 export async function POST(req) {
   try {
-    const { name, lastname, usuario, password } = await req.json();
+    const { name, lastname, usuario, password, confirmPassword } = await req.json();
 
-    // Validaciones
-    if (!name || !lastname || !usuario || !password) {
+    // Validaciones iniciales
+    if (!name || !lastname || !usuario || !password || !confirmPassword) {
       return createErrorResponse("Todos los campos son requeridos");
     }
 
-    const passwordError = validatePassword(password);
-    if (passwordError) {
-      return createErrorResponse(passwordError);
+    // Validar nombre
+    const nameError = validateNameField(name, "Nombre");
+    if (nameError) {
+      return createErrorResponse(nameError);
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Validar apellido
+    const lastnameError = validateNameField(lastname, "Apellido");
+    if (lastnameError) {
+      return createErrorResponse(lastnameError);
+    }
 
-    // Crear conexión y guardar datos
+    // Validar usuario (formato)
+    const UsuarRegex = /^[A-Z][a-z]*\d+$/;
+    if (!UsuarRegex.test(usuario)) {
+      return createErrorResponse(
+        "El Usuario no es válido. Debe comenzar con una letra mayúscula, seguir con minúsculas y contener al menos un número."
+      );
+    }
+
+    // Crear conexión a la base de datos para verificar duplicados
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USERNAME,
@@ -43,6 +64,36 @@ export async function POST(req) {
       database: process.env.DB_DATABASE,
     });
 
+    // Verificar si el usuario ya existe
+    const [existingUser] = await connection.execute(
+      "SELECT * FROM users WHERE usuario = ?",
+      [usuario]
+    );
+    if (existingUser.length > 0) {
+      await connection.end(); // Cerrar conexión
+      return new Response(
+        JSON.stringify({ message: "El usuario ya existe" }),
+        { status: 409, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validar que las contraseñas coincidan
+    if (password !== confirmPassword) {
+      await connection.end(); // Cerrar conexión en caso de error
+      return createErrorResponse("Las contraseñas no coinciden");
+    }
+
+    // Validar contraseña
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      await connection.end(); // Cerrar conexión en caso de error
+      return createErrorResponse(passwordError);
+    }
+
+    // Hash de la contraseña
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Guardar nuevo usuario en la base de datos
     await connection.execute(
       "INSERT INTO users (name, lastname, usuario, password) VALUES (?, ?, ?, ?)",
       [name, lastname, usuario, hashedPassword]
@@ -59,6 +110,7 @@ export async function POST(req) {
     return createErrorResponse("Error interno del servidor", 500);
   }
 }
+
 
 
 //Leer (READ)
@@ -113,7 +165,7 @@ export async function GET(req) {
 //Actualizar (UPDATE)
 export async function PUT(req) {
   try {
-    const { name, lastname, password } = await req.json();
+    const { name, lastname, password, confirmPassword } = await req.json(); // Se incluye confirmPassword
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -127,20 +179,39 @@ export async function PUT(req) {
 
     let updates = [];
     let values = [];
-
-    if (name) {
+     
+     
+    
+  
+    if (name) { 
+       // Validar nombre
+      const nameError = validateNameField(name, "Nombre");
+      if (nameError) {
+        return createErrorResponse(nameError);
+      }
       updates.push("name = ?");
       values.push(name);
     }
     if (lastname) {
+      // Validar apellido
+    const lastnameError = validateNameField(lastname, "Apellido");
+    if (lastnameError) {
+      return createErrorResponse(lastnameError);
+     }      
       updates.push("lastname = ?");
       values.push(lastname);
     }
     if (password) {
+      // Validar que las contraseñas coincidan
+      if (password !== confirmPassword) {
+        return createErrorResponse("Las contraseñas no coinciden");
+      }
+
       const passwordError = validatePassword(password);
       if (passwordError) {
         return createErrorResponse(passwordError);
       }
+
       const hashedPassword = await bcrypt.hash(password, 10);
       updates.push("password = ?");
       values.push(hashedPassword);
@@ -168,7 +239,7 @@ export async function PUT(req) {
 
     // Actualizar usuario
     await connection.execute(
-      `UPDATE users SET ${updates.join(", ")} WHERE id = ?`,
+      "UPDATE users SET ${updates.join(", ")} WHERE id = ?",
       values
     );
 
@@ -183,6 +254,7 @@ export async function PUT(req) {
     return createErrorResponse("Error interno del servidor", 500);
   }
 }
+
 
 
 //Borrar (DELETE)
