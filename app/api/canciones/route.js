@@ -1,41 +1,45 @@
-import { getServerSession } from "next-auth";
+import { getToken } from "next-auth/jwt";
 import { PrismaClient } from "@prisma/client";
-import { authOptions } from "../auth/[...nextauth]/route";
 
 const prisma = new PrismaClient();
 
 export async function POST(req) {
   try {
-    // Obtener la sesión del usuario
-    const session = await getServerSession(authOptions);
+    // Verificar el token
+    const token = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET, // Usa el secreto de tu .env
+    });
 
-    // Verificar si el usuario está autenticado
-    if (!session || !session.user?.id) {
+    // Log para ver si el token fue recibido
+    console.log("Token recibido:", token);
+
+    if (!token) {
       return new Response(
-        JSON.stringify({ error: "No estás autenticado" }),
+        JSON.stringify({ error: "No estás autenticado. Token inválido." }),
         { status: 401, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // Obtener los datos del cuerpo de la solicitud
+    // Si el token es válido, obtener los datos de la solicitud
     const { nombre, artista, categoria, status } = await req.json();
 
-    // Validar que los campos estén presentes
+    // Validar que los campos necesarios estén presentes
     if (!nombre || !artista || !categoria || !status) {
       return new Response(
-        JSON.stringify({ error: "Todos los campos son obligatorios" }),
+        JSON.stringify({ error: "Todos los campos son obligatorios." }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // Crear la canción en la base de datos, asociando el userId
+    // Crear una canción en la base de datos
     const newSong = await prisma.canciones.create({
       data: {
         nombre,
         artista,
         categoria,
         status,
-        userId: session.user.id, // Relacionar con el usuario autenticado
+        userId: token.id, // Vincular con el ID del usuario del token
       },
     });
 
@@ -44,9 +48,9 @@ export async function POST(req) {
       { status: 201, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Error al registrar la canción:", error.message);
+    console.error("Error en el endpoint /api/canciones:", error.message);
     return new Response(
-      JSON.stringify({ error: "Error interno del servidor" }),
+      JSON.stringify({ error: "Error interno del servidor." }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }

@@ -7,9 +7,11 @@ export async function middleware(req) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
+  //console.log("Middleware - Token recibido:", token);
+
   const { pathname } = req.nextUrl;
 
-  // Permitir el acceso sin sesión solo a las rutas públicas
+  // Permitir acceso a rutas públicas
   if (pathname.startsWith("/api") || pathname === "/" || pathname.startsWith("/login")) {
     return NextResponse.next();
   }
@@ -20,9 +22,11 @@ export async function middleware(req) {
   }
 
   return NextResponse.next();
+
 }
 
-// Aplica el middleware a rutas protegidas
+// Configurar rutas protegidas
 export const config = {
-  matcher: ["/home/:path*", "/dashboard/:path*"], // Rutas protegidas
+  matcher: ["/home/:path*", "/dashboard/:path*"],
 };
+

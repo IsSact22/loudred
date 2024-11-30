@@ -19,30 +19,28 @@ export default function Home() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage(""); // Reseteamos el mensaje de error
-
+  
     try {
       const response = await fetch("/api/canciones", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${session.accessToken}`, // Enviar el token en el header
         },
         body: JSON.stringify(formData),
       });
-
+  
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Error en la API");
+        throw new Error("Error al registrar la canción");
       }
-
+  
       const data = await response.json();
-      setMessage("Canción registrada correctamente");
-      setFormData({ nombre: "", artista: "", categoria: "", status: "" }); // Resetear formulario
+      console.log("Canción registrada:", data);
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
-      setMessage(error.message || "Error al registrar la canción");
     }
   };
+  
 
   // Redirigir si no hay sesión, pero usando useEffect para evitar el error
   useEffect(() => {
