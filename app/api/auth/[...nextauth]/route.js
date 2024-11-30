@@ -72,8 +72,9 @@ const authOptions = {
     },
     async session({ session, token }) {
       session.user = {
-        usuario: token.usuario,
         name: token.name,
+        lastname: token.lastname,
+        usuario: token.usuario,
        // roles: token.roles;
       };
       return session;

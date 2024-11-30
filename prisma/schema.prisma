@@ -1,3 +1,5 @@
+
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,13 +16,17 @@ model users {
   usuario      String    @unique(map: "user") @db.VarChar(255)
   password   String    @db.VarChar(255)
   created_at DateTime? @default(now()) @db.Timestamp(0)
+  canciones  canciones[]  // Relación uno a muchos con canciones
 }
 
-model PENE {
-  id        Int     @id @default(autoincrement())
-  culo      String
-  teta     String  @unique
-  password  String
-  createdAt DateTime @default(now())
-}
 
+model canciones {
+  id         Int       @id @default(autoincrement())
+  nombre     String
+  artista    String
+  categoria  String
+  status     String
+  createdAt  DateTime  @default(now())
+  userId     Int       // Clave foránea hacia el modelo users
+  user       users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

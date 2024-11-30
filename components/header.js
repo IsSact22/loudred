@@ -1,4 +1,4 @@
-// pages/Navbar.js
+// components/header.js
 import Link from 'next/link';
 import Image from 'next/image';
 

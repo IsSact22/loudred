@@ -6,9 +6,9 @@ import jwt from 'jsonwebtoken';
 const SECRET_KEY = 'tu_secreto_super_secreto';
 
 export async function POST(req) {
-  const { email, password } = await req.json();
+  const { usuario, password } = await req.json();
 
-  if (!email || !password) {
+  if (!usuario || !password) {
     return new Response(JSON.stringify({ message: 'Todos los campos son obligatorios' }), { status: 400 });
   }
 
