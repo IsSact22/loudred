@@ -41,7 +41,7 @@
 "use client";
 import React from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
-import PasswordInput from '@/components/PasswordInput';
+import PasswordInput from '@/src/components/PasswordInput';
 
 const PasswordForm = () => {
   const methods = useForm({

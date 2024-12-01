@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react"; // Importa signOut
 import { useRouter } from "next/navigation"; // Importa useRouter
-import Navbar from "@/components/header";
+import Navbar from "@/src/components/HeaderOut";
 
 export default function Home() {
   const { data: session } = useSession(); // Obtener la sesión del usuario

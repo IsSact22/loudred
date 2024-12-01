@@ -2,8 +2,7 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/header";
-import "@/styles/globals.css";
+import Navbar from "@/src/components/HeaderOut";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -36,10 +35,10 @@ export default function Login() {
   return (
     <>
       <Navbar />
-      <div className="container">
-        <div className="formWrapper">
-          <h2 className="title">Iniciar Sesión</h2>
-          {message && <p className="message">{message}</p>}
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
+          <h2 className="text-2xl text-gray-800 mb-4 text-center">Iniciar Sesión</h2>
+          {message && <p className="text-red-500 mb-4 text-center">{message}</p>}
           <form onSubmit={handleSubmit}>
             <input
               type="text"
@@ -48,7 +47,7 @@ export default function Login() {
               value={formData.usuario}
               onChange={handleChange}
               required
-              className="input"
+              className="w-full p-3 mb-4 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
             />
             <input
               type="password"
@@ -57,13 +56,16 @@ export default function Login() {
               value={formData.password}
               onChange={handleChange}
               required
-              className="input"
+              className="w-full p-3 mb-4 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
             />
-            <button type="submit" className="button">
+            <button
+              type="submit"
+              className="w-full p-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            >
               Iniciar sesión
             </button>
-            <p className="link">
-              ¿No tienes cuenta? <a href="/register">Registrar</a>
+            <p className="mt-4 text-center">
+              ¿No tienes cuenta? <a href="/register" className="text-purple-600 hover:underline">Registrar</a>
             </p>
           </form>
         </div>

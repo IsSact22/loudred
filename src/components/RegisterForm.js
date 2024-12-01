@@ -1,16 +1,10 @@
-// components/RegisterForm.js
 "use client";
-
-
 import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // Usa next/navigation
-import '@/styles/globals.css';
-import Navbar from '@/components/header';
-
-
+import { useRouter } from 'next/navigation';
+import Navbar from '@/src/components/HeaderOut';
 
 export default function Register() {
-  const router= useRouter();
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     lastname: '',
@@ -39,13 +33,11 @@ export default function Register() {
       },
       body: JSON.stringify(formData),
     });
-    
 
     const data = await res.json();
 
     if (res.ok) {
       setMessage('Registro exitoso');
-      
       setTimeout(() => router.push('/login'), 2000); 
     } else {
       setMessage(data.message || 'Error en el registro');
@@ -55,10 +47,10 @@ export default function Register() {
   return (
     <>
       <Navbar />
-      <div className="container">
-        <div className="formWrapper">
-          <h2 className="title">Registro</h2>
-          {message && <p className="message">{message}</p>}
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 font-sans">
+        <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
+          <h2 className="text-2xl text-gray-800 mb-4 text-center">Registro</h2>
+          {message && <p className="text-red-500 mb-4 text-center">{message}</p>}
           <form onSubmit={handleSubmit}>
             <input
               type="text"
@@ -67,7 +59,7 @@ export default function Register() {
               value={formData.name}
               onChange={handleChange}
               required
-              className="input"
+              className="w-full p-3 mb-4 border border-gray-300 rounded"
             />
             <input
               type="text"
@@ -76,16 +68,16 @@ export default function Register() {
               value={formData.lastname}
               onChange={handleChange}
               required
-              className="input"
+              className="w-full p-3 mb-4 border border-gray-300 rounded"
             />
             <input
-              type="usuario"
+              type="text"
               name="usuario"
               placeholder="Usuario"
               value={formData.usuario}
               onChange={handleChange}
               required
-              className="input"
+              className="w-full p-3 mb-4 border border-gray-300 rounded"
             />
             <input
               type="password"
@@ -94,7 +86,7 @@ export default function Register() {
               value={formData.password}
               onChange={handleChange}
               required
-              className="input"
+              className="w-full p-3 mb-4 border border-gray-300 rounded"
             />
             <input
               type="password"
@@ -103,11 +95,16 @@ export default function Register() {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              className="input"
+              className="w-full p-3 mb-4 border border-gray-300 rounded"
             />
-            <button type="submit" className="button">Registrarse</button>
-            <p className="link">
-              ¿Ya tienes cuenta? <a href="/login">Inicia sesión</a>
+            <button
+              type="submit"
+              className="w-full p-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            >
+              Registrarse
+            </button>
+            <p className="mt-4 text-center">
+              ¿Ya tienes cuenta? <a href="/login" className="text-purple-600 hover:underline">Inicia sesión</a>
             </p>
           </form>
         </div>
