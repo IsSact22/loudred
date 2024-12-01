@@ -2,9 +2,9 @@ import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
 
 function validatePassword(password) {
-  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  const strongPasswordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
   if (!password || !strongPasswordRegex.test(password)) {
-    return "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número. No debe contener caracteres especiales.";
+    return "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.";
   }
   return null;
 }
@@ -18,13 +18,14 @@ function createErrorResponse(message, status = 400) {
 function validateNameField(field, fieldName) {
   const nameRegex = /^[a-zA-Z\s]+$/;
   if (!field || !nameRegex.test(field)) {
-    return `${fieldName} no puede contener números ni caracteres especiales;`; // Cambiado a backticks
+    return '${fieldName} no puede contener números ni caracteres especiales;'
   }
   return null;
 }
 
 
 
+//Crear (CREATE)
 // Crear (CREATE)
 export async function POST(req) {
   try {
@@ -178,7 +179,9 @@ export async function PUT(req) {
 
     let updates = [];
     let values = [];
-
+     
+     
+    
   
     if (name) { 
        // Validar nombre
@@ -236,7 +239,7 @@ export async function PUT(req) {
 
     // Actualizar usuario
     await connection.execute(
-      `UPDATE users SET ${updates.join(", ")} WHERE id = ?`,
+      "UPDATE users SET ${updates.join(", ")} WHERE id = ?",
       values
     );
 
@@ -251,6 +254,8 @@ export async function PUT(req) {
     return createErrorResponse("Error interno del servidor", 500);
   }
 }
+
+
 
 //Borrar (DELETE)
 export async function DELETE(req) {

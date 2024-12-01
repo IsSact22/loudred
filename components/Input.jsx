@@ -1,26 +1,22 @@
 import React from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 
-
-//INPUT GENERAL
 const Input = ({
   name, // Nombre del campo para usar en react-hook-form
   type = 'text', // Tipo de input (text, email, etc.)
   label, // Etiqueta del input
   placeholder = '', // Texto placeholder
   rules = {}, // Reglas de validación para react-hook-form
-  className = '', // Clases adicionales para estilos personalizados
-  containerClass = '', // Clases para el contenedor
   ...props // Cualquier otra prop adicional
 }) => {
   const { control, formState: { errors } } = useFormContext(); // Acceder al contexto de react-hook-form
 
   return (
-    <div className={`mt-2 px-2 ${containerClass}`}>
+    <div className="mb-4">
       {label && (
         <label
           htmlFor={name}
-          className="block text-sm/6 font-medium text-lila-label font-black"
+          className="block text-sm/6 font-medium text-gray-900"
         >
           {label}
         </label>
@@ -36,10 +32,9 @@ const Input = ({
             type={type}
             id={name}
             placeholder={placeholder}
-            className={` px-3 py-2 border rounded-full bg-lila-input focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               errors[name] ? 'border-red-500' : 'border-gray-300'
-            } placeholder-lila-placeholder placeholder-opacity-40 font-black  
-             ${className}`} // Agregar clases personalizadas
+            }`}
             {...props}
           />
         )}

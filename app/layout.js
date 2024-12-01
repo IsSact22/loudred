@@ -1,8 +1,6 @@
 import localFont from "next/font/local";
 import { CoreProvider } from "@/components/CoreProvider";
-import './globals.css';
-import '@fontsource/poppins';
-
+import "./globals.css";
 
 
 const geistSans = localFont({
