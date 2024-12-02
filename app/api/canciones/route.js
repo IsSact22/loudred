@@ -1,4 +1,5 @@
-import { getToken } from "next-auth/jwt";
+import {verifyToken} from "@/app/api/middleware/auth";
+import mysql from "mysql2/promise";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -6,13 +7,15 @@ const prisma = new PrismaClient();
 export async function POST(req) {
   try {
     // Verificar el token
-    const token = await getToken({
-      req,
-      secret: process.env.NEXTAUTH_SECRET, // Usa el secreto de tu .env
-    });
+    let token;
 
-    // Log para ver si el token fue recibido
-    console.log("Token recibido:", token);
+    try {
+      token = await verifyToken(req);
+      console.log("Token recibido:", token);
+    } catch (error) {
+      console.error("Error en autenticación:", error.message);
+    }
+
 
     if (!token) {
       return new Response(
@@ -31,6 +34,30 @@ export async function POST(req) {
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
+// Crear conexión a la base de datos para verificar duplicados
+const connection = await mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+});
+
+// Validar que la canción no esté repetida
+const [existingSong] = await connection.execute(
+  "SELECT * FROM canciones WHERE nombre = ?",
+  [nombre]
+);
+
+if (existingSong.length > 0) {
+  await connection.end(); // Cerrar conexión
+  return new Response(
+    JSON.stringify({ message: "La canción ya existe." }),
+    { status: 409, headers: { "Content-Type": "application/json" } }
+  );
+}
+
+// Cerrar conexión tras la verificación
+await connection.end();
 
     // Crear una canción en la base de datos
     const newSong = await prisma.canciones.create({
@@ -42,9 +69,13 @@ export async function POST(req) {
         userId: token.id, // Vincular con el ID del usuario del token
       },
     });
+    const responseBody = {
+      message: "Canción subida con éxito",
+      song: newSong,
+    };
 
     return new Response(
-      JSON.stringify(newSong),
+      JSON.stringify(responseBody),
       { status: 201, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {

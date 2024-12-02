@@ -1,4 +1,3 @@
-
 "use client";
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react"; // Importa signOut
@@ -19,7 +18,7 @@ export default function Home() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const response = await fetch("/api/canciones", {
         method: "POST",
@@ -29,18 +28,30 @@ export default function Home() {
         },
         body: JSON.stringify(formData),
       });
-  
+
+      const data = await response.json(); // Procesar la respuesta del servidor
+
       if (!response.ok) {
-        throw new Error("Error al registrar la canción");
+        if (response.status === 409) {
+          // Manejar canción duplicada
+          setMessage("Error: La canción ya existe.");
+        } else {
+          // Manejar otros errores
+          setMessage(`Error: ${data.error || "Error inesperado"}`);
+        }
+        return;
       }
-  
-      const data = await response.json();
+
+      // Si se registra correctamente
+      setMessage("Canción subida con éxito.");
+      setShowModal(false); // Cierra el modal
+      setFormData({ nombre: "", artista: "", categoria: "", status: "" }); // Limpia el formulario
       console.log("Canción registrada:", data);
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
+      setMessage("Error inesperado. Por favor, inténtalo más tarde.");
     }
   };
-  
 
   // Redirigir si no hay sesión, pero usando useEffect para evitar el error
   useEffect(() => {
@@ -113,7 +124,7 @@ export default function Home() {
                 />
               </label>
               <button type="submit">Registrar Canción</button>
-              <button onClick={() => setShowModal(false)}>Cancelar</button>
+              <button type="button" onClick={() => setShowModal(false)}>Cancelar</button>
             </form>
           </div>
         )}

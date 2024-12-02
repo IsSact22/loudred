@@ -1,5 +1,16 @@
 import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
+import { verifyToken } from "@/middleware/auth";
+
+let token;
+
+    try {
+      token = await verifyToken(req);
+      console.log("Token recibido:", token);
+    } catch (error) {
+      console.error("Error en autenticación:", error.message);
+    }
+
 
 function validatePassword(password) {
   const strongPasswordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
@@ -18,7 +29,7 @@ function createErrorResponse(message, status = 400) {
 function validateNameField(field, fieldName) {
   const nameRegex = /^[a-zA-Z\s]+$/;
   if (!field || !nameRegex.test(field)) {
-    return '${fieldName} no puede contener números ni caracteres especiales;'
+    return `${fieldName} no puede contener números ni caracteres especiales;`
   }
   return null;
 }

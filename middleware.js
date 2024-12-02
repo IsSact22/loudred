@@ -1,13 +1,17 @@
-import { getToken } from "next-auth/jwt";
+import { verifyToken } from "@/app/api/middleware/auth";
 import { NextResponse } from "next/server";
 
 export async function middleware(req) {
-  const token = await getToken({
-    req,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
+  let token;
 
-  //console.log("Middleware - Token recibido:", token);
+  try {
+    token = await verifyToken(req);
+    console.log("Token recibido:", token);
+  } catch (error) {
+    console.error("Error en autenticación:", error.message);
+  }
+
+  console.log("Middleware - Token recibido:", token);
 
   const { pathname } = req.nextUrl;
 
