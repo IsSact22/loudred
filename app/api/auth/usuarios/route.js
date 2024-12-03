@@ -2,18 +2,8 @@ import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
 import { verifyToken } from "@/middleware/auth";
 
-let token;
-
-    try {
-      token = await verifyToken(req);
-      console.log("Token recibido:", token);
-    } catch (error) {
-      console.error("Error en autenticación:", error.message);
-    }
-
-
 function validatePassword(password) {
-  const strongPasswordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
   if (!password || !strongPasswordRegex.test(password)) {
     return "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.";
   }
@@ -21,26 +11,35 @@ function validatePassword(password) {
 }
 
 function createErrorResponse(message, status = 400) {
-  return new Response(
-    JSON.stringify({ message}),
-    { status, headers: { "Content-Type": "application/json" } }
-  );
+  return new Response(JSON.stringify({ message }), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
 }
+
 function validateNameField(field, fieldName) {
   const nameRegex = /^[a-zA-Z\s]+$/;
   if (!field || !nameRegex.test(field)) {
-    return `${fieldName} no puede contener números ni caracteres especiales;`
+    return `${fieldName} no puede contener números ni caracteres especiales.`;
   }
   return null;
 }
 
-
-
-//Crear (CREATE)
 // Crear (CREATE)
 export async function POST(req) {
   try {
-    const { name, lastname, usuario, password, confirmPassword } = await req.json();
+    // Verificación de token
+    let token;
+    try {
+      token = await verifyToken(req);
+      console.log("Token recibido:", token);
+    } catch (error) {
+      console.error("Error en autenticación:", error.message);
+      return createErrorResponse("No autorizado", 401);
+    }
+
+    const { name, lastname, usuario, password, confirmPassword } =
+      await req.json();
 
     // Validaciones iniciales
     if (!name || !lastname || !usuario || !password || !confirmPassword) {
@@ -82,10 +81,7 @@ export async function POST(req) {
     );
     if (existingUser.length > 0) {
       await connection.end(); // Cerrar conexión
-      return new Response(
-        JSON.stringify({ message: "El usuario ya existe" }),
-        { status: 409, headers: { "Content-Type": "application/json" } }
-      );
+      return createErrorResponse("El usuario ya existe", 409);
     }
 
     // Validar que las contraseñas coincidan
@@ -122,19 +118,24 @@ export async function POST(req) {
   }
 }
 
-
-
-//Leer (READ)
+// Leer (READ)
 export async function GET(req) {
   try {
+    // Verificación de token
+    let token;
+    try {
+      token = await verifyToken(req);
+      console.log("Token recibido:", token);
+    } catch (error) {
+      console.error("Error en autenticación:", error.message);
+      return createErrorResponse("No autorizado", 401);
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id"); // Obtener el ID desde los parámetros de la URL
 
     if (!id) {
-      return new Response(
-        JSON.stringify({ message: "El ID es requerido" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+      return createErrorResponse("El ID es requerido");
     }
 
     // Crear conexión
@@ -154,29 +155,33 @@ export async function GET(req) {
     await connection.end();
 
     if (user.length === 0) {
-      return new Response(
-        JSON.stringify({ message: "Usuario no encontrado" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
+      return createErrorResponse("Usuario no encontrado", 404);
     }
 
-    return new Response(
-      JSON.stringify(user[0]), // Retornar el usuario encontrado
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify(user[0]), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.error("Error al obtener usuario:", error);
-    return new Response(
-      JSON.stringify({ message: "Error interno del servidor", error: error.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return createErrorResponse("Error interno del servidor", 500);
   }
 }
 
-//Actualizar (UPDATE)
+// Actualizar (UPDATE)
 export async function PUT(req) {
   try {
-    const { name, lastname, password, confirmPassword } = await req.json(); // Se incluye confirmPassword
+    // Verificación de token
+    let token;
+    try {
+      token = await verifyToken(req);
+      console.log("Token recibido:", token);
+    } catch (error) {
+      console.error("Error en autenticación:", error.message);
+      return createErrorResponse("No autorizado", 401);
+    }
+
+    const { name, lastname, password, confirmPassword } = await req.json();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -185,17 +190,16 @@ export async function PUT(req) {
     }
 
     if (!name && !lastname && !password) {
-      return createErrorResponse("Debe proporcionar al menos un campo para actualizar");
+      return createErrorResponse(
+        "Debe proporcionar al menos un campo para actualizar"
+      );
     }
 
     let updates = [];
     let values = [];
-     
-     
-    
-  
-    if (name) { 
-       // Validar nombre
+
+    if (name) {
+      // Validar nombre
       const nameError = validateNameField(name, "Nombre");
       if (nameError) {
         return createErrorResponse(nameError);
@@ -205,10 +209,10 @@ export async function PUT(req) {
     }
     if (lastname) {
       // Validar apellido
-    const lastnameError = validateNameField(lastname, "Apellido");
-    if (lastnameError) {
-      return createErrorResponse(lastnameError);
-     }      
+      const lastnameError = validateNameField(lastname, "Apellido");
+      if (lastnameError) {
+        return createErrorResponse(lastnameError);
+      }
       updates.push("lastname = ?");
       values.push(lastname);
     }
@@ -250,7 +254,7 @@ export async function PUT(req) {
 
     // Actualizar usuario
     await connection.execute(
-      "UPDATE users SET ${updates.join(", ")} WHERE id = ?",
+      `UPDATE users SET ${updates.join(", ")} WHERE id = ?`,
       values
     );
 
@@ -266,19 +270,24 @@ export async function PUT(req) {
   }
 }
 
-
-
-//Borrar (DELETE)
+// Borrar (DELETE)
 export async function DELETE(req) {
   try {
+    // Verificación de token
+    let token;
+    try {
+      token = await verifyToken(req);
+      console.log("Token recibido:", token);
+    } catch (error) {
+      console.error("Error en autenticación:", error.message);
+      return createErrorResponse("No autorizado", 401);
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id"); // Obtener el ID desde los parámetros de la URL
 
     if (!id) {
-      return new Response(
-        JSON.stringify({ message: "El ID es requerido" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+      return createErrorResponse("El ID es requerido");
     }
 
     // Crear conexión
@@ -298,10 +307,7 @@ export async function DELETE(req) {
     await connection.end();
 
     if (result.affectedRows === 0) {
-      return new Response(
-        JSON.stringify({ message: "Usuario no encontrado o ya eliminado" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
+      return createErrorResponse("Usuario no encontrado o ya eliminado", 404);
     }
 
     return new Response(
@@ -310,9 +316,6 @@ export async function DELETE(req) {
     );
   } catch (error) {
     console.error("Error al eliminar usuario:", error);
-    return new Response(
-      JSON.stringify({ message: "Error interno del servidor", error: error.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return createErrorResponse("Error interno del servidor", 500);
   }
 }
