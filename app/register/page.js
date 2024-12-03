@@ -2,7 +2,7 @@
 "use client"; // Directiva para habilitar el cliente en este archivo
 
 import React from 'react';
-import RegisterForm from '@/src/components/RegisterForm';
+import RegisterForm from '@/src/partials/auth/RegisterForm'
 
 const RegisterPage = () => {
   return (
