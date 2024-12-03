@@ -1,12 +1,11 @@
-// components/HeaderOut.js
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Navbar() {
   return (
-    <nav className="flex justify-between items-center p-4 bg-purple-600">
-      <div className="flex items-center p-4">
-        <Image src="/img/loudredlogo.png" alt="Logo" width={250} height={50} />
+    <nav className="flex justify-between items-center p-2 bg-purple-600">
+      <div className="flex items-center p-2">
+        <Image src="/assets/loudred-logo3.png" alt="Logo" width={100} height={50} />
       </div>
       <ul className="flex space-x-6 list-none">
         <li>

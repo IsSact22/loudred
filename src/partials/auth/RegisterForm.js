@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from '@/src/components/HeaderOut';
+import Navbar from '@/src/layouts/nav/Navbar';
 
 export default function Register() {
   const router = useRouter();

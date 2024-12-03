@@ -2,7 +2,7 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/src/components/HeaderOut";
+import Navbar from "@/src/layouts/nav/Navbar";
 
 export default function Login() {
   const [formData, setFormData] = useState({
