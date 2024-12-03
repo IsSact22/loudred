@@ -1,6 +1,6 @@
-// app/page.js
+// app/auth/page.js
 import { redirect } from "next/navigation";
 
-export default function Home() {
+export default function Auth() {
   redirect("/auth/login");
 }

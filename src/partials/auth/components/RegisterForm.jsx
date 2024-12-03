@@ -1,9 +1,8 @@
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from '@/src/layouts/nav/Navbar';
 
-export default function Register() {
+export default function RegisterForm() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
@@ -38,7 +37,7 @@ export default function Register() {
 
     if (res.ok) {
       setMessage('Registro exitoso');
-      setTimeout(() => router.push('/login'), 2000); 
+      setTimeout(() => router.push('/auth/login'), 2000); 
     } else {
       setMessage(data.message || 'Error en el registro');
     }
@@ -46,7 +45,6 @@ export default function Register() {
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 font-sans">
         <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
           <h2 className="text-2xl text-gray-800 mb-4 text-center">Registro</h2>

@@ -2,9 +2,8 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/src/layouts/nav/Navbar";
 
-export default function Login() {
+export default function LoginForm() {
   const [formData, setFormData] = useState({
     usuario: "",
     password: "",
@@ -34,7 +33,6 @@ export default function Login() {
 
   return (
     <>
-      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
           <h2 className="text-2xl text-gray-800 mb-4 text-center">Iniciar Sesión</h2>
@@ -65,7 +63,7 @@ export default function Login() {
               Iniciar sesión
             </button>
             <p className="mt-4 text-center">
-              ¿No tienes cuenta? <a href="/register" className="text-purple-600 hover:underline">Registrar</a>
+              ¿No tienes cuenta? <a href="/auth/register" className="text-purple-600 hover:underline">Registrar</a>
             </p>
           </form>
         </div>

@@ -9,16 +9,16 @@ export default function Navbar() {
       </div>
       <ul className="flex space-x-6 list-none">
         <li>
-          <Link href="" className="text-white hover:underline">Inicio</Link>
+          <Link href="/" className="text-white hover:underline">Inicio</Link>
         </li>
         <li>
-          <Link href="/about" className="text-white hover:underline">Acerca de</Link>
+          <Link href="/auth/about" className="text-white hover:underline">Acerca de</Link>
         </li>
         <li>
-          <Link href="/contact" className="text-white hover:underline">Contacto</Link>
+          <Link href="/auth/contact" className="text-white hover:underline">Contacto</Link>
         </li>
         <li>
-          <Link href="/login" className="text-white hover:underline">Iniciar Sesión</Link>
+          <Link href="/auth/register" className="text-white hover:underline">Registrarse</Link>
         </li>
       </ul>
     </nav>
