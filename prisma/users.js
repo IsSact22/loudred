@@ -15,14 +15,14 @@ export const users = [
     password:'Taylor123'
 },
 {
-    name:'carlos',
+    name:'Carlos',
     lastname: 'Gonzalez',
     usuario:'Carluno13',
     // email:'carlos@gmail.com',
     password:'Dembow123'
 },
 {
-    name:'isaac',
+    name:'Isaac',
     lastname: 'Hung',
     usuario:'Chino04',
         // email:'yakuza@gmail.com',
