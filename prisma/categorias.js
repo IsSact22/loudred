@@ -7,4 +7,9 @@ export const categorias = [
     {nombre:"Merengue"},
     {nombre:"Electrónica"},
     {nombre:"K-pop"},
+    {nombre:"Reggaeton"},
+    {nombre:"Folklórica"},
+    {nombre:"Clásica"},
+    {nombre:"Soundtrack de Videojuegos"},
+    {nombre:"Trap"},
 ];

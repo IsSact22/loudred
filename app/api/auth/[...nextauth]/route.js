@@ -37,7 +37,7 @@ const authOptions = {
 
           const user = rows[0];
 
-          // Verificar si el usuario existe y si la contraseña es válida
+          // Validar existencia del usuario y la contraseña
           if (user) {
             const isValidPassword = await bcrypt.compare(
               credentials.password,
@@ -50,16 +50,14 @@ const authOptions = {
                 name: user.name,
                 lastname: user.lastname,
                 usuario: user.usuario,
-                role: user.role, 
+                role: user.role, // Si tienes roles
               };
-            } else {
-              throw new Error("Credenciales inválidas");
             }
-          } else {
-            throw new Error("Usuario no encontrado");
           }
+          // Lanzar error genérico si algo falla
+          throw new Error("Error de autenticación");
         } catch (error) {
-          console.error("Error durante la autenticación:", error);
+          console.error("Error durante la autenticación:", error.message);
           throw new Error("Error de autenticación");
         }
       },
