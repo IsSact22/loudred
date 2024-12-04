@@ -24,12 +24,14 @@ model canciones {
   id         Int       @id @default(autoincrement())
   nombre     String
   artista    String
+  categorias categorias? @relation(fields:[categoriaId], references:[id], onDelete:SetNull)
+  categoriaId Int?
   status     String
   createdAt  DateTime  @default(now())
   userId     Int       // Clave foránea hacia el modelo users
   user       users     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  categoriaId Int?
-  categorias categorias? @relation(fields:[categoriaId], references:[id], onDelete:SetNull)
+ 
+  
 }
 
 model categorias {

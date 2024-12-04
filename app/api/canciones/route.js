@@ -1,4 +1,4 @@
-import {verifyToken} from "@/app/api/middleware/auth";
+import { verifyToken } from "@/app/api/middleware/auth";
 import mysql from "mysql2/promise";
 import { PrismaClient } from "@prisma/client";
 
@@ -6,9 +6,9 @@ const prisma = new PrismaClient();
 
 export async function POST(req) {
   try {
-    // Verificar el token
     let token;
 
+    // Verificar token
     try {
       token = await verifyToken(req);
       console.log("Token recibido:", token);
@@ -16,66 +16,79 @@ export async function POST(req) {
       console.error("Error en autenticación:", error.message);
     }
 
-
     if (!token) {
+      console.log("Token no válido");
       return new Response(
         JSON.stringify({ error: "No estás autenticado. Token inválido." }),
         { status: 401, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // Si el token es válido, obtener los datos de la solicitud
+    // Obtener los datos de la solicitud
     const { nombre, artista, categoria, status } = await req.json();
+    console.log("Datos recibidos:", { nombre, artista, categoria, status });
 
-    // Validar que los campos necesarios estén presentes
     if (!nombre || !artista || !categoria || !status) {
       return new Response(
         JSON.stringify({ error: "Todos los campos son obligatorios." }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
-// Crear conexión a la base de datos para verificar duplicados
-const connection = await mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
+
+    // Conexión a la base de datos
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+    });
+
+    // Validar canción duplicada
+    const [existingSong] = await connection.execute(
+      "SELECT * FROM canciones WHERE nombre = ?",
+      [nombre]
+    );
+    console.log("Canción existente:", existingSong);
+
+    if (existingSong.length > 0) {
+      await connection.end();
+      return new Response(
+        JSON.stringify({ message: "La canción ya existe." }),
+        { status: 409, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+
+// Buscar el id de la categoría en la base de datos
+const category = await prisma.categorias.findUnique({
+  where: { id: parseInt(categoria) }, // Usar el ID numérico de la categoría
 });
 
-// Validar que la canción no esté repetida
-const [existingSong] = await connection.execute(
-  "SELECT * FROM canciones WHERE nombre = ?",
-  [nombre]
-);
-
-if (existingSong.length > 0) {
+if (!category) {
   await connection.end(); // Cerrar conexión
   return new Response(
-    JSON.stringify({ message: "La canción ya existe." }),
-    { status: 409, headers: { "Content-Type": "application/json" } }
+    JSON.stringify({ error: "Categoría no encontrada." }),
+    { status: 404, headers: { "Content-Type": "application/json" } }
   );
 }
 
-// Cerrar conexión tras la verificación
-await connection.end();
 
-    // Crear una canción en la base de datos
+    await connection.end(); // Cerrar la conexión
+
+    // Crear la canción
     const newSong = await prisma.canciones.create({
       data: {
         nombre,
         artista,
-        categoria,
         status,
-        userId: token.id, // Vincular con el ID del usuario del token
+        userId: token.id,
+        categoriaId: category.id, // Usar el ID de la categoría
       },
     });
-    const responseBody = {
-      message: "Canción subida con éxito",
-      song: newSong,
-    };
+    console.log("Canción creada:", newSong);
 
     return new Response(
-      JSON.stringify(responseBody),
+      JSON.stringify({ message: "Canción subida con éxito", song: newSong }),
       { status: 201, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {

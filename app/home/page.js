@@ -13,8 +13,34 @@ export default function Home() {
     categoria: "",
     status: "",
   });
+  const [categories, setCategories] = useState([]); // Para almacenar las categorías
   const [message, setMessage] = useState("");
   const router = useRouter();
+
+  // Obtener las categorías cuando la vista se cargue
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("/api/getCategories", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setCategories(data); // Almacena las categorías en el estado
+        } else {
+          setMessage("Error al cargar categorías.");
+        }
+      } catch (error) {
+        console.error("Error al obtener categorías:", error);
+        setMessage("Error al cargar categorías.");
+      }
+    };
+
+    fetchCategories(); // Llamar la función cuando la vista se monte
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -103,14 +129,20 @@ export default function Home() {
               </label>
               <label>
                 Categoría:
-                <input
-                  type="text"
+                <select
                   value={formData.categoria}
                   onChange={(e) =>
                     setFormData({ ...formData, categoria: e.target.value })
                   }
                   required
-                />
+                >
+                  <option value="">Seleccionar categoría</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.nombre}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label>
                 Estado:
