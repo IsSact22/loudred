@@ -1,11 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useSession, signOut } from "next-auth/react"; // Importa signOut
-import { useRouter } from "next/navigation"; // Importa useRouter
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Navbar from "@/src/layouts/nav/Navbar";
 
 export default function Home() {
-  const { data: session } = useSession(); // Obtener la sesión del usuario
+  const { data: session } = useSession();
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     nombre: "",
@@ -13,11 +13,40 @@ export default function Home() {
     categoria: "",
     status: "",
   });
-  const [categories, setCategories] = useState([]); // Para almacenar las categorías
+  const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState("");
+  const [userRole, setUserRole] = useState(null);
   const router = useRouter();
+   // Obtener el rol del usuario basado en su ID
+   useEffect(() => {
+    const fetchUserRole = async () => {
+      if (session?.user?.id) {
+        try {
+          const response = await fetch(`/api/getUserRole?id=${session.user.id}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
 
-  // Obtener las categorías cuando la vista se cargue
+          const data = await response.json();
+
+          if (response.ok) {
+            console.log("Role del usuario:", data.role); // Verifica qué valor estás recibiendo
+            setUserRole(data.role); // Asume que el valor que regresa es el rol
+          } else {
+            setMessage("Error al obtener el rol del usuario.");
+          }
+        } catch (error) {
+          console.error("Error al obtener el rol del usuario:", error);
+          setMessage("Error al obtener el rol del usuario.");
+        }
+      }
+    };
+
+    fetchUserRole();
+  }, [session]);
+  // Obtener categorías
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -29,7 +58,7 @@ export default function Home() {
         });
         const data = await response.json();
         if (response.ok) {
-          setCategories(data); // Almacena las categorías en el estado
+          setCategories(data);
         } else {
           setMessage("Error al cargar categorías.");
         }
@@ -39,9 +68,10 @@ export default function Home() {
       }
     };
 
-    fetchCategories(); // Llamar la función cuando la vista se monte
+    fetchCategories();
   }, []);
 
+  // Manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -68,43 +98,58 @@ export default function Home() {
         return;
       }
 
-      // Si se registra correctamente
-      setMessage("Canción subida con éxito.");
-      setShowModal(false); // Cierra el modal
-      setFormData({ nombre: "", artista: "", categoria: "", status: "" }); // Limpia el formulario
-      console.log("Canción registrada:", data);
+      setMessage("Canción registrada con éxito.");
+      setShowModal(false);
+      setFormData({ nombre: "", artista: "", categoria: "", status: "" });
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
       setMessage("Error inesperado. Por favor, inténtalo más tarde.");
     }
   };
 
-  // Redirigir si no hay sesión, pero usando useEffect para evitar el error
+  // Redirigir si no hay sesión
   useEffect(() => {
     if (!session) {
-      router.push("/login"); // Redirige al login si no está autenticado
+      router.push("/"); // Redirige al login si no hay sesión
     }
-  }, [session, router]); // Dependencias: se ejecuta cuando cambia la sesión
+  }, [session, router]);
 
   if (!session) {
-    return <p>Redirigiendo al login...</p>; // Mostrar mensaje de redirección
+    return <p>Redirigiendo al login...</p>;
   }
+
+  // Determinar si es superusuario
+ // Verificar si el rol es SUPERADMIN
+ const isSuperUser = userRole === "SUPERADMIN"; // Compara si el rol es SUPERADMIN
+
 
   return (
     <>
       <Navbar />
       <div>
-        <h1>Bienvenido a la página principal, {session.user.name}</h1>
-        
+        <h1>
+          Bienvenido, {session.user.name} {isSuperUser ? "(SUPERADMIN)" : ""}
+        </h1>
+
         {/* Botón para cerrar sesión */}
-        <button onClick={() => signOut({ callbackUrl: "/login" })}>Cerrar Sesión</button>
+        <button onClick={() => signOut({ callbackUrl: "/" })}>Cerrar Sesión</button>
+
+   {/* Mostrar contenido especial para superusuarios */}
+   {isSuperUser && (
+          <div>
+            <h2>MAMALO CARLOS</h2>
+            {/* Funcionalidades específicas para superusuarios */}
+          </div>
+        )}
+
+        {userRole === "USER" && null} {/* No muestra nada si es un usuario normal */}
+
 
         <button onClick={() => setShowModal(true)}>Subir Canción</button>
 
         {showModal && (
           <div className="modal">
             <form onSubmit={handleSubmit}>
-              <h2>Subir Canción</h2>
               <label>
                 Nombre:
                 <input
@@ -156,7 +201,9 @@ export default function Home() {
                 />
               </label>
               <button type="submit">Registrar Canción</button>
-              <button type="button" onClick={() => setShowModal(false)}>Cancelar</button>
+              <button type="button" onClick={() => setShowModal(false)}>
+                Cancelar
+              </button>
             </form>
           </div>
         )}

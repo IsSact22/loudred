@@ -5,6 +5,8 @@ CREATE TABLE `users` (
     `lastname` VARCHAR(100) NOT NULL,
     `usuario` VARCHAR(100) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
+    `roleId` INT NOT NULL,
+
     `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
 
     UNIQUE INDEX `usuario`(`usuario`),

@@ -50,7 +50,7 @@ const authOptions = {
                 name: user.name,
                 lastname: user.lastname,
                 usuario: user.usuario,
-                // roles: user.roles, // Opcional, agrega roles si los usas
+                role: user.role, 
               };
             } else {
               throw new Error("Credenciales inválidas");
@@ -73,7 +73,7 @@ const authOptions = {
         token.name = user.name;
         token.lastname = user.lastname;
         token.usuario = user.usuario;
-        // token.roles = user.roles; // Si planeas usar roles
+        token.role = user.role; // Si planeas usar roles
       }
       return token;
     },
@@ -83,7 +83,7 @@ const authOptions = {
         name: token.name,
         lastname: token.lastname,
         usuario: token.usuario,
-        // roles: token.roles, // Opcional
+        role: token.role, 
       };
       return session;
     },

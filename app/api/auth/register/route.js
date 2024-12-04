@@ -69,11 +69,25 @@ export async function POST(req) {
       );
     }
 
+    // Obtener el roleId para el rol "USER"
+    const [role] = await connection.execute(
+      "SELECT id FROM role WHERE name = ?",
+      ["USER"]
+    );
+    if (role.length === 0) {
+      await connection.end(); // Cerrar conexión
+      return new Response(
+        JSON.stringify({ message: "El rol 'USER' no existe" }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+    const roleId = role[0].id;
+
     // Crear el usuario con contraseña encriptada
     const hashedPassword = await bcrypt.hash(password, 10);
     await connection.execute(
-      "INSERT INTO users (name, lastname, usuario, password) VALUES (?, ?, ?, ?)",
-      [name, lastname, usuario, hashedPassword]
+      "INSERT INTO users (name, lastname, usuario, password, roleId) VALUES (?, ?, ?, ?, ?)",
+      [name, lastname, usuario, hashedPassword, roleId]
     );
 
     // Cerrar la conexión
