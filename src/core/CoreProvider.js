@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 
 export const CoreProvider = ({ children }) => {
   return (
-    <SessionProvider>
+    <SessionProvider refetchInterval={1 * 60} refetchOnWindowFocus={true}>
       <SessionStatus>{children}</SessionStatus>
     </SessionProvider>
   );
