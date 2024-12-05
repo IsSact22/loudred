@@ -1,7 +1,6 @@
-// app/register/page.js
-"use client"; // Directiva para habilitar el cliente en este archivo
-
-import React from 'react';
+// app/auth/register/page.js
+"use client"; 
+// Components
 import RegisterForm from '@/src/partials/auth/components/RegisterForm';
 
 const RegisterPage = () => {

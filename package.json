@@ -21,7 +21,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.53.2",
-    "seed": "^0.4.4"
+    "seed": "^0.4.4",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "eslint": "^8",
