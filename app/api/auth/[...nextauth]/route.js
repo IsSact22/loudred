@@ -91,7 +91,6 @@ const authOptions = {
   },
   pages: {
     signIn: "/auth/login",
-    signOut: "/auth/login",
   },
   session: {
     strategy: "jwt",

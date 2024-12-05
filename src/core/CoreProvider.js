@@ -1,36 +1,35 @@
 "use client";
 
 /* Next */
-import { SessionProvider, useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
+import { SessionProvider, useSession, signIn } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 
 export const CoreProvider = ({ children }) => {
   return (
     <SessionProvider refetchInterval={1 * 60} refetchOnWindowFocus={true}>
-      {children}
+      <SessionStatus>{children}</SessionStatus>
     </SessionProvider>
   );
 };
 
 export const SessionStatus = ({ children }) => {
-
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const pathname = usePathname();
-  const { router } = useRouter();
-
-  // Mostrar animación de carga mientras se verifica la sesión
-  if (status === "unauthenticated" && pathname !== "/auth/login" && pathname !== "/auth/register") {
-    router.push("/auth/login");
-  }
 
   if (status === "loading") {
     return <div>Cargando</div>;
   }
 
-  return (
-    <>
-      {children}
-    </>
-  );
+  // Si no hay sesión y no estás ya en el login o register, te redirige a la página del signIn
+  if (
+    status === "unauthenticated" &&
+    pathname !== "/auth/login" &&
+    pathname !== "/auth/register"
+  ) {
+    signIn();
+    return null; // Evitar que se renderice el children mientras redirige
+  }
+
+  return <>{children}</>;
 };
