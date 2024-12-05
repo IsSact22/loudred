@@ -1,31 +1,12 @@
 "use client";
 
 /* Next */
-import { SessionProvider, useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
-
+import { SessionProvider } from "next-auth/react";
 
 export const CoreProvider = ({ children }) => {
   return (
     <SessionProvider refetchInterval={1 * 60} refetchOnWindowFocus={true}>
-      <SessionStatus>{children}</SessionStatus>
-    </SessionProvider>
-  );
-};
-
-export const SessionStatus = ({ children }) => {
-
-  const { data: session, status } = useSession();
-  const pathname = usePathname();
-
-  // Mostrar animación de carga mientras se verifica la sesión
-  if (status === "loading") {
-    return <div>cargando</div>
-  }
-
-  return (
-    <>
       {children}
-    </>
+    </SessionProvider>
   );
 };

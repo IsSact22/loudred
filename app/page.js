@@ -10,7 +10,7 @@ import { useSession, signOut } from "next-auth/react";
 export default function Home() {
   const { data: session } = useSession();
 
-  if (!session) {
+  if (typeof window !== 'undefined' && !session) {
     redirect("/auth/login");
   }
 
@@ -93,7 +93,7 @@ export default function Home() {
       <Navbar />
       <div>
         <h1>
-          Bienvenido, {session.user.name}{" "}
+          Bienvenido, {session?.user.name}{" "}
           {userRoleName === "SUPERADMIN" ? "(SUPERADMIN)" : ""}
         </h1>
 
