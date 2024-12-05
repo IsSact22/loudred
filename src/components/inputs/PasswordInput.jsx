@@ -34,13 +34,14 @@ const PasswordInput = ({
           name={name}
           control={control}
           rules={rules}
+          defaultValue=""
           render={({ field }) => (
             <input
               {...field}
               type={isVisible ? 'text' : 'password'} // Cambiar entre texto y contraseña
               id={name}
               placeholder={placeholder}
-              className={` px-3 py-2 border rounded-full bg-purple-input focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              className={`w-full px-3 py-2 border rounded-full bg-purple-input focus:outline-none focus:ring-2 focus:ring-purple-login focus:border-purple-login ${
                 errors[name] ? 'border-red-500' : 'border-gray-300'
               } placeholder-purple-placeholder placeholder-opacity-40 font-black  
                ${className}`}
@@ -53,7 +54,7 @@ const PasswordInput = ({
         <button
           type="button"
           onClick={toggleVisibility}
-          className=" ml-2 flex items-center text-gray-600 hover:text-gray-900 focus:outline-none"
+          className=" ml-2 flex items-center text-purple-navbar hover:text-purple-navbar focus:outline-none"
         >
             {isVisible ? (
                 <EyeIcon className="h-5 w-5 text-purple-input hover:text-purple-label" />

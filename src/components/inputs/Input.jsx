@@ -30,13 +30,15 @@ const Input = ({
         name={name}
         control={control}
         rules={rules}
+        defaultValue=""
         render={({ field }) => (
+
           <input
             {...field}
             type={type}
             id={name}
             placeholder={placeholder}
-            className={` px-3 py-2 border rounded-full bg-purple-input focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`w-full px-3 py-2 border rounded-full bg-purple-input focus:outline-none focus:ring-2 focus:ring-purple-login focus:border-purple-login ${
               errors[name] ? 'border-red-500' : 'border-gray-300'
             } placeholder-purple-placeholder placeholder-opacity-40 font-black  
              ${className}`} // Agregar clases personalizadas

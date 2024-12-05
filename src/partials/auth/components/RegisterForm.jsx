@@ -45,7 +45,7 @@ export default function RegisterForm() {
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 font-sans">
+      <div className="flex flex-col items-center justify-center min-h-screen  font-sans">
         <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
           <h2 className="text-2xl text-gray-800 mb-4 text-center">Registro</h2>
           {message && <p className="text-red-500 mb-4 text-center">{message}</p>}
