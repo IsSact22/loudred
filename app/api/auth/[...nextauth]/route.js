@@ -27,9 +27,12 @@ const authOptions = {
         try {
           const connection = await getDatabaseConnection();
 
-          // Buscar al usuario en la base de datos
+          // Buscar al usuario con su rol
           const [rows] = await connection.execute(
-            "SELECT * FROM users WHERE usuario = ?",
+            `SELECT users.id, users.name, users.lastname, users.usuario, users.password, role.id AS roleId, role.name AS roleName
+             FROM users 
+             JOIN role ON users.roleId = role.id
+             WHERE users.usuario = ?`,
             [credentials.usuario]
           );
 
@@ -50,7 +53,7 @@ const authOptions = {
                 name: user.name,
                 lastname: user.lastname,
                 usuario: user.usuario,
-                role: user.role, // Si tienes roles
+                role: { id: user.roleId, name: user.roleName },
               };
             }
           }

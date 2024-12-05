@@ -15,37 +15,11 @@ export default function Home() {
   });
   const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState("");
-  const [userRole, setUserRole] = useState(null);
   const router = useRouter();
-   // Obtener el rol del usuario basado en su ID
-   useEffect(() => {
-    const fetchUserRole = async () => {
-      if (session?.user?.id) {
-        try {
-          const response = await fetch(`/api/getUserRole?id=${session.user.id}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
 
-          const data = await response.json();
+  // Usar directamente el rol desde la sesión
+  const userRoleName = session?.user?.role?.name;
 
-          if (response.ok) {
-            console.log("Role del usuario:", data.role); // Verifica qué valor estás recibiendo
-            setUserRole(data.role); // Asume que el valor que regresa es el rol
-          } else {
-            setMessage("Error al obtener el rol del usuario.");
-          }
-        } catch (error) {
-          console.error("Error al obtener el rol del usuario:", error);
-          setMessage("Error al obtener el rol del usuario.");
-        }
-      }
-    };
-
-    fetchUserRole();
-  }, [session]);
   // Obtener categorías
   useEffect(() => {
     const fetchCategories = async () => {
@@ -70,7 +44,12 @@ export default function Home() {
 
     fetchCategories();
   }, []);
-
+ // Redirigir si no hay sesión
+ useEffect(() => {
+  if (!session) {
+    router.push("/");
+  }
+}, [session, router]);
   // Manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -107,20 +86,10 @@ export default function Home() {
     }
   };
 
-  // Redirigir si no hay sesión
-  useEffect(() => {
-    if (!session) {
-      router.push("/"); // Redirige al login si no hay sesión
-    }
-  }, [session, router]);
 
   if (!session) {
     return <p>Redirigiendo al login...</p>;
   }
-
-  // Determinar si es superusuario
- // Verificar si el rol es SUPERADMIN
- const isSuperUser = userRole === "SUPERADMIN"; // Compara si el rol es SUPERADMIN
 
 
   return (
@@ -128,21 +97,25 @@ export default function Home() {
       <Navbar />
       <div>
         <h1>
-          Bienvenido, {session.user.name} {isSuperUser ? "(SUPERADMIN)" : ""}
+          Bienvenido, {session.user.name} {userRoleName === "SUPERADMIN" ? "(SUPERADMIN)" : ""}
         </h1>
 
         {/* Botón para cerrar sesión */}
         <button onClick={() => signOut({ callbackUrl: "/" })}>Cerrar Sesión</button>
 
-   {/* Mostrar contenido especial para superusuarios */}
-   {isSuperUser && (
-          <div>
-            <h2>MAMALO CARLOS</h2>
-            {/* Funcionalidades específicas para superusuarios */}
-          </div>
-        )}
+      {userRoleName === "SUPERADMIN" && (
+        <div>
+          <h2>Me la pelan somos arrecho</h2>
+          {/* Opciones o funcionalidades */}
+        </div>
+      )}
 
-        {userRole === "USER" && null} {/* No muestra nada si es un usuario normal */}
+      {userRoleName === "USER" && (
+        <div>
+          <h2>Bienvenido, webones proveedores de nuestra locura  .</h2>
+          {/* Opciones o funcionalidades específicas para el rol USER */}
+        </div>
+      )}
 
 
         <button onClick={() => setShowModal(true)}>Subir Canción</button>
