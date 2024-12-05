@@ -90,8 +90,8 @@ const authOptions = {
     },
   },
   pages: {
-    signIn: "/",
-    signOut: "/",
+    signIn: "/auth/login",
+    signOut: "/auth/login",
   },
   session: {
     strategy: "jwt",

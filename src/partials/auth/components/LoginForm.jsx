@@ -23,7 +23,7 @@ export default function LoginForm() {
     if (result?.error) {
       alert(result.error); // Puedes personalizar la gestión del error
     } else {
-      router.replace("/home");
+      router.replace("/");
     }
   };
 

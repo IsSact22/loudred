@@ -1,36 +1,41 @@
-import { verifyToken } from "@/app/api/middleware/auth";
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 
 export async function middleware(req) {
-  let token;
-
-  try {
-    token = await verifyToken(req);
-    console.log("Token recibido:", token);
-  } catch (error) {
-    console.error("Error en autenticación:", error.message);
-  }
-
-  console.log("Middleware - Token recibido:", token);
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
   const { pathname } = req.nextUrl;
 
-  // Permitir acceso a rutas públicas
-  if (pathname.startsWith("/api") || pathname === "/" || pathname.startsWith("/login")) {
-    return NextResponse.next();
-  }
-
-  // Redirigir si no hay token
+  // Si no hay token (usuario no autenticado)
   if (!token) {
-    return NextResponse.redirect(new URL("/", req.url));
+    // Permitir acceso a rutas de autenticación
+    if (pathname.startsWith("/auth")) {
+      return NextResponse.next();
+    } else {
+      // Redirigir al usuario no autenticado a "/auth/login"
+      return NextResponse.redirect(new URL("/auth/login", req.url));
+    }
+  } else {
+    // Si hay token (usuario autenticado)
+    // Redirigir a "/" si intenta acceder a "/auth/login" o "/auth/register"
+    if (pathname.startsWith("/auth/login") || pathname.startsWith("/auth/register")) {
+      return NextResponse.redirect(new URL("/", req.url));
+    } else {
+      // Permitir acceso a otras rutas
+      return NextResponse.next();
+    }
   }
-
-  return NextResponse.next();
-
 }
 
 // Configurar rutas protegidas
 export const config = {
-  matcher: ["/home/:path*", "/dashboard/:path*"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
+     */
+    "/((?!api|_next/static|favicon.ico|sitemap.xml|robots.txt).*)",
+  ],
 };
-
