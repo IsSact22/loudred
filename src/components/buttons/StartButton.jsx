@@ -7,7 +7,6 @@ export const StartButton = ({
   onClick = () => {},
   text = "",
   type = "text",
-  small = false,
   inputLoading,
 }) => (
   <Fragment>
