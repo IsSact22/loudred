@@ -1,73 +1,94 @@
 "use client";
+// Hooks
+import { useForm } from "react-hook-form";
+// Next
 import { signIn } from "next-auth/react";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
-  const [formData, setFormData] = useState({
-    usuario: "",
-    password: "",
-  });
-  const [message, setMessage] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const router = useRouter();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const onSubmit = async (data) => {
     const result = await signIn("credentials", {
       redirect: false,
-      usuario: formData.usuario,
-      password: formData.password,
+      usuario: data.usuario,
+      password: data.password,
     });
 
     if (result?.error) {
-      setMessage(result.error);
+      alert(result.error); // Puedes personalizar la gestión del error
     } else {
-      router.push("/home");
+      router.replace("/home");
     }
   };
 
   return (
-    <>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
-          <h2 className="text-2xl text-gray-800 mb-4 text-center">Iniciar Sesión</h2>
-          {message && <p className="text-red-500 mb-4 text-center">{message}</p>}
-          <form onSubmit={handleSubmit}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
+        <h2 className="text-2xl text-gray-800 mb-4 text-center">
+          Iniciar Sesión
+        </h2>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="mb-4">
             <input
               type="text"
-              name="usuario"
               placeholder="Usuario"
-              value={formData.usuario}
-              onChange={handleChange}
-              required
-              className="w-full p-3 mb-4 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+              {...register("usuario", {
+                required: "El usuario es obligatorio",
+              })}
+              className={`w-full p-3 border rounded focus:outline-none ${
+                errors.usuario
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-500"
+              }`}
             />
+            {errors.usuario && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.usuario.message}
+              </p>
+            )}
+          </div>
+          <div className="mb-4">
             <input
               type="password"
-              name="password"
               placeholder="Contraseña"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full p-3 mb-4 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+              {...register("password", {
+                required: "La contraseña es obligatoria",
+              })}
+              className={`w-full p-3 border rounded focus:outline-none ${
+                errors.password
+                  ? "border-red-500"
+                  : "border-gray-300 focus:border-blue-500"
+              }`}
             />
-            <button
-              type="submit"
-              className="w-full p-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+          <button
+            type="submit"
+            className="w-full p-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          >
+            Iniciar sesión
+          </button>
+          <p className="mt-4 text-center">
+            ¿No tienes cuenta?{" "}
+            <a
+              href="/auth/register"
+              className="text-purple-600 hover:underline"
             >
-              Iniciar sesión
-            </button>
-            <p className="mt-4 text-center">
-              ¿No tienes cuenta? <a href="/auth/register" className="text-purple-600 hover:underline">Registrar</a>
-            </p>
-          </form>
-        </div>
+              Registrar
+            </a>
+          </p>
+        </form>
       </div>
-    </>
+    </div>
   );
 }
