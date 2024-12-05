@@ -4,16 +4,10 @@ import Navbar from "@/src/layouts/nav/Navbar";
 // Hooks
 import {useState, useEffect} from "react";
 // Next
-import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 
 export default function Home() {
   const { data: session } = useSession();
-  const router = useRouter();
-
-  if (typeof window !== 'undefined' && !session) {
-    router.push("/auth/login");
-  }
 
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({

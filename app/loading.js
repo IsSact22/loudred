@@ -1,3 +1,7 @@
+import RootLoading from "@/src/animations/RootLoading";
+
 export default function Loading() {
-    return <div>Cargando</div>;
-}
+    return (
+        <RootLoading />
+    );
+    }
