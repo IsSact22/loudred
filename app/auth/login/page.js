@@ -3,10 +3,10 @@
 // Components
 import LoginForm from "@/src/partials/auth/components/LoginForm";
 
-const LoginPage = ({isLogin, setIsLogin}) => {
+const LoginPage = () => {
   return (
     <div className="login-page">
-      <LoginForm isLogin={isLogin}/>
+      <LoginForm/>
     </div>
   );
 };
