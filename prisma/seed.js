@@ -1,8 +1,8 @@
-import { users } from "./users.js";
-import { categorias } from "./categorias.js";
-import { roles } from "./roles.js";
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
+const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcrypt');
+const { users } = require('./users.js');
+const { categorias } = require('./categorias.js');
+const { roles } = require('./roles.js');
 
 const prisma = new PrismaClient();
 
