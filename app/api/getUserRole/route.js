@@ -1,4 +1,4 @@
-import { verifyToken } from "@/app/api/middleware/auth"; 
+import { verifyToken } from "@/app/api/middleware/auth";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -19,45 +19,33 @@ export async function GET(req) {
       );
     }
 
-    // Obtener el ID de usuario desde los parámetros de consulta
-    const url = new URL(req.url);
-    const userId = url.searchParams.get("id");
-
-    if (!userId) {
-      return new Response(
-        JSON.stringify({ message: "ID de usuario no proporcionado" }),
-        { status: 400 }
-      );
-    }
-
-    // Consultar el roleId del usuario desde la base de datos
-    const userRole = await prisma.users.findUnique({
-      where: { id: parseInt(userId) },
+    // Consultar los roles desde la base de datos
+    const roles = await prisma.role.findMany({
       select: {
-        roleId: true, // Esto asume que tu tabla de usuarios tiene un campo roleId
+        id: true,
+        name: true, // Selecciona los campos relevantes
+        users: false, // Ignora la relación si no es necesaria
       },
     });
 
-    if (!userRole) {
+    // Verificar si hay roles
+    if (!roles || roles.length === 0) {
       return new Response(
-        JSON.stringify({ message: "Usuario no encontrado" }),
+        JSON.stringify({ message: "No se encontraron roles" }),
         { status: 404 }
       );
     }
 
-    // Responder con el roleId del usuario
-    return new Response(
-      JSON.stringify({ roleId: userRole.roleId }), // Devuelve el roleId
-      { status: 200 }
-    );
+    // Respuesta exitosa con los roles
+    return new Response(JSON.stringify(roles), { status: 200 });
   } catch (error) {
-    console.error("Error al obtener el rol del usuario:", error);
+    console.error("Error al obtener roles:", error);
     return new Response(
       JSON.stringify({ error: "Error interno del servidor" }),
       { status: 500 }
     );
   } finally {
-    // Cerrar la conexión con Prisma
+    // Cierra la conexión con Prisma al final
     await prisma.$disconnect();
   }
 }

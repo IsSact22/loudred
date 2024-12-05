@@ -181,7 +181,7 @@ export async function PUT(req) {
       return createErrorResponse("No autorizado", 401);
     }
 
-    const { name, lastname, password, confirmPassword } = await req.json();
+    const { name, lastname, password, confirmPassword, roleId } = await req.json();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -189,17 +189,15 @@ export async function PUT(req) {
       return createErrorResponse("El ID es requerido");
     }
 
-    if (!name && !lastname && !password) {
-      return createErrorResponse(
-        "Debe proporcionar al menos un campo para actualizar"
-      );
+    if (!name && !lastname && !password && !roleId) {
+      return createErrorResponse("Debe proporcionar al menos un campo para actualizar");
     }
 
     let updates = [];
     let values = [];
 
+    // Verificar si se proporciona un nuevo nombre
     if (name) {
-      // Validar nombre
       const nameError = validateNameField(name, "Nombre");
       if (nameError) {
         return createErrorResponse(nameError);
@@ -207,8 +205,9 @@ export async function PUT(req) {
       updates.push("name = ?");
       values.push(name);
     }
+
+    // Verificar si se proporciona un nuevo apellido
     if (lastname) {
-      // Validar apellido
       const lastnameError = validateNameField(lastname, "Apellido");
       if (lastnameError) {
         return createErrorResponse(lastnameError);
@@ -216,8 +215,9 @@ export async function PUT(req) {
       updates.push("lastname = ?");
       values.push(lastname);
     }
+
+    // Verificar si se proporciona una nueva contraseña
     if (password) {
-      // Validar que las contraseñas coincidan
       if (password !== confirmPassword) {
         return createErrorResponse("Las contraseñas no coinciden");
       }
@@ -230,6 +230,18 @@ export async function PUT(req) {
       const hashedPassword = await bcrypt.hash(password, 10);
       updates.push("password = ?");
       values.push(hashedPassword);
+    }
+
+    // Si se proporciona un nuevo roleId, validar si existe en la base de datos
+    if (roleId) {
+      const role = await prisma.role.findUnique({
+        where: { id: roleId },
+      });
+      if (!role) {
+        return createErrorResponse("El rol proporcionado no existe", 404);
+      }
+      updates.push("roleId = ?");
+      values.push(roleId);
     }
 
     values.push(id);
@@ -269,6 +281,7 @@ export async function PUT(req) {
     return createErrorResponse("Error interno del servidor", 500);
   }
 }
+
 
 // Borrar (DELETE)
 export async function DELETE(req) {
