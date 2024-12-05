@@ -6,10 +6,14 @@ module.exports = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        "lila-input": "#DAD3F2",
-        "lila-placeholder": "#360983",
-        "lila-label": "#462185",
-        "rojo-titulos": "#DB314A",
+        "purple-input": "#DAD3F2",
+        "purple-placeholder": "#360983",
+        "purple-label": "#462185",
+        "red-titles": "#DB314A",
+        "purple-login": "#4E08C5",
+        "purple-register": "#F5EBFF",
+        "purple-navbar": "#9679FF",
+        
       },
       fontFamily: {
         sans: ["Poppins", "sans-serif"],

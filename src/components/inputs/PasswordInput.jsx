@@ -23,7 +23,7 @@ const PasswordInput = ({
       {label && (
         <label
           htmlFor={name}
-          className="block text-sm/6 font-medium text-lila-label font-bold"
+          className="block text-sm/6 font-medium text-purple-label font-bold"
         >
           {label}
         </label>
@@ -40,9 +40,9 @@ const PasswordInput = ({
               type={isVisible ? 'text' : 'password'} // Cambiar entre texto y contraseña
               id={name}
               placeholder={placeholder}
-              className={` px-3 py-2 border rounded-full bg-lila-input focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              className={` px-3 py-2 border rounded-full bg-purple-input focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors[name] ? 'border-red-500' : 'border-gray-300'
-              } placeholder-lila-placeholder placeholder-opacity-40 font-black  
+              } placeholder-purple-placeholder placeholder-opacity-40 font-black  
                ${className}`}
               {...props}
             />
@@ -56,9 +56,9 @@ const PasswordInput = ({
           className=" ml-2 flex items-center text-gray-600 hover:text-gray-900 focus:outline-none"
         >
             {isVisible ? (
-                <EyeIcon className="h-5 w-5 text-lila-input hover:text-lila-label" />
+                <EyeIcon className="h-5 w-5 text-purple-input hover:text-purple-label" />
                 ) : (
-                <EyeSlashIcon className="h-5 w-5 text-lila-input hover:text-lila-label" />
+                <EyeSlashIcon className="h-5 w-5 text-purple-input hover:text-purple-label" />
             )}
         </button>
       </div>

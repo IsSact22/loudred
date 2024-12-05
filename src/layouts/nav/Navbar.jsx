@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 export default function Navbar() {
   return (
-    <nav className="flex justify-between items-center p-2 bg-purple-600">
+    <nav className="flex justify-between items-center p-2 bg-purple-navbar">
       <div className="flex items-center p-2">
         <Image src="/assets/loudred-logo3.png" alt="Logo" width={100} height={50} />
       </div>
