@@ -43,8 +43,8 @@ export default function LoginForm() {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-md min-h-[400px] min-w-[400px]">
-        <h2 className="text-2xl text-gray-800 mb-4 text-center">
+      <div className="bg-gradient-to-br from-purple-dark to-purple-darker p-8 rounded-lg shadow-md min-h-[400px] min-w-[400px]">
+        <h2 className="text-2xl text-white mb-4 text-center">
           Iniciar Sesión
         </h2>
          {/* FORMULARIO DE LOGIN */}
@@ -55,6 +55,7 @@ export default function LoginForm() {
             <Input
               name="usuario"
               label="Usuario"
+              labelClass="text-white"
               placeholder="Ingrese su usuario"
               containerClass="mb-4"
             />
@@ -63,6 +64,7 @@ export default function LoginForm() {
             <PasswordInput
               name="password"
               label="Contraseña"
+              labelClass="text-white"
               placeholder="Ingrese su contraseña"
               containerClass="mb-4"
             />

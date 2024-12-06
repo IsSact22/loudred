@@ -1,12 +1,10 @@
-import React from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 
-
-//INPUT GENERAL
 const Input = ({
   name, // Nombre del campo para usar en react-hook-form
   type = 'text', // Tipo de input (text, email, etc.)
   label, // Etiqueta del input
+  labelClass = '', // Clases adicionales para la etiqueta
   placeholder = '', // Texto placeholder
   rules = {}, // Reglas de validación para react-hook-form
   className = '', // Clases adicionales para estilos personalizados
@@ -20,7 +18,7 @@ const Input = ({
       {label && (
         <label
           htmlFor={name}
-          className="block text-sm/6 text-indigo-loud font-bold"
+          className={`block text-sm/6 font-bold ${labelClass}`}
         >
           {label}
         </label>

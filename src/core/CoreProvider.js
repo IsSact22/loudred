@@ -1,9 +1,9 @@
 "use client";
 
 /* Next */
-import { SessionProvider, useSession, signIn } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
-
+import { useRouter} from "next/navigation"
 
 export const CoreProvider = ({ children }) => {
   return (
@@ -16,6 +16,7 @@ export const CoreProvider = ({ children }) => {
 export const SessionStatus = ({ children }) => {
   const { status } = useSession();
   const pathname = usePathname();
+  const router = useRouter();
 
   if (status === "loading") {
     return <div>Cargando</div>;
@@ -27,7 +28,7 @@ export const SessionStatus = ({ children }) => {
     pathname !== "/auth/login" &&
     pathname !== "/auth/register"
   ) {
-    signIn();
+    router.push("/auth/login");
     return null; // Evitar que se renderice el children mientras redirige
   }
 

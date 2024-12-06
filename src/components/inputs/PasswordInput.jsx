@@ -7,6 +7,7 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 const PasswordInput = ({
   name, // Nombre del campo en el formulario
   label = '', // Etiqueta del input
+  labelClass = '', // Clases adicionales para la etiqueta
   placeholder = '', // Placeholder
   className = '', // Clases adicionales para estilos personalizados
   containerClass = '', // Clases para el contenedor
@@ -23,7 +24,7 @@ const PasswordInput = ({
       {label && (
         <label
           htmlFor={name}
-          className="block text-sm/6 text-indigo-loud font-bold"
+          className={`block text-sm/6 font-bold ${labelClass}`}
         >
           {label}
         </label>
@@ -38,11 +39,11 @@ const PasswordInput = ({
           render={({ field }) => (
             <input
               {...field}
-              type={isVisible ? 'text' : 'password'} // Cambiar entre texto y contraseña
+              type={isVisible ? "text" : "password"} // Cambiar entre texto y contraseña
               id={name}
               placeholder={placeholder}
               className={`w-full px-3 py-2 border rounded-full bg-lavender-light focus:outline-none focus:ring-0 focus:ring-purple-dark focus:border-purple-dark ${
-                errors[name] ? 'border-red-500' : 'border-gray-300'
+                errors[name] ? "border-red-500" : "border-gray-300"
               } placeholder-purple-darker placeholder-opacity-40  
                ${className}`}
               {...props}
@@ -56,11 +57,11 @@ const PasswordInput = ({
           onClick={toggleVisibility}
           className="absolute right-4 flex items-center text-lavender hover:text-lavender focus:outline-none"
         >
-            {isVisible ? (
-                <EyeIcon className="h-5 w-5 text-lavender-light hover:text-indigo-loud" />
-                ) : (
-                <EyeSlashIcon className="h-5 w-5 text-lavender-light hover:text-indigo-loud" />
-            )}
+          {isVisible ? (
+            <EyeIcon className="h-5 w-5 text-lavender-light hover:text-indigo-loud" />
+          ) : (
+            <EyeSlashIcon className="h-5 w-5 text-lavender-light hover:text-indigo-loud" />
+          )}
         </button>
       </div>
 
