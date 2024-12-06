@@ -6,13 +6,13 @@ module.exports = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        "purple-input": "#DAD3F2",
-        "purple-placeholder": "#360983",
-        "purple-label": "#462185",
-        "red-titles": "#DB314A",
-        "purple-login": "#4E08C5",
-        "purple-register": "#F5EBFF",
-        "purple-navbar": "#9679FF",
+        "lavender-light": "#DAD3F2",
+        "purple-darker": "#360983",
+        "indigo-loud": "#462185",
+        "rusty-red": "#DB314A",
+        "purple-dark": "#4E08C5",
+        "lavender-pale": "#F5EBFF",
+        "lavender": "#9679FF",
         
       },
       fontFamily: {

@@ -10,12 +10,10 @@ import PasswordInput from "@/src/components/inputs/PasswordInput";
 //Validations
 import {yupResolver} from "@hookform/resolvers/yup"
 import { validationSchema } from "@/src/validations/validationSchema";
-// Libraries
+// Toast
 import toast from 'react-hot-toast';
 
 export default function LoginForm() {
-
-
   const methods = useForm({
     resolver: yupResolver(validationSchema), // Integra Yup con react-hook-form
   });
@@ -37,22 +35,18 @@ export default function LoginForm() {
     });
 
     if (result?.error) {
-      alert(result.error); // Puedes personalizar la gestión del error
+      toast.error(result.error);
     } else {
       router.replace("/");
     }
   };
 
-
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen ">
-      <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
-
+    <div className="flex flex-col items-center justify-center">
+      <div className="bg-white p-8 rounded-lg shadow-md min-h-[400px] min-w-[400px]">
         <h2 className="text-2xl text-gray-800 mb-4 text-center">
           Iniciar Sesión
         </h2>
-
          {/* FORMULARIO DE LOGIN */}
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -72,7 +66,6 @@ export default function LoginForm() {
               placeholder="Ingrese su contraseña"
               containerClass="mb-4"
             />
-
 
             {/* <div className="mb-4">
               <input
@@ -127,10 +120,8 @@ export default function LoginForm() {
                 Registrar
               </a>
             </p>
-
           </form>
         </FormProvider>
-
       </div>
     </div>
   );

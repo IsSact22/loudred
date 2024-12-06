@@ -23,13 +23,13 @@ const PasswordInput = ({
       {label && (
         <label
           htmlFor={name}
-          className="block text-sm/6 font-medium text-purple-label font-bold"
+          className="block text-sm/6 text-indigo-loud font-bold"
         >
           {label}
         </label>
       )}
 
-      <div className="flex items-center relativ">
+      <div className="flex items-center relative">
         <Controller
           name={name}
           control={control}
@@ -41,9 +41,9 @@ const PasswordInput = ({
               type={isVisible ? 'text' : 'password'} // Cambiar entre texto y contraseña
               id={name}
               placeholder={placeholder}
-              className={`w-full px-3 py-2 border rounded-full bg-purple-input focus:outline-none focus:ring-2 focus:ring-purple-login focus:border-purple-login ${
+              className={`w-full px-3 py-2 border rounded-full bg-lavender-light focus:outline-none focus:ring-0 focus:ring-purple-dark focus:border-purple-dark ${
                 errors[name] ? 'border-red-500' : 'border-gray-300'
-              } placeholder-purple-placeholder placeholder-opacity-40 font-black  
+              } placeholder-purple-darker placeholder-opacity-40  
                ${className}`}
               {...props}
             />
@@ -54,12 +54,12 @@ const PasswordInput = ({
         <button
           type="button"
           onClick={toggleVisibility}
-          className=" ml-2 flex items-center text-purple-navbar hover:text-purple-navbar focus:outline-none"
+          className="absolute right-4 flex items-center text-lavender hover:text-lavender focus:outline-none"
         >
             {isVisible ? (
-                <EyeIcon className="h-5 w-5 text-purple-input hover:text-purple-label" />
+                <EyeIcon className="h-5 w-5 text-lavender-light hover:text-indigo-loud" />
                 ) : (
-                <EyeSlashIcon className="h-5 w-5 text-purple-input hover:text-purple-label" />
+                <EyeSlashIcon className="h-5 w-5 text-lavender-light hover:text-indigo-loud" />
             )}
         </button>
       </div>

@@ -20,7 +20,7 @@ const Input = ({
       {label && (
         <label
           htmlFor={name}
-          className="block text-sm/6 font-medium text-purple-label font-black"
+          className="block text-sm/6 text-indigo-loud font-bold"
         >
           {label}
         </label>
@@ -38,9 +38,9 @@ const Input = ({
             type={type}
             id={name}
             placeholder={placeholder}
-            className={`w-full px-3 py-2 border rounded-full bg-purple-input focus:outline-none focus:ring-2 focus:ring-purple-login focus:border-purple-login ${
+            className={`w-full px-3 py-2 border rounded-full bg-lavender-light focus:outline-none focus:ring-0 focus:ring-purple-dark focus:border-purple-dark ${
               errors[name] ? 'border-red-500' : 'border-gray-300'
-            } placeholder-purple-placeholder placeholder-opacity-40 font-black  
+            } placeholder-purple-darker placeholder-opacity-40
              ${className}`} // Agregar clases personalizadas
             {...props}
           />
