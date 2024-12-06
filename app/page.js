@@ -1,6 +1,5 @@
 "use client";
-// Components
-import Navbar from "@/src/layouts/nav/Navbar";
+
 // Hooks
 import {useState, useEffect} from "react";
 // Next
@@ -85,7 +84,6 @@ export default function Home() {
 
   return (
     <>
-      <Navbar />
       <div>
         <h1>
           Bienvenido, {session?.user.name}{" "}
