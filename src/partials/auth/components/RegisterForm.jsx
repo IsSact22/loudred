@@ -1,6 +1,9 @@
 "use client";
-import { useState } from 'react';
+// Next
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+// Hooks
+import { useState } from 'react';
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -48,7 +51,9 @@ export default function RegisterForm() {
       <div className="flex flex-col items-center justify-center min-h-screen  font-sans">
         <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
           <h2 className="text-2xl text-gray-800 mb-4 text-center">Registro</h2>
-          {message && <p className="text-red-500 mb-4 text-center">{message}</p>}
+          {message && (
+            <p className="text-red-500 mb-4 text-center">{message}</p>
+          )}
           <form onSubmit={handleSubmit}>
             <input
               type="text"
@@ -102,7 +107,10 @@ export default function RegisterForm() {
               Registrarse
             </button>
             <p className="mt-4 text-center">
-              ¿Ya tienes cuenta? <a href="/" className="text-purple-600 hover:underline">Inicia sesión</a>
+              ¿Ya tienes cuenta?{""}
+              <Link href="/" className="text-purple-600 hover:underline">
+                Inicia sesión
+              </Link>
             </p>
           </form>
         </div>

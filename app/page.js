@@ -1,5 +1,4 @@
 "use client";
-
 // Hooks
 import {useState, useEffect} from "react";
 // Next

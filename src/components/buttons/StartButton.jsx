@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-export const StartButton = ({
+const StartButton = ({
   disabled,
   padding = "",
   margin = "",
@@ -34,3 +34,5 @@ export const StartButton = ({
     )}
   </Fragment>
 );
+
+export default StartButton;
