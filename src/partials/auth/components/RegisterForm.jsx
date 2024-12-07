@@ -3,118 +3,122 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 // Hooks
-import { useState } from 'react';
+import { useForm, FormProvider } from "react-hook-form";
+// Components
+import Input from "@/src/components/inputs/Input";
+import PasswordInput from "@/src/components/inputs/PasswordInput";
+import Checkbox from '@/src/components/checkboxes/checkbox';
+import StartButton from "@/src/components/buttons/StartButton";
+// Validations
+import {yupResolver} from "@hookform/resolvers/yup"
+import { validationSchema } from "@/src/validations/validationSchema";
+// Toast
+import toast from 'react-hot-toast';
 
 export default function RegisterForm() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    name: '',
-    lastname: '',
-    usuario: '',
-    password: '',
-    confirmPassword: '',
+
+  // Inicializar react-hook-form con Yup
+  const methods = useForm({
+    resolver: yupResolver(validationSchema), // Integra el esquema de validación
   });
-  const [message, setMessage] = useState('');
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const { handleSubmit, setError } = methods; // Extrae funciones necesarias
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
 
-    if (formData.password !== formData.confirmPassword) {
-      setMessage('Las contraseñas no coinciden');
-      return;
-    }
+      const result = await res.json();
 
-    const res = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
+      if (res.ok) {
+        toast.success('Registro exitoso');
+        setTimeout(() => router.push('/auth/login'), 2000); // Redirección tras éxito
+      } else {
+        toast.error(result.message || 'Error en el registro');
+        if (result.errors) {
 
-    const data = await res.json();
-
-    if (res.ok) {
-      setMessage('Registro exitoso');
-      setTimeout(() => router.push('/auth/login'), 2000); 
-    } else {
-      setMessage(data.message || 'Error en el registro');
+          result.errors.forEach((err) => setError(err.field, { message: err.message }));
+        }
+      }
+    } catch (error) {
+      toast.error('Ocurrió un error inesperado');
     }
   };
 
   return (
-    <>
-      <div className="flex flex-col items-center justify-center min-h-screen  font-sans">
-        <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
-          <h2 className="text-2xl text-gray-800 mb-4 text-center">Registro</h2>
-          {message && (
-            <p className="text-red-500 mb-4 text-center">{message}</p>
-          )}
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
+    <div className="flex flex-col items-center justify-center min-h-screen font-sans">
+      <div className="bg-gradient-to-br from-white to-purple-100 p-8 rounded-2xl shadow-md min-h-[600px] min-w-[600px]">
+      <h2 className="text-4xl font-bold text-red-500 mb-12 ml-1">Bienvenido</h2>
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            {/* Nombre */}
+            <Input
               name="name"
-              placeholder="Nombre"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="w-full p-3 mb-4 border border-gray-300 rounded"
+              label="Nombre"
+              labelClass="text-gray-800"
+              placeholder="Ingrese su nombre"
+              containerClass="mb-4"
             />
-            <input
-              type="text"
+            {/* Apellido */}
+            <Input
               name="lastname"
-              placeholder="Apellido"
-              value={formData.lastname}
-              onChange={handleChange}
-              required
-              className="w-full p-3 mb-4 border border-gray-300 rounded"
+              label="Apellido"
+              labelClass="text-gray-800"
+              placeholder="Ingrese su apellido"
+              containerClass="mb-4"
             />
-            <input
-              type="text"
+            {/* Usuario */}
+            <Input
               name="usuario"
-              placeholder="Usuario"
-              value={formData.usuario}
-              onChange={handleChange}
-              required
-              className="w-full p-3 mb-4 border border-gray-300 rounded"
+              label="Usuario"
+              labelClass="text-gray-800"
+              placeholder="Ingrese su usuario"
+              containerClass="mb-4"
             />
-            <input
-              type="password"
+            {/* Contraseña */}
+            <PasswordInput
               name="password"
-              placeholder="Contraseña"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full p-3 mb-4 border border-gray-300 rounded"
+              label="Contraseña"
+              labelClass="text-gray-800"
+              placeholder="Ingrese su contraseña"
+              containerClass="mb-4"
             />
-            <input
-              type="password"
+            {/* Confirmar contraseña */}
+            <PasswordInput
               name="confirmPassword"
-              placeholder="Confirmar contraseña"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-              className="w-full p-3 mb-4 border border-gray-300 rounded"
+              label="Confirmar contraseña"
+              labelClass="text-gray-800"
+              placeholder="Confirme su contraseña"
+              containerClass="mb-4"
             />
+            {/* Aceptar términos y condiciones */}
+            <Checkbox
+              name= "checkbox"
+              label= "Acepto los términos y condiciones"
+              labelClass=''
+              containerClass=''
+            />
+            {/* Botón de registro */}
             <button
               type="submit"
               className="w-full p-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
             >
               Registrarse
             </button>
-            <p className="mt-4 text-center">
-              ¿Ya tienes cuenta?{""}
-              <Link href="/" className="text-purple-600 hover:underline">
-                Inicia sesión
-              </Link>
-            </p>
           </form>
-        </div>
+        </FormProvider>
+        <p className="mt-4 text-center">
+          ¿Ya tienes cuenta?{' '}
+          <Link href="/auth/login" className="text-purple-600 hover:underline">
+            Inicia sesión
+          </Link>
+        </p>
       </div>
-    </>
+    </div>
   );
 }

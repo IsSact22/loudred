@@ -38,8 +38,8 @@ export default function LoginForm() {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="bg-gradient-to-br from-purple-dark to-purple-darker p-8 rounded-lg shadow-md min-h-[400px] min-w-[400px]">
-        <h2 className="text-2xl text-white mb-4 text-center">Iniciar Sesión</h2>
+      <div className="bg-gradient-to-br from-purple-dark to-purple-darker p-8 rounded-2xl shadow-md min-h-[600px] min-w-[600px]">
+        <h2 className="text-4xl font-bold text-white mb-12 ml-1">Bienvenido</h2>
         {/* FORMULARIO DE LOGIN */}
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -58,7 +58,7 @@ export default function LoginForm() {
               label="Contraseña"
               labelClass="text-white"
               placeholder="Ingrese su contraseña"
-              containerClass="mb-4"
+              containerClass="mb-20 mt-10"
             />
 
             <button
@@ -67,11 +67,11 @@ export default function LoginForm() {
             >
               Iniciar sesión
             </button>
-            <p className="mt-4 text-center">
+            <p className="mt-4 text-center text-white font-bold">
               ¿No tienes cuenta?{" "}
               <Link
                 href="/auth/register"
-                className="text-purple-600 hover:underline"
+                className="text-red-500 hover:underline"
               >
                 Registrar
               </Link>

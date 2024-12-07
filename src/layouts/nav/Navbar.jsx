@@ -14,23 +14,8 @@ export default function Navbar({color, shadow}) {
       </div>
       <ul className="flex space-x-6 list-none">
         <li>
-          <Link href="/" className="text-white hover:underline">
-            Inicio
-          </Link>
-        </li>
-        <li>
-          <Link href="/auth/about" className="text-white hover:underline">
-            Acerca de
-          </Link>
-        </li>
-        <li>
-          <Link href="/auth/contact" className="text-white hover:underline">
-            Contacto
-          </Link>
-        </li>
-        <li>
           <Link href="/auth/register" className="text-white hover:underline">
-            Registrarse
+            Sobre nosotros
           </Link>
         </li>
       </ul>

@@ -24,7 +24,7 @@ const PasswordInput = ({
       {label && (
         <label
           htmlFor={name}
-          className={`block text-sm/6 font-bold ${labelClass}`}
+          className={`block text-lg/6 font-bold ${labelClass}`}
         >
           {label}
         </label>
@@ -42,7 +42,7 @@ const PasswordInput = ({
               type={isVisible ? "text" : "password"} // Cambiar entre texto y contraseña
               id={name}
               placeholder={placeholder}
-              className={`w-full px-3 py-2 border rounded-full bg-lavender-light focus:outline-none focus:ring-0 focus:ring-purple-dark focus:border-purple-dark ${
+              className={`w-full mt-2 px-3 py-3 mb-5 border rounded-2xl bg-lavender-light focus:outline-none focus:ring-0 focus:ring-purple-dark focus:border-purple-dark ${
                 errors[name] ? "border-red-500" : "border-gray-300"
               } placeholder-purple-darker placeholder-opacity-40  
                ${className}`}
@@ -55,12 +55,12 @@ const PasswordInput = ({
         <button
           type="button"
           onClick={toggleVisibility}
-          className="absolute right-4 flex items-center text-lavender hover:text-lavender focus:outline-none"
+          className="absolute mb-3 right-4 flex items-center text-lavender hover:text-lavender focus:outline-none"
         >
           {isVisible ? (
-            <EyeIcon className="h-5 w-5 text-lavender-light hover:text-indigo-loud" />
+            <EyeIcon className="h-5 w-5 text-lavender hover:text-indigo-loud" />
           ) : (
-            <EyeSlashIcon className="h-5 w-5 text-lavender-light hover:text-indigo-loud" />
+            <EyeSlashIcon className="h-5 w-5 text-lavender hover:text-indigo-loud" />
           )}
         </button>
       </div>
