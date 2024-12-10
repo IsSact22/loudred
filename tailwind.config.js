@@ -9,7 +9,7 @@ module.exports = {
         "lavender-light": "#DAD3F2",
         "purple-darker": "#360983",
         "indigo-loud": "#462185",
-        "rusty-red": "#DB314A",
+        "red-rusty": "#DB314A",
         "purple-dark": "#4E08C5",
         "lavender-pale": "#F5EBFF",
         "lavender": "#9679FF",

@@ -14,7 +14,7 @@ export default function Navbar({color, shadow}) {
       </div>
       <ul className="flex space-x-6 list-none">
         <li>
-          <Link href="/auth/register" className="text-white hover:underline">
+          <Link href="/auth/register" className="p-1.5 bg-lavender text-white rounded-xl duration-300 hover:shadow-lg hover:shadow-white/50">
             Sobre nosotros
           </Link>
         </li>
