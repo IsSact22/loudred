@@ -1,66 +1,73 @@
+import { useState } from 'react';
+import { Checkbox as HeadlessCheckbox } from '@headlessui/react';
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { useFormContext, Controller } from 'react-hook-form';
+import { XMarkIcon } from '@heroicons/react/24/solid';
 
-const Checkbox = ({
-    name, // Nombre del campo para usar en react-hook-form
-    label, // Etiqueta del checkbox
-    labelClass = '', // Clases adicionales para la etiqueta
-    containerClass = '', // Clases adicionales para el contenedor
-    rules = {}, // Reglas de validación para react-hook-form
-    className = '', // Clases adicionales para estilos personalizados
-  }) => {
-    const { control, formState: { errors } } = useFormContext(); // Acceder al contexto de react-hook-form
-  
-    return (
-        <div className={`mt-2 px-2 ${containerClass}`}>
-          <Controller
-            name={name}
-            control={control}
-            rules={rules}
-            defaultValue={false}
-            render={({ field }) => (
-              <div className="flex items-start gap-2">
-                <input
-                  {...field}
-                  type="checkbox"
-                  id={name}
-                  className={`rounded border-gray-300 text-purple-dark focus:ring-purple-dark ${className}`}
-                />
-                <label
-                  htmlFor={name}
-                  className={`text-sm text-gray-700 ${labelClass}`}
-                >
-                  {label}{' '}
-                  <span
-                    onClick={toggleModal}
-                    className="text-purple-600 underline cursor-pointer"
-                  >
-                    Términos y Condiciones
-                  </span>
-                </label>
-              </div>
+const CheckboxSimple = ({
+  name = 'termsAccepted', // Nombre del campo para react-hook-form
+  label, // Texto del checkbox
+  rules = {}, // Reglas de validación para react-hook-form
+  className = '', // Clases adicionales para el contenedor
+  labelClass = '', // Clases adicionales para el label
+  ...props
+}) => {
+  const { control, formState: { errors } } = useFormContext(); // Acceso al contexto de react-hook-form
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+return (
+    <div className={`flex flex-col items-start gap-1 ${className}`}>
+        {/* Contenedor para checkbox y label en la misma fila */}
+        <div className="flex items-center gap-2">
+            <Controller
+                name={name}
+                control={control}
+                rules={rules}
+                defaultValue={false}
+                render={({ field: { value, onChange } }) => (
+                <>
+
+                    {/* Checkbox */}
+                    <HeadlessCheckbox
+                        checked={value}
+                        onChange={onChange}
+                        className="group block size-4 rounded border border-purple-500 bg-white data-[checked]:bg-purple-500 focus:outline-none"
+                        {...props}>
+                        <svg
+                            className="stroke-white opacity-0 group-data-[checked]:opacity-100"
+                            viewBox="0 0 14 14"
+                            fill="none">
+
+                            <path
+                                d="M3 8L6 11L11 3.5"
+                                strokeWidth={2}
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
+                        </svg>
+                    </HeadlessCheckbox>
+
+                </>
             )}
-          />
-          {errors[name] && (
-            <p className="text-sm text-red-500 mt-1">{errors[name].message}</p>
-          )}
-    
-          {/* Modal */}
-          {isModalOpen && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-              <div className="bg-white rounded-lg shadow-lg p-6 max-w-lg">
-                <h2 className="text-xl font-bold mb-4">Términos y Condiciones</h2>
-                <p className="text-gray-700">{modalContent}</p>
-                <button
-                  onClick={toggleModal}
-                  className="mt-4 bg-purple-dark text-white px-4 py-2 rounded hover:bg-purple-darker"
-                >
-                  Cerrar
-                </button>
-              </div>
-            </div>
-          )}
+        />  
+
+        {/* Label */}
+        <span className={`text-sm text-lg/6 font-bold text-purple-700 ${labelClass}`}>
+        {label}{' '}
+            </span>
         </div>
-      );
-    };
-    
-    export default Checkbox;
+
+        {/* Mostrar error si existe */}
+        {errors[name] && (
+            
+            <p className="text-sm text-red-500 mt-1">{errors[name].message}</p>
+        )}
+
+
+
+    </div>
+  );
+};
+
+export default CheckboxSimple;
+
