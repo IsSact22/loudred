@@ -12,7 +12,6 @@ export async function verifyToken(req) {
       throw new Error("No estás autenticado. Token inválido.");
     }
 
-    console.log("Token decodificado:", token); // Registro para depuración
     return token;
   } catch (error) {
     console.error("Error al verificar el token:", error.message);

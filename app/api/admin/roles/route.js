@@ -1,30 +1,14 @@
-import { verifyToken } from "@/app/api/middleware/auth";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function GET(req) {
   try {
-    let token;
-
-    // Verificar el token
-    try {
-      token = await verifyToken(req);
-      console.log("Token recibido:", token);
-    } catch (error) {
-      console.error("Error en autenticación:", error.message);
-      return new Response(
-        JSON.stringify({ message: "No autorizado" }),
-        { status: 401 }
-      );
-    }
-
     // Consultar los roles desde la base de datos
     const roles = await prisma.role.findMany({
       select: {
         id: true,
-        name: true, // Selecciona los campos relevantes
-        users: false, // Ignora la relación si no es necesaria
+        name: true,
       },
     });
 

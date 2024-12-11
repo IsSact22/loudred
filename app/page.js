@@ -19,12 +19,12 @@ export default function Home() {
 
   // Usar directamente el rol desde la sesión
   const userRoleName = session?.user?.role?.name;
-
+  
   // Obtener categorías
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("/api/getCategories", {
+        const response = await fetch("/api/songs/categories", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -52,10 +52,6 @@ export default function Home() {
     try {
       const response = await fetch("/api/canciones", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.accessToken}`, // Enviar el token en el header
-        },
         body: JSON.stringify(formData),
       });
 

@@ -1,6 +1,5 @@
 import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
-import { verifyToken } from "@/app/api/middleware/auth";
 
 function validatePassword(password) {
   const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
@@ -28,16 +27,6 @@ function validateNameField(field, fieldName) {
 //READ TODOS LOS USUARIOS
 export async function GET(req) {
   try {
-    // Verificación de token
-    let token;
-    try {
-      token = await verifyToken(req);
-      console.log("Token recibido:", token);
-    } catch (error) {
-      console.error("Error en autenticación:", error.message);
-      return createErrorResponse("No autorizado", 401);
-    }
-
     // Conexión a la base de datos
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
@@ -52,7 +41,6 @@ export async function GET(req) {
 
     return new Response(JSON.stringify(users), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Error al obtener usuarios:", error);
@@ -64,16 +52,6 @@ export async function GET(req) {
 export async function POST(req) {
   let connection;
   try {
-    // Verificación de token
-    let token;
-    try {
-      token = await verifyToken(req);
-      console.log("Token recibido:", token);
-    } catch (error) {
-      console.error("Error en autenticación:", error.message);
-      return createErrorResponse("No autorizado", 401);
-    }
-
     const { name, lastname, usuario, password, confirmPassword } = await req.json();
 
     // Validaciones iniciales
@@ -154,7 +132,7 @@ export async function POST(req) {
 
     return new Response(
       JSON.stringify({ message: "Usuario creado exitosamente" }),
-      { status: 201, headers: { "Content-Type": "application/json" } }
+      { status: 201, }
     );
   } catch (error) {
     console.error("Error al crear usuario:", error);

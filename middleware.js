@@ -9,7 +9,16 @@ export async function middleware(req) {
   if (!token) {
     // Permitir rutas de autenticación
     if (pathname.startsWith("/auth")) return NextResponse.next();
-    // Redirigir a login si intenta acceder a otras rutas
+    // Permitir rutas de APIs de autenticación
+    if (pathname.startsWith("/api/auth")) return NextResponse.next();
+    // Si es una ruta API, responder con 401 JSON
+    if (pathname.startsWith("/api")) {
+      return new NextResponse(JSON.stringify({ message: "No autorizado" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    // Redirigir a login para otras rutas
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
@@ -25,6 +34,6 @@ export async function middleware(req) {
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|assets|favicon.ico|sitemap.xml|robots.txt).*)",
+    "/((?!api/auth|_next/static|_next/image|assets|favicon.ico|sitemap.xml|robots.txt).*)",
   ],
 };

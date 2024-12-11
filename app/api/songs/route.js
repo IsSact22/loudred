@@ -1,4 +1,3 @@
-import { verifyToken } from "@/app/api/middleware/auth";
 import mysql from "mysql2/promise";
 import { PrismaClient } from "@prisma/client";
 
@@ -6,24 +5,6 @@ const prisma = new PrismaClient();
 
 export async function POST(req) {
   try {
-    let token;
-
-    // Verificar token
-    try {
-      token = await verifyToken(req);
-      console.log("Token recibido:", token);
-    } catch (error) {
-      console.error("Error en autenticación:", error.message);
-    }
-
-    if (!token) {
-      console.log("Token no válido");
-      return new Response(
-        JSON.stringify({ error: "No estás autenticado. Token inválido." }),
-        { status: 401, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
     // Obtener los datos de la solicitud
     const { nombre, artista, categoria, status } = await req.json();
     console.log("Datos recibidos:", { nombre, artista, categoria, status });
@@ -58,20 +39,18 @@ export async function POST(req) {
       );
     }
 
+    // Buscar el id de la categoría en la base de datos
+    const category = await prisma.categorias.findUnique({
+      where: { id: parseInt(categoria) }, // Usar el ID numérico de la categoría
+    });
 
-// Buscar el id de la categoría en la base de datos
-const category = await prisma.categorias.findUnique({
-  where: { id: parseInt(categoria) }, // Usar el ID numérico de la categoría
-});
-
-if (!category) {
-  await connection.end(); // Cerrar conexión
-  return new Response(
-    JSON.stringify({ error: "Categoría no encontrada." }),
-    { status: 404, headers: { "Content-Type": "application/json" } }
-  );
-}
-
+    if (!category) {
+      await connection.end(); // Cerrar conexión
+      return new Response(
+        JSON.stringify({ error: "Categoría no encontrada." }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
     await connection.end(); // Cerrar la conexión
 

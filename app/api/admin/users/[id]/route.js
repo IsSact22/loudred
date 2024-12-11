@@ -1,5 +1,4 @@
 import mysql from "mysql2/promise";
-import { verifyToken } from '@/app/api/middleware/auth';
 
 function validatePassword(password) {
   const strongPasswordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
@@ -17,7 +16,6 @@ function validateNameField(field, fieldName) {
   return null;
 }
 
-
 //READ UNO POR UNO
 export async function GET(req, { params }) {
   try {
@@ -28,24 +26,6 @@ export async function GET(req, { params }) {
       return new Response(
         JSON.stringify({ error: "ID no proporcionado en la ruta" }),
         { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Verificar token
-    try {
-      const token = await verifyToken(req);
-      if (!token) {
-        return new Response(
-          JSON.stringify({ error: "No autorizado" }),
-          { status: 401, headers: { "Content-Type": "application/json" } }
-        );
-      }
-      console.log("Token válido:", token);
-    } catch (error) {
-      console.error("Error en autenticación:", error.message);
-      return new Response(
-        JSON.stringify({ error: "No autorizado" }),
-        { status: 401, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -82,7 +62,6 @@ export async function GET(req, { params }) {
     // Respuesta exitosa
     return new Response(JSON.stringify(user[0]), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Error interno del servidor:", error);
@@ -95,7 +74,6 @@ export async function GET(req, { params }) {
   }
 }
 
-
 //UPDATE
 export async function PUT(req, { params }) {
   const { id } = params; // Obtener el ID de la ruta
@@ -104,16 +82,6 @@ export async function PUT(req, { params }) {
   let connection;
 
   try {
-    // Verificar token
-    let token;
-    try {
-      token = await verifyToken(req);
-      console.log("Token recibido:", token);
-    } catch (error) {
-      console.error("Error en autenticación:", error.message);
-      return createErrorResponse("No autorizado", 401);
-    }
-
 
     if (!name && !lastname && !password && !roleId) {
       return new Response(
@@ -232,15 +200,6 @@ export async function DELETE(req, { params }) {
   const { id } = params;
 
   try {
-    let token;
-    try {
-      token = await verifyToken(req);
-      console.log("Token recibido:", token);
-    } catch (error) {
-      console.error("Error en autenticación:", error.message);
-      return createErrorResponse("No autorizado", 401);
-    }
-
 
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
