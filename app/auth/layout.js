@@ -11,10 +11,15 @@ export default function AuthLayout({ children }) {
 
   return (
     <div
-      className={`min-h-screen transition-colors ease-in-out duration-700 
+      className={`min-h-screen transition-colors ease-in-out duration-500 
       ${isRegister ? "bg-purple-dark" : "bg-lavender-pale"}`}
     >
-      <Navbar color={isRegister ? "bg-lavender" : "bg-indigo-loud"} shadow={isRegister ? "shadow-lavender/50" : "shadow-indigo-loud/50"}/>
+      <Navbar
+        color={isRegister ? "bg-lavender" : "bg-indigo-loud"}
+        color2={isRegister ? "bg-indigo-loud" : "bg-lavender"}
+        shadow={isRegister ? "shadow-lavender/50" : "shadow-indigo-loud/50"}
+        shadow2={isRegister ? "shadow-indigo-loud/50" : "shadow-lavender/50"}
+      />
       <main>{children}</main>
     </div>
   );
