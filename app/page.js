@@ -1,11 +1,16 @@
 "use client";
+// Animations
+import { Heaven } from "@/src/animations/Heaven";
 // Hooks
-import {useState, useEffect} from "react";
+import { useData } from "@/src/hooks/useData";
 // Next
 import { useSession, signOut } from "next-auth/react";
+// React
+import { useState } from "react";
 
 export default function Home() {
   const { data: session } = useSession();
+  const { data: categories, isLoading, error } = useData("/songs/categories");
 
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -14,36 +19,10 @@ export default function Home() {
     categoria: "",
     status: "",
   });
-  const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState("");
 
   // Usar directamente el rol desde la sesión
   const userRoleName = session?.user?.role?.name;
-  
-  // Obtener categorías
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch("/api/songs/categories", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setCategories(data);
-        } else {
-          setMessage("Error al cargar categorías.");
-        }
-      } catch (error) {
-        console.error("Error al obtener categorías:", error);
-        setMessage("Error al cargar categorías.");
-      }
-    };
-
-    fetchCategories();
-  }, []);
 
   // Manejar el envío del formulario
   const handleSubmit = async (e) => {
@@ -76,6 +55,13 @@ export default function Home() {
       setMessage("Error inesperado. Por favor, inténtalo más tarde.");
     }
   };
+
+  // Prueba de carga y error de datos
+  // if (isLoading) {
+  //   return <Heaven />;
+  // }
+
+  // console.log(error?.response.data.message);
 
   return (
     <>

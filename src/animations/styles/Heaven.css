@@ -1,0 +1,64 @@
+.clouds {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.cloud {
+    position: absolute;
+    bottom: 0;
+    width: 100%; /* Ajusta el tamaño según sea necesario */
+    height: 49%;
+    animation: animateCloud calc(3s * var(--i)) linear infinite;
+    background-size: cover;
+}
+
+.cloud:nth-child(1) {
+    background-image: url('/assets/heaven/cloud1.png');
+}
+
+.cloud:nth-child(2) {
+    background-image: url('/assets/heaven/cloud2.png');
+}
+
+.cloud:nth-child(3) {
+    background-image: url('/assets/heaven/cloud3.png');
+}
+
+.cloud:nth-child(4) {
+    background-image: url('/assets/heaven/cloud5.png');
+}
+
+.cloud:nth-child(5) {
+    background-image: url('/assets/heaven/cloud5.png');
+}
+
+.cloud:nth-child(6) {
+    background-image: url('/assets/heaven/cloud3.png');
+}
+
+.cloud:nth-child(7) {
+    background-image: url('/assets/heaven/cloud2.png');
+}
+
+.cloud:nth-child(8) {
+    background-image: url('/assets/heaven/cloud1.png');
+}
+
+@keyframes animateCloud {
+    0% {
+        opacity: 0;
+        transform: scale(1);
+    }
+    25%, 75% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.4);
+    }
+}

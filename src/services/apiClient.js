@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { broadcastLogout } from "@/src/utils/broadcastAuth";
 
 export const apiClient = axios.create({
-  baseURL: "/api/proxy", // Apunta al proxy
+  baseURL: "/api", // URL base de la API
 });
 
 const MAX_RETRIES = 2;
