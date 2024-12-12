@@ -56,22 +56,6 @@ export async function POST(req) {
       );
     }
 
-    // Buscar el id de la categoría en la base de datos
-    // const category = await prisma.categories.findUnique({
-    //   where: { id: parseInt(categories) }, // Usar el ID numérico de la categoría
-    // });
-
-    // if (!category) {
-    //   await connection.end(); // Cerrar conexión
-    //   return new Response(
-    //     JSON.stringify({ error: "Categoría no encontrada." }),
-    //     { status: 404, headers: { "Content-Type": "application/json" } }
-    //   );
-    // }
-
-    // await connection.end(); // Cerrar la conexión
-
-
     // Crear la canción
     const newSong = await prisma.songs.create({
       data: {
@@ -118,9 +102,14 @@ export async function GET(req){
         { status: 404, headers: { "Content-Type": "application/json" } }
       );
     }
+
+    const response = {
+      Canciones:songs[0],
+    }
     
-    return new Response(JSON.stringify(songs), {
+    return new Response(JSON.stringify(response), {
       status:200,
+      headers: { "Content-Type": "application/json" },
     });
   }catch(error){
     console.error("Error al obtener canciones", error);

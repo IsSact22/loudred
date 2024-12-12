@@ -22,7 +22,7 @@ export const registerSchema = yup.object().shape({
     .required("El usuario es obligatorio")
     .matches(
       /^[A-Z][a-zA-Z0-9]*$/,
-      "El usuario debe comenzar con una letra mayúscula, contener solo letras y números, y tener al menos un número"
+      "El usuario debe comenzar con una letra mayúscula, luego minúsculas y al menos un número"
     )
     .matches(/\d/, "El usuario debe incluir al menos un número"),
   password: yup.string()

@@ -19,6 +19,8 @@ import { loginSchema } from "@/src/validations/validationSchema";
 
 export default function LoginForm() {
   const router = useRouter();
+
+  // Inicializar react-hook-form con Yup
   const methods = useForm({
     resolver: yupResolver(loginSchema),
     mode: "onChange",
@@ -56,7 +58,7 @@ export default function LoginForm() {
     const mensajes = Object.values(errors)
       .map(error => error.message)
       .join(', ');
-    toast.error(`Errores de validación: ${mensajes}`);
+    toast.error(`Error: ${mensajes}`);
   };
   return (
     <div className="flex flex-col items-center justify-center">
@@ -100,7 +102,7 @@ export default function LoginForm() {
                 href="/auth/register"
                 className="text-red-500 hover:underline"
               >
-                Registrar
+                Regístrate
               </Link>
             </p>
           </form>

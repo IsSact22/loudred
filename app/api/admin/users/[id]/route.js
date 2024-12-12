@@ -16,13 +16,14 @@ function validateNameField(field, fieldName) {
   return null;
 }
 
-//READ UNO POR UNO
+// READ UNO POR UNO CON CANCIONES QUE HAN SUBIDO
 export async function GET(req, { params }) {
   try {
-    // Esperar que params esté listo antes de acceder a sus propiedades
-    const id = params?.id;
 
-    if (!id) {
+    
+    const userId = params?.id;
+
+    if (!userId) {
       return new Response(
         JSON.stringify({ error: "ID no proporcionado en la ruta" }),
         { status: 400, headers: { "Content-Type": "application/json" } }
@@ -30,7 +31,7 @@ export async function GET(req, { params }) {
     }
 
     // Validar que el ID sea un número
-    if (isNaN(Number(id))) {
+    if (isNaN(Number(userId))) {
       return new Response(
         JSON.stringify({ error: "El ID proporcionado no es válido" }),
         { status: 400, headers: { "Content-Type": "application/json" } }
@@ -45,24 +46,41 @@ export async function GET(req, { params }) {
       database: process.env.DB_DATABASE,
     });
 
-    // Buscar el usuario por ID
-    const [user] = await connection.execute(
-      "SELECT id, name, lastname, username, roleId, created_at FROM User WHERE id = ?",
-      [id]
-    );
-    await connection.end();
-
-    if (user.length === 0) {
-      return new Response(
-        JSON.stringify({ error: "Usuario no encontrado" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
+    try {
+      // Buscar el usuario por ID
+      const [user] = await connection.execute(
+        "SELECT id, name, lastname, username, roleId, created_at FROM User WHERE id = ?",
+        [userId]
       );
-    }
 
-    // Respuesta exitosa
-    return new Response(JSON.stringify(user[0]), {
-      status: 200,
-    });
+      if (user.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "Usuario no encontrado" }),
+          { status: 404, headers: { "Content-Type": "application/json" } }
+        );
+      }
+
+      // Buscar canciones del usuario
+      const [songs] = await connection.execute(
+        "SELECT * FROM Songs WHERE userId = ?",
+        [userId]
+      );
+
+      // Combinar resultados
+      const response = {
+        ...user[0],
+        songs: songs || [],
+        message: songs.length === 0 ? "El usuario no tiene canciones aún" : undefined,
+      };
+
+      // Respuesta exitosa
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } finally {
+      await connection.end(); // Cierra la conexión en el bloque finally
+    }
   } catch (error) {
     console.error("Error interno del servidor:", error);
 
