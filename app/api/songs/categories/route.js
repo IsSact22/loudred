@@ -5,10 +5,10 @@ const prisma = new PrismaClient();
 export async function GET(req) {
     try {
         // Consultar las categorías desde la base de datos
-        const categories = await prisma.categorias.findMany({
+        const categories = await prisma.categories.findMany({
             select: {
                 id: true,
-                nombre: true,
+                name: true,
             },
         });
 

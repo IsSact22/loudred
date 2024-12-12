@@ -3,8 +3,8 @@ import bcrypt from "bcryptjs";
 
 
 // Validación de entrada
-function validacionInput({ name, lastname, usuario, password, confirmPassword }) {
-  if (!name ||!lastname || !usuario || !password || !confirmPassword) {
+function validacionInput({ name, lastname, username, password, confirmPassword }) {
+  if (!name ||!lastname || !username || !password || !confirmPassword) {
     return "Todos los campos son necesarios";
   }
   const nameRegex = /^[a-zA-Z\s]+$/;
@@ -15,7 +15,7 @@ function validacionInput({ name, lastname, usuario, password, confirmPassword })
     return "El apellido no puede contener números ni caracteres especiales";
   }
   const UsuarRegex = /^[A-Z][a-z]*\d+$/;
-  if (!UsuarRegex.test(usuario)) {
+  if (!UsuarRegex.test(username)) {
     return "El Usuario no es válido. Debe comenzar con una letra mayúscula, seguir con minúsculas y contener al menos un número.";
   }
   if (password !== confirmPassword) {
@@ -38,9 +38,9 @@ function isStrongPassword(password) {
 export async function POST(req) {
   try {
     // Parsear y validar la entrada
-    const { name, lastname, usuario, password, confirmPassword } = await req.json();
+    const { name, lastname, username, password, confirmPassword } = await req.json();
 
-    const validationError = validacionInput({ name, lastname, usuario, password, confirmPassword });
+    const validationError = validacionInput({ name, lastname, username, password, confirmPassword });
     if (validationError) {
       return new Response(
         JSON.stringify({ message: validationError }),
@@ -58,8 +58,8 @@ export async function POST(req) {
 
     // Verificar si el usuario ya existe
     const [existingUser] = await connection.execute(
-      "SELECT * FROM users WHERE usuario = ?",
-      [usuario]
+      "SELECT * FROM User WHERE username = ?",
+      [username]
     );
     if (existingUser.length > 0) {
       await connection.end(); // Cerrar conexión
@@ -86,8 +86,8 @@ export async function POST(req) {
     // Crear el usuario con contraseña encriptada
     const hashedPassword = await bcrypt.hash(password, 10);
     await connection.execute(
-      "INSERT INTO users (name, lastname, usuario, password, roleId) VALUES (?, ?, ?, ?, ?)",
-      [name, lastname, usuario, hashedPassword, roleId]
+      "INSERT INTO User (name, lastname, username, password, roleId) VALUES (?, ?, ?, ?, ?)",
+      [name, lastname, username, hashedPassword, roleId]
     );
 
     // Cerrar la conexión

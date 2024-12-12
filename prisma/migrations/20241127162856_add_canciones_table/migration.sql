@@ -1,9 +1,9 @@
 -- CreateTable
-CREATE TABLE `canciones` (
+CREATE TABLE `Songs` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `nombre` VARCHAR(191) NOT NULL,
-    `artista` VARCHAR(191) NOT NULL,
-    `categoria` VARCHAR(191) NOT NULL,
+    `title` VARCHAR(191) NOT NULL,
+    `artist` VARCHAR(191) NOT NULL,
+    `categories` VARCHAR(191) NOT NULL,
     `status` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `userId` INTEGER NOT NULL,
@@ -12,4 +12,4 @@ CREATE TABLE `canciones` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `canciones` ADD CONSTRAINT `canciones_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `Songs` ADD CONSTRAINT `Songs_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

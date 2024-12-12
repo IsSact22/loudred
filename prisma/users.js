@@ -1,32 +1,32 @@
 
-export const users = [
+export const User = [
     {
       name: 'Anthony',
       lastname: 'Goncalves',
-      usuario: 'Rollin21',
+      username: 'Rollin21',
       password: 'Hola1234',
-      role: 'SUPERADMIN', // Este usuario es un superadmin
+      role: 'SUPERADMIN', // Este username es un superadmin
     },
     {
       name: 'Liz',
       lastname: 'Ovalles',
-      usuario: 'Rose19',
+      username: 'Rose19',
       password: 'Taylor123',
-      role: 'SUPERADMIN', // Usuario común
+      role: 'SUPERADMIN', // username común
     },
     {
       name: 'Carlos',
       lastname: 'Gonzalez',
-      usuario: 'Carluno13',
+      username: 'Carluno13',
       password: 'Dembow123',
-      role: 'SUPERADMIN', // Usuario común
+      role: 'SUPERADMIN', // username común
     },
     {
       name: 'Isaac',
       lastname: 'Hung',
-      usuario: 'Chino04',
+      username: 'Chino04',
       password: 'Chanwis123',
-      role: 'SUPERADMIN', // Este usuario también es un superadmin
+      role: 'SUPERADMIN', // Este username también es un superadmin
     },
   ];
   

@@ -36,7 +36,7 @@ export async function GET(req) {
     });
 
     // Consultar todos los usuarios
-    const [users] = await connection.execute("SELECT * FROM users");
+    const [users] = await connection.execute("SELECT id, name, lastname, username, roleId, created_at FROM User");
     await connection.end();
 
     return new Response(JSON.stringify(users), {
@@ -52,10 +52,10 @@ export async function GET(req) {
 export async function POST(req) {
   let connection;
   try {
-    const { name, lastname, usuario, password, confirmPassword } = await req.json();
+    const { name, lastname, username, password, confirmPassword } = await req.json();
 
     // Validaciones iniciales
-    if (!name || !lastname || !usuario || !password || !confirmPassword) {
+    if (!name || !lastname || !username || !password || !confirmPassword) {
       return createErrorResponse("Todos los campos son requeridos");
     }
 
@@ -73,7 +73,7 @@ export async function POST(req) {
 
     // Validar usuario (formato)
     const UsuarRegex = /^[A-Z][a-z]*\d+$/;
-    if (!UsuarRegex.test(usuario)) {
+    if (!UsuarRegex.test(username)) {
       return createErrorResponse(
         "El Usuario no es válido. Debe comenzar con una letra mayúscula, seguir con minúsculas y contener al menos un número."
       );
@@ -89,8 +89,8 @@ export async function POST(req) {
 
     // Verificar si el usuario ya existe
     const [existingUser] = await connection.execute(
-      "SELECT * FROM users WHERE usuario = ?",
-      [usuario]
+      "SELECT * FROM User WHERE username = ?",
+      [username]
     );
     if (existingUser.length > 0) {
       return createErrorResponse("El usuario ya existe", 409);
@@ -111,7 +111,7 @@ export async function POST(req) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Obtener el número total de usuarios para determinar si es SUPERADMIN o USER
-    const [usersCount] = await connection.execute("SELECT COUNT(*) AS count FROM users");
+    const [usersCount] = await connection.execute("SELECT COUNT(*) AS count FROM Users");
 
     // Determinar el roleId según el número de usuarios existentes
     const roleId = usersCount[0].count < 4 ? 2 : 1; // 2 es para SUPERADMIN, 1 es para USER
@@ -126,8 +126,8 @@ export async function POST(req) {
 
     // Insertar nuevo usuario con el roleId correspondiente
     await connection.execute(
-      "INSERT INTO users (name, lastname, usuario, password, roleId) VALUES (?, ?, ?, ?, ?)",
-      [name, lastname, usuario, hashedPassword, roleId]
+      "INSERT INTO users (name, lastname, username, password, roleId) VALUES (?, ?, ?, ?, ?)",
+      [name, lastname, username, hashedPassword, roleId]
     );
 
     return new Response(

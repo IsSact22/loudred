@@ -1,15 +1,14 @@
 import mysql from "mysql2/promise";
 import { PrismaClient } from "@prisma/client";
-
 const prisma = new PrismaClient();
 
 export async function POST(req) {
   try {
     // Obtener los datos de la solicitud
-    const { nombre, artista, categoria, status } = await req.json();
-    console.log("Datos recibidos:", { nombre, artista, categoria, status });
+    const { title, artist, categories, status } = await req.json();
+    console.log("Datos recibidos:", { title, artist, categories, status });
 
-    if (!nombre || !artista || !categoria || !status) {
+    if (!title || !artist || !categories || !status) {
       return new Response(
         JSON.stringify({ error: "Todos los campos son obligatorios." }),
         { status: 400, headers: { "Content-Type": "application/json" } }
@@ -26,8 +25,8 @@ export async function POST(req) {
 
     // Validar canción duplicada
     const [existingSong] = await connection.execute(
-      "SELECT * FROM canciones WHERE nombre = ?",
-      [nombre]
+      "SELECT * FROM Songs WHERE title = ?",
+      [title]
     );
     console.log("Canción existente:", existingSong);
 
@@ -40,8 +39,8 @@ export async function POST(req) {
     }
 
     // Buscar el id de la categoría en la base de datos
-    const category = await prisma.categorias.findUnique({
-      where: { id: parseInt(categoria) }, // Usar el ID numérico de la categoría
+    const category = await prisma.categories.findUnique({
+      where: { id: parseInt(categories) }, // Usar el ID numérico de la categoría
     });
 
     if (!category) {
@@ -55,13 +54,13 @@ export async function POST(req) {
     await connection.end(); // Cerrar la conexión
 
     // Crear la canción
-    const newSong = await prisma.canciones.create({
+    const newSong = await prisma.song.create({
       data: {
-        nombre,
-        artista,
+        title,
+        artist,
         status,
         userId: token.id,
-        categoriaId: category.id, // Usar el ID de la categoría
+        categoryId: categories.id, // Usar el ID de la categoría
       },
     });
     console.log("Canción creada:", newSong);
@@ -71,7 +70,7 @@ export async function POST(req) {
       { status: 201, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Error en el endpoint /api/canciones:", error.message);
+    console.error("Error en el endpoint /api/Songs:", error.message);
     return new Response(
       JSON.stringify({ error: "Error interno del servidor." }),
       { status: 500, headers: { "Content-Type": "application/json" } }

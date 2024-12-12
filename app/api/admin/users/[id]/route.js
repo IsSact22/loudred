@@ -47,7 +47,7 @@ export async function GET(req, { params }) {
 
     // Buscar el usuario por ID
     const [user] = await connection.execute(
-      "SELECT * FROM users WHERE id = ?",
+      "SELECT id, name, lastname, username, roleId, created_at FROM User WHERE id = ?",
       [id]
     );
     await connection.end();
@@ -162,7 +162,7 @@ export async function PUT(req, { params }) {
     }
 
     // Asegurar que el usuario existe antes de actualizar
-    const [existingUser] = await connection.execute("SELECT id FROM users WHERE id = ?", [id]);
+    const [existingUser] = await connection.execute("SELECT id FROM User WHERE id = ?", [id]);
     if (existingUser.length === 0) {
       await connection.end();
       return new Response(JSON.stringify({ message: "Usuario no encontrado" }), {
@@ -173,7 +173,7 @@ export async function PUT(req, { params }) {
     // Ejecutar la actualización
     values.push(id); // Agregar el ID al final para WHERE
     await connection.execute(
-      `UPDATE users SET ${updates.join(", ")} WHERE id = ?`,
+      `UPDATE User SET ${updates.join(", ")} WHERE id = ?`,
       values
     );
 
@@ -208,7 +208,7 @@ export async function DELETE(req, { params }) {
       database: process.env.DB_DATABASE,
     });
 
-    const [result] = await connection.execute("DELETE FROM users WHERE id = ?", [id]);
+    const [result] = await connection.execute("DELETE FROM User WHERE id = ?", [id]);
     await connection.end();
 
     if (result.affectedRows === 0) {

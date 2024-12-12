@@ -1,0 +1,15 @@
+export const categories = [
+    {name:"Pop"},
+    {name:"Rock"},
+    {name:"Rap"},
+    {name:"Dembow"},
+    {name:"Salsa"},
+    {name:"Merengue"},
+    {name:"Electrónica"},
+    {name:"K-pop"},
+    {name:"Reggaeton"},
+    {name:"Folklórica"},
+    {name:"Clásica"},
+    {name:"Soundtrack de Videojuegos"},
+    {name:"Trap"},
+];

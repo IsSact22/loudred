@@ -20,7 +20,7 @@ const authOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        usuario: { label: "Usuario", type: "text" },
+        username: { label: "Usuario", type: "text" },
         password: { label: "Contraseña", type: "password" },
       },
       authorize: async (credentials) => {
@@ -29,11 +29,11 @@ const authOptions = {
 
           // Buscar al usuario con su rol
           const [rows] = await connection.execute(
-            `SELECT users.id, users.name, users.lastname, users.usuario, users.password, role.id AS roleId, role.name AS roleName
-             FROM users 
-             JOIN role ON users.roleId = role.id
-             WHERE users.usuario = ?`,
-            [credentials.usuario]
+            `SELECT User.id, User.name, User.lastname, User.username, User.password, role.id AS roleId, role.name AS roleName
+             FROM User 
+             JOIN role ON User.roleId = role.id
+             WHERE User.username = ?`,
+            [credentials.username]
           );
 
           await connection.end();
@@ -52,7 +52,7 @@ const authOptions = {
                 id: user.id,
                 name: user.name,
                 lastname: user.lastname,
-                usuario: user.usuario,
+                username: user.username,
                 role: { id: user.roleId, name: user.roleName },
               };
             }
@@ -73,7 +73,7 @@ const authOptions = {
         token.id = user.id;
         token.name = user.name;
         token.lastname = user.lastname;
-        token.usuario = user.usuario;
+        token.username = user.username;
         token.role = user.role; // Si planeas usar roles
       }
       return token;
@@ -83,7 +83,7 @@ const authOptions = {
         id: token.id,
         name: token.name,
         lastname: token.lastname,
-        usuario: token.usuario,
+        username: token.username,
         role: token.role, 
       };
       return session;

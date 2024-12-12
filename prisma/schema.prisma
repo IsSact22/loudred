@@ -10,35 +10,35 @@ datasource db {
 model role {
   id    Int    @id @default(autoincrement())
   name  String @db.VarChar(100) @unique
-  users users[] // Relación uno a muchos
+  User User[] // Relación uno a muchos
 }
 
-model users {
+model User {
   id         Int       @id @default(autoincrement())
   name       String    @db.VarChar(100)
   lastname   String    @db.VarChar(100)
-  usuario    String    @unique(map: "user") @db.VarChar(255)
+  username    String    @unique(map: "user") @db.VarChar(255)
   password   String    @db.VarChar(255)
   roleId     Int
   role       role      @relation(fields: [roleId], references: [id]) // Relación con roles
   created_at DateTime? @default(now()) @db.Timestamp(0)
-  canciones  canciones[]  // Relación uno a muchos con canciones
+  Songs  Songs[]  // Relación uno a muchos con Songs
 }
 
-model canciones {
+model Songs {
   id          Int           @id @default(autoincrement())
-  nombre      String
-  artista     String
-  categorias  categorias?   @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
-  categoriaId Int?
+  title      String
+  artist     String
+  categories  categories?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId Int?
   status      String
   createdAt   DateTime       @default(now())
-  userId      Int            // Clave foránea hacia el modelo users
-  user        users          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int            // Clave foránea hacia el modelo User
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model categorias {
+model categories {
   id         Int           @id @default(autoincrement())
-  nombre     String
-  canciones  canciones[]
+  name     String
+  Songs  Songs[]
 }
