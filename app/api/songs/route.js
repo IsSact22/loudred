@@ -1,16 +1,16 @@
 import mysql from "mysql2/promise";
 import { PrismaClient } from "@prisma/client";
-import { User } from "@/prisma/users";
-import { categories } from "@/prisma/categories";
 const prisma = new PrismaClient();
 
+
+//Subir canciones
 export async function POST(req) {
   try {
     // Obtener los datos de la solicitud
-    const { title, artist, categories, status, userId } = await req.json();
-    console.log("Datos recibidos:", { title, artist, categories, status, userId });
+    const { title, artist, status, userId, categoryId } = await req.json();
+    console.log("Datos recibidos:", { title, artist, status, userId, categoryId });
 
-    if (!title || !artist || !categories || !status) {
+    if (!title || !artist || !status) {
       return new Response(
         JSON.stringify({ error: "Todos los campos son obligatorios." }),
         { status: 400, headers: { "Content-Type": "application/json" } }
@@ -23,6 +23,14 @@ export async function POST(req) {
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
+
+    if (typeof categoryId !== 'number') {
+      return new Response(
+        JSON.stringify({ error: "El campo categoryId debe ser un número." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
 
 
     // Conexión a la base de datos
@@ -49,19 +57,19 @@ export async function POST(req) {
     }
 
     // Buscar el id de la categoría en la base de datos
-    const category = await prisma.categories.findUnique({
-      where: { id: parseInt(categories) }, // Usar el ID numérico de la categoría
-    });
+    // const category = await prisma.categories.findUnique({
+    //   where: { id: parseInt(categories) }, // Usar el ID numérico de la categoría
+    // });
 
-    if (!category) {
-      await connection.end(); // Cerrar conexión
-      return new Response(
-        JSON.stringify({ error: "Categoría no encontrada." }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
-    }
+    // if (!category) {
+    //   await connection.end(); // Cerrar conexión
+    //   return new Response(
+    //     JSON.stringify({ error: "Categoría no encontrada." }),
+    //     { status: 404, headers: { "Content-Type": "application/json" } }
+    //   );
+    // }
 
-    await connection.end(); // Cerrar la conexión
+    // await connection.end(); // Cerrar la conexión
 
 
     // Crear la canción
@@ -71,7 +79,7 @@ export async function POST(req) {
         artist,
         status,
         userId,
-        categoryId: categories.id, // Usar el ID de la categoría
+        categoryId, // Usar el ID de la categoría
       },
     });
     console.log("Canción creada:", newSong);
@@ -87,4 +95,36 @@ export async function POST(req) {
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
+}
+
+//función read para las canciones
+export async function GET(req){
+  try{
+    //conexión a la bd
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+    })
+
+    //consultar canciones
+    const [songs]= await connection.execute("SELECT * FROM Songs");
+    await connection.end();
+    
+    if(songs.length===0){
+      return new Response(
+        JSON.stringify({ error: "No hay canciones aún!" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+    
+    return new Response(JSON.stringify(songs), {
+      status:200,
+    });
+  }catch(error){
+    console.error("Error al obtener canciones", error);
+    return new Response("Error interno del servidor", { status: 500 });
+  }
+
 }
