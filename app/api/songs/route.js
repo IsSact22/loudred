@@ -1,12 +1,14 @@
 import mysql from "mysql2/promise";
 import { PrismaClient } from "@prisma/client";
+import { User } from "@/prisma/users";
+import { categories } from "@/prisma/categories";
 const prisma = new PrismaClient();
 
 export async function POST(req) {
   try {
     // Obtener los datos de la solicitud
-    const { title, artist, categories, status } = await req.json();
-    console.log("Datos recibidos:", { title, artist, categories, status });
+    const { title, artist, categories, status, userId } = await req.json();
+    console.log("Datos recibidos:", { title, artist, categories, status, userId });
 
     if (!title || !artist || !categories || !status) {
       return new Response(
@@ -54,12 +56,12 @@ export async function POST(req) {
     await connection.end(); // Cerrar la conexión
 
     // Crear la canción
-    const newSong = await prisma.song.create({
+    const newSong = await prisma.songs.create({
       data: {
         title,
         artist,
         status,
-        userId: token.id,
+        userId,
         categoryId: categories.id, // Usar el ID de la categoría
       },
     });

@@ -111,7 +111,7 @@ export async function POST(req) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Obtener el número total de usuarios para determinar si es SUPERADMIN o USER
-    const [usersCount] = await connection.execute("SELECT COUNT(*) AS count FROM Users");
+    const [usersCount] = await connection.execute("SELECT COUNT(*) AS count FROM User");
 
     // Determinar el roleId según el número de usuarios existentes
     const roleId = usersCount[0].count < 4 ? 2 : 1; // 2 es para SUPERADMIN, 1 es para USER
@@ -126,7 +126,7 @@ export async function POST(req) {
 
     // Insertar nuevo usuario con el roleId correspondiente
     await connection.execute(
-      "INSERT INTO users (name, lastname, username, password, roleId) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO User (name, lastname, username, password, roleId) VALUES (?, ?, ?, ?, ?)",
       [name, lastname, username, hashedPassword, roleId]
     );
 
