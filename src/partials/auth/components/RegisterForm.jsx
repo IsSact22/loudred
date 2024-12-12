@@ -28,10 +28,10 @@ export default function RegisterForm() {
   });
   const { handleSubmit, setError } = methods;
 
-  const [inputLoading, setInputLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (data) => {
-    setInputLoading(true);
+    setIsLoading(true);
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
@@ -52,7 +52,7 @@ export default function RegisterForm() {
     } catch (error) {
       toast.error('Ocurrió un error inesperado');
     } finally {
-      setInputLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -124,10 +124,9 @@ export default function RegisterForm() {
               <StartButton
                 text="Registrarse"
                 type="submit"
-                inputLoading={inputLoading}
-                disabled={inputLoading}
-                padding="p-4"
-                margin=""
+                isLoading={isLoading}
+                disabled={isLoading}
+                className="p-4"
               />
             </div>
           </form>

@@ -24,48 +24,50 @@ export default function LoginForm() {
     mode: "onChange",
   });
   const { handleSubmit } = methods; // Extrae métodos de react-hook-form
-  const [inputLoading, setInputLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (data) => {
-    setInputLoading(true);
-    setTimeout(() => setInputLoading(true), 250);
+    setTimeout(() => setIsLoading(true), 250);
     try {
-      console.log("Datos enviados:", data);
-  
+
       const result = await signIn("credentials", {
         redirect: false,
-        usuario: data.usuario,
+        username: data.username,
         password: data.password,
       });
-  
-      console.log("Resultado de signIn:", result);
-  
+
+      setIsLoading(false);
       if (result?.error) {
         toast.error(result.error);
-        setInputLoading(false);
       } else {
         toast.success("Inicio de sesión exitoso");
-        console.log("Redirigiendo a la página principal...");
-        router.replace("/");
+        setTimeout(() => {
+          router.replace("/");
+        }, 1000); // Retraso de 1 segundo
       }
     } catch (error) {
-
-      console.error("Error en el proceso de inicio de sesión:", error.message);
       toast.error("Ocurrió un error inesperado. Intenta nuevamente.");
-      setInputLoading(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const onError = (errors) => {
+    const mensajes = Object.values(errors)
+      .map(error => error.message)
+      .join(', ');
+    toast.error(`Errores de validación: ${mensajes}`);
+  };
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="flex flex-col mt-14 p-10 bg-gradient-to-br from-purple-dark to-purple-darker rounded-2xl shadow-md">
         <h2 className="text-4xl font-bold text-white mb-10 ml-1">Bienvenido</h2>
         {/* FORMULARIO DE LOGIN */}
         <FormProvider {...methods}>
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+          <form onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col">
             {/* Input para el usuario */}
             <Input
-              name="usuario"
+              name="username"
               label="Usuario"
               labelClass="text-white"
               placeholder="Ingrese su usuario"
@@ -85,9 +87,9 @@ export default function LoginForm() {
               <StartButton
                 text="Iniciar sesión"
                 type="submit"
-                inputLoading={inputLoading}
-                disabled={inputLoading}
-                padding="p-4"
+                isLoading={isLoading}
+                disabled={isLoading}
+                className="p-4"
               />
             </div>
 

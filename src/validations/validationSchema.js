@@ -2,7 +2,7 @@ import * as yup from "yup";
 
 // Esquema de validación para el Login
 export const loginSchema = yup.object().shape({
-  usuario: yup.string()
+  username: yup.string()
     .required("El usuario es obligatorio"),
   password: yup.string()
     .required("La contraseña es obligatoria"),
@@ -18,7 +18,7 @@ export const registerSchema = yup.object().shape({
     .required("El apellido es obligatorio")
     .matches(/^[a-zA-Z\s]+$/, "El apellido solo puede contener letras y espacios")
     .min(3, "El apellido debe tener al menos 3 caracteres"),
-  usuario: yup.string()
+  username: yup.string()
     .required("El usuario es obligatorio")
     .matches(
       /^[A-Z][a-zA-Z0-9]*$/,
