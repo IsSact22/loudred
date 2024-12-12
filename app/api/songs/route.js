@@ -17,6 +17,14 @@ export async function POST(req) {
       );
     }
 
+    if (typeof userId !== 'number') {
+      return new Response(
+        JSON.stringify({ error: "El campo userId debe ser un número." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+
     // Conexión a la base de datos
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
@@ -54,6 +62,7 @@ export async function POST(req) {
     }
 
     await connection.end(); // Cerrar la conexión
+
 
     // Crear la canción
     const newSong = await prisma.songs.create({
