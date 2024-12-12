@@ -36,7 +36,7 @@ const Input = ({
             type={type}
             id={name}
             placeholder={placeholder}
-            className={`w-full mt-2 px-3 py-3 mb-5 border rounded-2xl bg-lavender-light focus:outline-none focus:ring-0 focus:ring-purple-dark focus:border-purple-dark ${
+            className={`w-full mt-2 px-3 py-3 border rounded-2xl bg-lavender-light focus:outline-none focus:ring-0 focus:ring-purple-dark focus:border-purple-dark ${
               errors[name] ? 'border-red-500' : 'border-gray-300'
             } placeholder-purple-darker placeholder-opacity-40
              ${className}`} // Agregar clases personalizadas
