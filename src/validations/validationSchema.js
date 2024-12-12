@@ -43,3 +43,30 @@ export const registerSchema = yup.object().shape({
   userAccepted: yup.boolean()
     .oneOf([true], "Aceptar este término es obligatorio"),
 });
+
+// Esquema de validación para formulario de canción
+export const songsSchema = yup.object().shape({
+  title: yup.string()
+    .required("El nombre de la canción es obligatorio")
+    .min(1, "El nombre debe tener al menos 1 caracter"),
+
+  artist: yup.string()
+    .required("El nombre del artista es obligatorio")
+    .matches(/^[a-zA-Z\s]+$/, "El nombre solo puede contener letras y espacios")
+    .min(2, "El nombre debe tener al menos 2 caracteres"),
+  
+  audioFile: yup
+    .mixed()
+    .test('fileType', 'Solo se permiten archivos MP3', (value) => value?.[0]?.type === 'audio/mp3')
+    .test('fileSize', 'El archivo debe ser menor a 10MB', (value) => value?.[0]?.size <= 10 * 1024 * 1024),
+
+  imageFile: yup
+    .mixed()
+    .test('fileType', 'Solo se permiten imágenes PNG', (value) => value?.[0]?.type === 'image/png')
+    .test('fileSize', 'El archivo debe ser menor a 10MB', (value) => value?.[0]?.size <= 10 * 1024 * 1024),
+  
+  category: yup
+    .object()
+    .nullable()
+    .required('Debes seleccionar una categoría'),
+});
