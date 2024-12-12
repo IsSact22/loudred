@@ -7,12 +7,17 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 // Centralizar configuración de base de datos
 const getDatabaseConnection = async () => {
-  return await mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-  });
+  try {
+    return await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+    });
+  } catch (error) {
+    console.error("Error al conectar con la base de datos:", error);
+    throw new Error("Error de conexión a la base de datos");
+  }
 };
 
 const authOptions = {
@@ -24,8 +29,9 @@ const authOptions = {
         password: { label: "Contraseña", type: "password" },
       },
       authorize: async (credentials) => {
+        let connection;
         try {
-          const connection = await getDatabaseConnection();
+          connection = await getDatabaseConnection();
 
           // Buscar al usuario con su rol
           const [rows] = await connection.execute(
@@ -35,8 +41,6 @@ const authOptions = {
              WHERE User.username = ?`,
             [credentials.username]
           );
-
-          await connection.end();
 
           const user = rows[0];
 
@@ -55,13 +59,25 @@ const authOptions = {
                 username: user.username,
                 role: { id: user.roleId, name: user.roleName },
               };
+            } else {
+              console.warn(`Contraseña inválida para el usuario: ${credentials.username}`);
+              throw new Error("Credenciales inválidas");
             }
+          } else {
+            console.warn(`Usuario no encontrado: ${credentials.username}`);
+            throw new Error("Usuario no encontrado");
           }
-          // Lanzar error genérico si algo falla
-          throw new Error("Error de autenticación");
         } catch (error) {
           console.error("Error durante la autenticación:", error.message);
-          throw new Error("Error de autenticación");
+          throw new Error(error.message || "Error de autenticación");
+        } finally {
+          if (connection) {
+            try {
+              await connection.end();
+            } catch (endError) {
+              console.error("Error al cerrar la conexión:", endError);
+            }
+          }
         }
       },
     }),
@@ -78,13 +94,13 @@ const authOptions = {
       }
       return token;
     },
-    async session({ session, token}) {
-      session.user =  {
+    async session({ session, token }) {
+      session.user = {
         id: token.id,
         name: token.name,
         lastname: token.lastname,
         username: token.username,
-        role: token.role, 
+        role: token.role,
       };
       return session;
     },

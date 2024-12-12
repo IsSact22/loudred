@@ -27,26 +27,26 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (data) => {
-    setTimeout(() => setIsLoading(true), 250);
+    setIsLoading(true);
     try {
-
       const result = await signIn("credentials", {
         redirect: false,
         username: data.username,
         password: data.password,
       });
 
-      setIsLoading(false);
       if (result?.error) {
         toast.error(result.error);
       } else {
         toast.success("Inicio de sesión exitoso");
         setTimeout(() => {
           router.replace("/");
-        }, 1000); // Retraso de 1 segundo
+        }, 1000);
       }
     } catch (error) {
-      toast.error("Ocurrió un error inesperado. Intenta nuevamente.");
+      toast.error(
+        error.message || "Ocurrió un error inesperado. Intenta nuevamente."
+      );
     } finally {
       setIsLoading(false);
     }
