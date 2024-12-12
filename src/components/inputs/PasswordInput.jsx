@@ -42,7 +42,7 @@ const PasswordInput = ({
               type={isVisible ? "text" : "password"} // Cambiar entre texto y contraseña
               id={name}
               placeholder={placeholder}
-              className={`w-full mt-2 px-3 py-3 mb-5 border rounded-2xl bg-lavender-light focus:outline-none focus:ring-0 focus:ring-purple-dark focus:border-purple-dark ${
+              className={`w-full mt-2 px-3 py-3 border rounded-2xl bg-lavender-light focus:outline-none focus:ring-0 focus:ring-purple-dark focus:border-purple-dark ${
                 errors[name] ? "border-red-500" : "border-gray-300"
               } placeholder-purple-darker placeholder-opacity-40  
                ${className}`}
@@ -55,7 +55,7 @@ const PasswordInput = ({
         <button
           type="button"
           onClick={toggleVisibility}
-          className="absolute mb-3 right-4 flex items-center text-lavender hover:text-lavender focus:outline-none"
+          className="absolute right-4 flex items-center mt-2 text-lavender hover:text-lavender focus:outline-none"
         >
           {isVisible ? (
             <EyeIcon className="h-5 w-5 text-lavender hover:text-indigo-loud" />

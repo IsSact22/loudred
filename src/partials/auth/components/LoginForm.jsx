@@ -57,12 +57,12 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center ">
-      <div className="bg-gradient-to-br from-purple-dark to-purple-darker p-8 rounded-2xl shadow-md min-h-[600px] min-w-[600px]">
+    <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col mt-14 p-10 bg-gradient-to-br from-purple-dark to-purple-darker rounded-2xl shadow-md">
         <h2 className="text-4xl font-bold text-white mb-10 ml-1">Bienvenido</h2>
         {/* FORMULARIO DE LOGIN */}
         <FormProvider {...methods}>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
             {/* Input para el usuario */}
             <Input
               name="usuario"
@@ -81,19 +81,18 @@ export default function LoginForm() {
               containerClass="mb-10"
             />
 
-            <div className="mx-44">
+            <div className="mx-44 mb-10">
               <StartButton
                 text="Iniciar sesión"
                 type="submit"
                 inputLoading={inputLoading}
                 disabled={inputLoading}
                 padding="p-4"
-                margin="mb-10"
               />
             </div>
 
             {/* Link para registrar */}
-            <p className="mt-4 text-center text-white font-bold">
+            <p className="text-center text-white font-bold">
               ¿No tienes cuenta?{" "}
               <Link
                 href="/auth/register"
