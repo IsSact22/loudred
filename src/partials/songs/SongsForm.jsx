@@ -3,6 +3,7 @@
 import Input from "@/src/components/inputs/Input";
 import UploadInput from "@/src/components/inputs/UploadInput";
 import StartButton from "@/src/components/buttons/StartButton";
+import CategorySelect from "@/src/components/select/CategoriesSelect";
 // Hooks
 import { useForm, FormProvider } from "react-hook-form";
 import { useState } from "react";
@@ -11,10 +12,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { songsSchema } from "@/src/validations/validationSchema";
 // Toast
 import toast from 'react-hot-toast';
-//icons
-import { IoMusicalNoteOutline } from "react-icons/io5";
-
-import { FaImage } from "react-icons/fa";
 
 export default function SongsForm() {
   
@@ -88,6 +85,15 @@ export default function SongsForm() {
               className="bg-purple-50"
             />
 
+            {/* Seleccionar una categoria */}
+            <CategorySelect
+              name="category"
+              label="Categoría"
+              labelClass="text-purple-900"
+              placeholder="Selecciona una categoría"
+              containerClass="mb-6"
+            />
+
             <div className="flex items-center justify-center gap-4 mb-4">
               {/* Input para el archivo de la canción */}
               <UploadInput
@@ -115,13 +121,11 @@ export default function SongsForm() {
 
             <div className="mx-44">
               <StartButton
-                text="Subir Canción"
+                text="Enviar"
                 type="submit"
                 isLoading={isLoading}
                 disabled={isLoading}
                 padding="p-4"
-                margin="mb-10"
-
               />
             </div>
           </form>
