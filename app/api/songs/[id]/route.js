@@ -1,3 +1,4 @@
+
 import mysql from "mysql2/promise";
 
 export async function DELETE(req, { params }) {

@@ -8,8 +8,8 @@ datasource db {
 }
 
 model role {
-  id    Int    @id @default(autoincrement())
-  name  String @db.VarChar(100) @unique
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(100) @unique
   User User[] // Relación uno a muchos
 }
 
@@ -17,28 +17,50 @@ model User {
   id         Int       @id @default(autoincrement())
   name       String    @db.VarChar(100)
   lastname   String    @db.VarChar(100)
-  username    String    @unique(map: "user") @db.VarChar(255)
+  username   String    @unique(map: "user") @db.VarChar(255)
   password   String    @db.VarChar(255)
   roleId     Int
   role       role      @relation(fields: [roleId], references: [id]) // Relación con roles
   created_at DateTime? @default(now()) @db.Timestamp(0)
-  Songs  Songs[]  // Relación uno a muchos con Songs
+  Songs      Songs[]   // Relación uno a muchos con Songs
+  Image      Image[]   // Relación uno a muchos con imágenes
+  Music      Music[]   // Relación uno a muchos con Musics
 }
 
 model Songs {
   id          Int           @id @default(autoincrement())
-  title      String
-  artist     String
+  title       String
+  artist      String
   categories  categories?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  categoryId Int?
+  categoryId  Int?
   status      String
   createdAt   DateTime       @default(now())
   userId      Int            // Clave foránea hacia el modelo User
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Image       Image[]        // Relación uno a muchos con imágenes
+  Music       Music[]        // Relación uno a muchos con Musics
 }
 
 model categories {
-  id         Int           @id @default(autoincrement())
-  name     String
-  Songs  Songs[]
+  id    Int     @id @default(autoincrement())
+  name  String
+  Songs Songs[]
+}
+
+model Image {
+  id       Int      @id @default(autoincrement())
+  fileName String   @db.VarChar(255)
+  songId   Int
+  userId   Int
+  song     Songs    @relation(fields: [songId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Music {
+  id       Int      @id @default(autoincrement())
+  fileName String   @db.VarChar(255)
+  songId   Int
+  userId   Int
+  song     Songs    @relation(fields: [songId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

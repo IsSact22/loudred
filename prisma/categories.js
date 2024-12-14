@@ -12,4 +12,5 @@ export const categories = [
     {name:"Clásica"},
     {name:"Soundtrack de Videojuegos"},
     {name:"Trap"},
+    {name:"podcast"},
 ];
