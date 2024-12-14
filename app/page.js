@@ -3,6 +3,8 @@
 import { Heaven } from "@/src/animations/Heaven";
 // Hooks
 import { useData } from "@/src/hooks/useData";
+// Components
+import SongsForm from "@/src/partials/songs/SongsForm";
 // Next
 import { useSession, signOut } from "next-auth/react";
 // React
@@ -12,49 +14,51 @@ export default function Home() {
   const { data: session } = useSession();
   const { data: categories, isLoading, error } = useData("/songs/categories");
 
-  const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({
-    nombre: "",
-    artista: "",
-    categoria: "",
-    status: "",
-  });
-  const [message, setMessage] = useState("");
+  const [showForm, setShowForm] = useState(false);
+
+  // const [showModal, setShowModal] = useState(false);
+  // const [formData, setFormData] = useState({
+  //   nombre: "",
+  //   artista: "",
+  //   categoria: "",
+  //   status: "",
+  // });
+  // const [message, setMessage] = useState("");
 
   // Usar directamente el rol desde la sesión
   const userRoleName = session?.user?.role?.name;
 
-  // Manejar el envío del formulario
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // // Manejar el envío del formulario
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
 
-    try {
-      const response = await fetch("/api/canciones", {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
+  //   try {
+  //     const response = await fetch("/api/canciones", {
+  //       method: "POST",
+  //       body: JSON.stringify(formData),
+  //     });
 
-      const data = await response.json(); // Procesar la respuesta del servidor
+  //     const data = await response.json(); // Procesar la respuesta del servidor
 
-      if (!response.ok) {
-        if (response.status === 409) {
-          // Manejar canción duplicada
-          setMessage("Error: La canción ya existe.");
-        } else {
-          // Manejar otros errores
-          setMessage(`Error: ${data.error || "Error inesperado"}`);
-        }
-        return;
-      }
+  //     if (!response.ok) {
+  //       if (response.status === 409) {
+  //         // Manejar canción duplicada
+  //         setMessage("Error: La canción ya existe.");
+  //       } else {
+  //         // Manejar otros errores
+  //         setMessage(`Error: ${data.error || "Error inesperado"}`);
+  //       }
+  //       return;
+  //     }
 
-      setMessage("Canción registrada con éxito.");
-      setShowModal(false);
-      setFormData({ nombre: "", artista: "", categoria: "", status: "" });
-    } catch (error) {
-      console.error("Error al enviar el formulario:", error);
-      setMessage("Error inesperado. Por favor, inténtalo más tarde.");
-    }
-  };
+  //     setMessage("Canción registrada con éxito.");
+  //     setShowModal(false);
+  //     setFormData({ nombre: "", artista: "", categoria: "", status: "" });
+  //   } catch (error) {
+  //     console.error("Error al enviar el formulario:", error);
+  //     setMessage("Error inesperado. Por favor, inténtalo más tarde.");
+  //   }
+  // };
 
   // Prueba de carga y error de datos
   // if (isLoading) {
@@ -90,9 +94,14 @@ export default function Home() {
           </div>
         )}
 
-        <button onClick={() => setShowModal(true)}>Subir Canción</button>
+        <button onClick={() => setShowForm(!showForm)}>
+          {showForm ? "Cerrar Formulario" : "Subir Canción"}
+        </button>
 
-        {showModal && (
+        {showForm && <SongsForm />}
+
+
+        {/* {showModal && (
           <div className="modal">
             <form onSubmit={handleSubmit}>
               <label>
@@ -120,7 +129,7 @@ export default function Home() {
               <label>
                 Categoría:
                 <select
-                  value={formData.categoria}
+                  value={formData.category}
                   onChange={(e) =>
                     setFormData({ ...formData, categoria: e.target.value })
                   }
@@ -153,7 +162,7 @@ export default function Home() {
           </div>
         )}
 
-        {message && <p>{message}</p>}
+        {message && <p>{message}</p>} */}
       </div>
     </>
   );

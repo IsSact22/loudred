@@ -10,6 +10,7 @@ const UploadInput = ({
   labelClass = '',
   className = '',
   rules = {},
+  
 }) => {
   const { control, formState: { errors } } = useFormContext();
 
@@ -21,7 +22,7 @@ const UploadInput = ({
   return (
     <div className={`mt-2 px-2 ${containerClass}`}>
       {label && (
-        <label htmlFor={name} className={`block text-lg/6 font-bold ${labelClass}`}>
+        <label htmlFor={name} className={`block text-lg/6 text-center font-bold ${labelClass}`}>
           {label}
         </label>
       )}
@@ -37,7 +38,7 @@ const UploadInput = ({
         }}
         render={({ field: { onChange, value, ...field } }) => (
           <div
-            className={`relative border-dashed border-2 rounded-lg p-4 text-center cursor-pointer ${className} ${errors[name] ? 'border-red-500' : 'border-gray-300'}`}
+            className={` w-56 h-48 flex flex-col mt-1 pt-10 border-dashed border-2 rounded-lg p-4 border-purple-900 text-center cursor-pointer ${className} ${errors[name] ? 'border-red-500' : 'border-gray-300'}`}
             onClick={() => document.getElementById(name).click()}
           >
             <input
@@ -51,7 +52,7 @@ const UploadInput = ({
             <label htmlFor={name} className="text-purple-darker hover:underline">
               {value?.[0]?.name || 'Selecciona un archivo'}
             </label>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-purple-400 mt-2">
               Debe ser en formato {accept.replace(/,/g, ', ')} y menor a {maxSize / 1024 / 1024} MB.
             </p>
           </div>
