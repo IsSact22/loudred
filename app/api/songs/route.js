@@ -17,11 +17,12 @@ export async function POST(req) {
     // Obtener los otros datos del formulario
     const title = data.get("title");
     const artist = data.get("artist");
-    const validate = data.get("validate");
+    const validateRaw = data.get("validate"); // Obtén validate como string
+    const validate = validateRaw === "true";
     const userId = parseInt(data.get("userId"));
     const categoryId = parseInt(data.get("categoryId"));
 
-    console.log("Datos recibidos:", { title, artist, userId, categoryId });
+    console.log("Datos recibidos:", { title, artist, validate, userId, categoryId });
 
     // Validación
     if (!title || !artist || !userId || !categoryId) {
@@ -32,7 +33,7 @@ export async function POST(req) {
     }
 
     // Validar si se han enviado los archivos de imagen y música
-    if ( image.size === 0 || music.size === 0) {
+    if (!image || image.size === 0 || !music || music.size === 0) {
       return new Response(
         JSON.stringify({ error: "Se requieren los archivos de imagen y música." }),
         { status: 400, headers: { "Content-Type": "application/json" } }
@@ -147,7 +148,7 @@ export async function POST(req) {
       { status: 201, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Error en el endpoint /api/songs:", error.message);
+    console.error("Error en el endpoint /api/songs", error.message);
     return new Response(
       JSON.stringify({ error: "Error interno del servidor." }),
       { status: 500, headers: { "Content-Type": "application/json" } }

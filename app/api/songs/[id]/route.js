@@ -1,9 +1,5 @@
 
 import mysql from "mysql2/promise";
-import { boolean } from "yup";
-
-
-
 //actualizar validate de canciones
 
 export async function PUT(req, {params}) {
@@ -28,6 +24,27 @@ export async function PUT(req, {params}) {
           password: process.env.DB_PASSWORD,
           database: process.env.DB_DATABASE,
       });
+        
+      const [song] = await connection.execute(
+        "SELECT * FROM songs WHERE id = ?",
+        [id] // Filtrar por el ID de la canción
+      );
+      
+      // Validar que exista la canción
+      if (song.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "No existe canción por actualizar!" }),
+          { status: 404, headers: { "Content-Type": "application/json" } }
+        );
+      }
+      
+  
+        // Validar que el valor de validate sea booleano
+        if (typeof validate !== "boolean") {
+            return new Response(JSON.stringify({ message: "El valor debe ser booleano" }), {
+                status: 400,
+            });
+        }
 
       // Verificar si el valor 'validate' es NULL, en caso de que quieras actualizarlo solo a TRUE
       const [validates] = await connection.execute("SELECT validate FROM songs WHERE id = ?", [id]);
