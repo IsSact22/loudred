@@ -10,7 +10,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 // Hooks
 import { useForm, FormProvider } from "react-hook-form";
-// React
 import { useState } from "react";
 // Toast
 import toast from 'react-hot-toast';

@@ -3,8 +3,9 @@
 import { Heaven } from "@/src/animations/Heaven";
 // Hooks
 import { useData } from "@/src/hooks/useData";
+import UpdateForm from "@/src/partials/dashboard/profile/UpdateForm";
 // Components
-import SongsForm from "@/src/partials/songs/SongsForm";
+import SongsForm from "@/src/partials/dashboard/songs/SongsForm";
 // Next
 import { useSession, signOut } from "next-auth/react";
 // React
@@ -15,6 +16,8 @@ export default function Home() {
   const { data: categories, isLoading, error } = useData("/songs/categories");
 
   const [showForm, setShowForm] = useState(false);
+  const [showFormUser, setShowFormUser] = useState(false);
+
 
   // const [showModal, setShowModal] = useState(false);
   // const [formData, setFormData] = useState({
@@ -99,6 +102,16 @@ export default function Home() {
         </button>
 
         {showForm && <SongsForm />}
+
+        <button onClick={() => setShowFormUser(!showFormUser)}>
+          {showFormUser ? "Cerrar Formulario" : "Actualizar datos"}
+        </button>
+
+        {showFormUser && <UpdateForm />}
+
+
+
+
 
 
         {/* {showModal && (

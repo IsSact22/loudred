@@ -4,9 +4,11 @@ import * as yup from "yup";
 export const loginSchema = yup.object().shape({
   username: yup.string()
     .required("El usuario es obligatorio"),
+
   password: yup.string()
     .required("La contraseña es obligatoria"),
 });
+
 
 // Esquema de validación para el Registro
 export const registerSchema = yup.object().shape({
@@ -14,10 +16,12 @@ export const registerSchema = yup.object().shape({
     .required("El nombre es obligatorio")
     .matches(/^[a-zA-Z\s]+$/, "El nombre solo puede contener letras y espacios")
     .min(3, "El nombre debe tener al menos 3 caracteres"),
+
   lastname: yup.string()
     .required("El apellido es obligatorio")
     .matches(/^[a-zA-Z\s]+$/, "El apellido solo puede contener letras y espacios")
     .min(3, "El apellido debe tener al menos 3 caracteres"),
+
   username: yup.string()
     .required("El usuario es obligatorio")
     .matches(
@@ -25,6 +29,7 @@ export const registerSchema = yup.object().shape({
       "El usuario debe comenzar con una letra mayúscula, luego minúsculas y al menos un número"
     )
     .matches(/\d/, "El usuario debe incluir al menos un número"),
+
   password: yup.string()
     .required("La contraseña es obligatoria")
     .min(8, "La contraseña debe tener al menos 8 caracteres")
@@ -35,14 +40,18 @@ export const registerSchema = yup.object().shape({
       /^[A-Za-z0-9]*$/,
       "La contraseña no debe contener caracteres especiales"
     ),
+
   confirmPassword: yup.string()
     .required("Debe confirmar la contraseña")
     .oneOf([yup.ref("password")], "Las contraseñas no coinciden"),
+
   termsAccepted: yup.boolean()
     .oneOf([true], "Los términos y condiciones son obligatorios"),
+
   userAccepted: yup.boolean()
     .oneOf([true], "Aceptar este término es obligatorio"),
 });
+
 
 // Esquema de validación para formulario de canción
 export const songsSchema = yup.object().shape({
@@ -69,4 +78,26 @@ export const songsSchema = yup.object().shape({
     .object()
     .nullable()
     .required('Debes seleccionar una categoría'),
+});
+
+
+// Esquema de validación para ajustes de usuario
+export const updateSchema = yup.object().shape({
+  name: yup.string()
+    .matches(/^[a-zA-Z\s]+$/, "El nombre solo puede contener letras y espacios")
+    .min(3, "El nombre debe tener al menos 3 caracteres"),
+
+  lastname: yup.string()
+    .matches(/^[a-zA-Z\s]+$/, "El apellido solo puede contener letras y espacios")
+    .min(3, "El apellido debe tener al menos 3 caracteres"),
+
+  password: yup.string()
+    .min(8, "La contraseña debe tener al menos 8 caracteres")
+    .matches(/[A-Z]/, "La contraseña debe incluir al menos una letra mayúscula")
+    .matches(/[a-z]/, "La contraseña debe incluir al menos una letra minúscula")
+    .matches(/\d/, "La contraseña debe incluir al menos un número"),
+
+  confirmPassword: yup.string()
+    .oneOf([yup.ref("password")], "Las contraseñas no coinciden"),
+  
 });
