@@ -1,6 +1,25 @@
 
 import mysql from "mysql2/promise";
 
+
+
+//actualizar validate de canciones
+
+export async function PUT(req, {params}) {
+    const {id}=params;
+}
+
+
+
+
+
+
+
+
+
+
+
+//borrar canciones
 export async function DELETE(req, { params }) {
     const { id } = params;
   

@@ -33,7 +33,7 @@ model Songs {
   artist      String
   categories  categories?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   categoryId  Int?
-  status      String
+  validate      Boolean?
   createdAt   DateTime       @default(now())
   userId      Int            // Clave foránea hacia el modelo User
   user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)

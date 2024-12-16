@@ -4,7 +4,7 @@ CREATE TABLE `Songs` (
     `title` VARCHAR(191) NOT NULL,
     `artist` VARCHAR(191) NOT NULL,
     `categories` VARCHAR(191) NOT NULL,
-    `status` VARCHAR(191) NOT NULL,
+    `validate` BOOLEAN NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `userId` INTEGER NOT NULL,
 
