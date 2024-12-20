@@ -1,9 +1,20 @@
 "use client";
+// Components
+import {
+  Combobox,
+  ComboboxButton,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
+} from "@headlessui/react";
+// Hooks
 import { useFormContext, Controller } from "react-hook-form";
-import { useEffect, useState } from "react";
-import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { useData } from "@/src/hooks/useData";
 import clsx from "clsx";
+// Icons
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
+// React
+import { useState } from "react";
 
 const CategorySelect = ({
   name, // Nombre del campo para usar en react-hook-form
@@ -14,39 +25,30 @@ const CategorySelect = ({
   className = "", // Clases adicionales personalizadas
   rules = {}, // Reglas de validación
 }) => {
-  const { control, formState: { errors } } = useFormContext(); // Obtener control y errores del formulario
-  const [categories, setCategories] = useState([]); // Estado de categorías
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext(); // Obtener control y errores del formulario
+  const {
+    data: categories = [],
+  } = useData("/songs/categories");
   const [query, setQuery] = useState(""); // Estado del query del input
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        // Fetch para obtener categorías desde tu backend
-        const response = await fetch("/api/categories");
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-        const data = await response.json();
-        setCategories(data || []);
-      } catch (error) {
-        console.error("Error al cargar categorías:", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
   // Filtrado de categorías basado en el query
-  const filteredCategories = query === ""
-    ? categories
-    : categories.filter((category) =>
-        category.name.toLowerCase().includes(query.toLowerCase())
-      );
+  const filteredCategories =
+    query === ""
+      ? categories
+      : categories.filter((category) =>
+          category.name.toLowerCase().includes(query.toLowerCase())
+        );
 
   return (
     <div className={`mt-2 px-2 ${containerClass}`}>
       {label && (
-        <label htmlFor={name} className={`block text-lg font-bold ${labelClass}`}>
+        <label
+          htmlFor={name}
+          className={`block text-lg font-bold ${labelClass}`}
+        >
           {label}
         </label>
       )}
@@ -55,6 +57,7 @@ const CategorySelect = ({
         name={name}
         control={control}
         rules={rules}
+        defaultValue={null}
         render={({ field: { onChange, value } }) => (
           <Combobox value={value} onChange={onChange} nullable>
             <div className="relative mt-2">
@@ -72,7 +75,7 @@ const CategorySelect = ({
                 )}
               />
               <ComboboxButton className="absolute inset-y-0 right-0 flex items-center pr-3">
-                <ChevronDownIcon className="h-5 w-5 text-purple-500" />
+                <ChevronDownIcon className="mt-1 h-5 w-5 text-purple-500" />
               </ComboboxButton>
 
               {/* Opciones */}
@@ -93,7 +96,9 @@ const CategorySelect = ({
                     </ComboboxOption>
                   ))
                 ) : (
-                  <p className="p-2 text-gray-500 text-sm">No se encontraron categorías</p>
+                  <p className="p-2 text-gray-500 text-sm">
+                    No se encontraron categorías
+                  </p>
                 )}
               </ComboboxOptions>
             </div>

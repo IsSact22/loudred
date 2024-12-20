@@ -1,4 +1,4 @@
-// Next Auth
+// Next
 import { signIn, signOut } from "next-auth/react";
 
 export const authChannel = new BroadcastChannel("auth_channel");
@@ -27,12 +27,12 @@ export const broadcastLogout = (reason = "manual") => {
   sessionStorage.setItem("lastRoute", window.location.pathname);
   sessionStorage.setItem("logoutReason", reason);
   authChannel.postMessage({ type: "logout", reason });
-  signOut({ callbackUrl: "/" });
+  signOut({ callbackUrl: "/auth/login" });
 };
 
 // Función para restaurar las pestañas
 export const restoreTabs = () => {
-  const lastRoute = sessionStorage.getItem("lastRoute") || "/inicio";
+  const lastRoute = sessionStorage.getItem("lastRoute") || "/";
   setTimeout(() => {
     window.location.replace(lastRoute);
   }, 800);
@@ -41,7 +41,7 @@ export const restoreTabs = () => {
 // Función para redirigir a la página de inicio
 export const redirectToHome = () => {
   setTimeout(() => {
-    window.location.replace("/inicio");
+    window.location.replace("/");
   }, 800);
 };
 
@@ -74,5 +74,5 @@ const handleLogin = ({ reason, action }) => {
 };
 
 const handleLogout = () => {
-  signOut({ callbackUrl: "/" });
+  signOut({ callbackUrl: "/auth/login" });
 };

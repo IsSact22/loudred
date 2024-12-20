@@ -15,11 +15,13 @@ export async function middleware(req) {
     if (pathname.startsWith("/api")) {
       return new NextResponse(JSON.stringify({ message: "No autorizado" }), {
         status: 401,
-        headers: { "Content-Type": "application/json" },
       });
     }
-    // Redirigir a login para otras rutas
-    return NextResponse.redirect(new URL("/auth/login", req.url));
+    // Redirigir a login para otras rutas con parámetro 'from=error'
+    const url = req.nextUrl.clone();
+    url.pathname = "/auth/login";
+    url.searchParams.set("from", "error");
+    return NextResponse.redirect(url);
   }
 
   // Usuario autenticado

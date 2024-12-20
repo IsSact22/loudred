@@ -1,19 +1,27 @@
 "use client";
 // Animations
 import { Heaven } from "@/src/animations/Heaven";
-// Hooks
-import { useData } from "@/src/hooks/useData";
-import UpdateForm from "@/src/partials/dashboard/profile/UpdateForm";
 // Components
-import SongsForm from "@/src/partials/dashboard/songs/SongsForm";
+import SongsForm from "@/src/partials/songs/SongsForm";
+import UpdateForm from "@/src/partials/profile/UpdateForm";
 // Next
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 // React
-import { useState } from "react";
+import { useState, useEffect } from "react";
+// Stores
+import { useSessionStore } from "@/src/stores/sessionStore";
+// Utils
+import { broadcastLogout } from "@/src/utils/broadcastAuth";
 
 export default function Home() {
+  const { setIsLogging, isLogging, isDecided } = useSessionStore();
   const { data: session } = useSession();
-  const { data: categories, isLoading, error } = useData("/songs/categories");
+  console.log(isDecided, isLogging);
+  
+
+  useEffect(() => {
+    setIsLogging(false);
+  }, []);
 
   const [showForm, setShowForm] = useState(false);
   const [showFormUser, setShowFormUser] = useState(false);
@@ -72,15 +80,18 @@ export default function Home() {
 
   return (
     <>
-      <div>
+      <div className="flex flex-col items-center justify-center gap-2">
         <h1>
           Bienvenido, {session?.user.name}{" "}
           {userRoleName === "SUPERADMIN" ? "(SUPERADMIN)" : ""}
         </h1>
 
         {/* Botón para cerrar sesión */}
-        <button onClick={() => signOut({ callbackUrl: "/auth/login" })}>
+        <button onClick={() => broadcastLogout("manual")}>
           Cerrar Sesión
+        </button>
+        <button onClick={() => broadcastLogout("sessionExpired")}>
+          Cerrar Sesión por expiración
         </button>
 
         {userRoleName === "SUPERADMIN" && (
