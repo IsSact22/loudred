@@ -3,22 +3,16 @@
 import Input from "@/src/components/inputs/Input";
 import PasswordInput from "@/src/components/inputs/PasswordInput";
 import StartButton from "@/src/components/buttons/StartButton";
-import SessionModal from "@/src/partials/auth/components/SessionModal";
 // Hooks
 import { useForm, FormProvider } from "react-hook-form";
-import { useIsClient } from "@uidotdev/usehooks";
-import { useSessionDecision } from "@/src/hooks/useSessionDecision";
 // Next
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-// React
-import { useEffect } from "react";
 // Store
 import { useSessionStore } from "@/src/stores/sessionStore";
 // Toast
 import toast from "react-hot-toast";
 // Utils
-import { broadcastLogin, redirectToHome } from "@/src/utils/broadcastAuth";
+import { useAuthBroadcast } from "@/src/hooks/useAuthBroadcast";
 // Validations
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "@/src/validations/validationSchema";
@@ -30,17 +24,8 @@ export default function LoginForm() {
     mode: "onChange",
   });
   const { handleSubmit } = methods; // Extrae métodos de react-hook-form
-  const { isLogging, setIsLogging, setIsDecided, showModal, setShowModal } = useSessionStore();
-  const { handleRestore, handleHome } = useSessionDecision();
-  const isClient = useIsClient();
-  const searchParams = useSearchParams();
-  const from = searchParams.get("from");
-
-  useEffect(() => {
-    if (isClient && from === "error") {
-      toast.error("Necesitas iniciar sesión para acceder a esa página.");
-    }
-  }, [isClient, from]);
+  const { isLogging, setIsLogging } = useSessionStore();
+  const { broadcastLogin } = useAuthBroadcast();
 
   const onSubmit = async (data) => {
     setIsLogging(true);
@@ -53,17 +38,6 @@ export default function LoginForm() {
       toast.error(result.error || "Oops, credenciales inválidas.");
       setIsLogging(false);
     } else {
-      // Obtenemos la razón del cierre de sesión anterior
-      const logoutReason = sessionStorage.getItem("logoutReason");
-
-      if (logoutReason === "manual") {
-        // Si fue manual, redirigimos directamente a inicio
-        redirectToHome();
-        setIsDecided(true);
-      } else {
-        // Si no, mostramos el modal de decisión
-        setShowModal(true);
-      }
       // Limpiamos la razón del logout del sessionStorage
       sessionStorage.removeItem("logoutReason");
     }
@@ -77,12 +51,6 @@ export default function LoginForm() {
   };
   return (
     <>
-      <SessionModal
-        isOpen={showModal}
-        onHome={handleHome}
-        onRestore={handleRestore}
-        closeModal={handleHome}
-      />
       <div className="flex flex-col items-center justify-center">
         <div className="flex flex-col mt-14 p-10 bg-gradient-to-br from-purple-dark to-purple-darker rounded-2xl shadow-md">
           <h2 className="text-4xl font-bold text-white mb-10 ml-1">

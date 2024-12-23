@@ -7,22 +7,13 @@ import UpdateForm from "@/src/partials/profile/UpdateForm";
 // Next
 import { useSession } from "next-auth/react";
 // React
-import { useState, useEffect } from "react";
-// Stores
-import { useSessionStore } from "@/src/stores/sessionStore";
+import { useState } from "react";
 // Utils
-import { broadcastLogout } from "@/src/utils/broadcastAuth";
+import { useAuthBroadcast } from "@/src/hooks/useAuthBroadcast";
 
 export default function Home() {
-  const { setIsLogging, isLogging, isDecided } = useSessionStore();
   const { data: session } = useSession();
-  console.log(isDecided, isLogging);
-  
-
-  useEffect(() => {
-    setIsLogging(false);
-  }, []);
-
+  const { broadcastLogout } = useAuthBroadcast();
   const [showForm, setShowForm] = useState(false);
   const [showFormUser, setShowFormUser] = useState(false);
 
@@ -87,10 +78,10 @@ export default function Home() {
         </h1>
 
         {/* Botón para cerrar sesión */}
-        <button onClick={() => broadcastLogout("manual")}>
+        <button type="button" onClick={() => broadcastLogout("manual")}>
           Cerrar Sesión
         </button>
-        <button onClick={() => broadcastLogout("sessionExpired")}>
+        <button type="button" onClick={() => broadcastLogout("sessionExpired")}>
           Cerrar Sesión por expiración
         </button>
 
@@ -119,11 +110,6 @@ export default function Home() {
         </button>
 
         {showFormUser && <UpdateForm />}
-
-
-
-
-
 
         {/* {showModal && (
           <div className="modal">

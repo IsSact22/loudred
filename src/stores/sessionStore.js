@@ -5,8 +5,6 @@ import Cookies from "js-cookie";
 export const useSessionStore = create(
   persist(
     (set) => ({
-      isDecided: false,
-      setIsDecided: (value) => set({ isDecided: value }),
       isLogging: false,
       setIsLogging: (value) => set({ isLogging: value }),
       showModal: false,

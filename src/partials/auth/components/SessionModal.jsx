@@ -1,20 +1,19 @@
-/* Components */
+// Components
 import BasicsModal from "@/src/components/modals/BasicsModal";
 import { TextIconButton } from "@/src/components/buttons/TextIconButton";
-
-/* Icons */
+// Hooks
+import { useSessionDecision } from "@/src/hooks/useSessionDecision";
+// Icons
 import { TbExclamationCircle } from "react-icons/tb";
 
 export default function SessionModal ({
   isOpen,
-  closeModal,
-  onRestore,
-  onHome,
 }) {
+  const { handleRestore, handleHome } = useSessionDecision();
   return (
     <BasicsModal
       isOpen={isOpen}
-      closeModal={closeModal}
+      closeModal={handleHome}
       icon={<TbExclamationCircle className="text-red-rusty" />}
       title="¿Qué desea hacer?"
       titleCenter
@@ -31,7 +30,7 @@ export default function SessionModal ({
           padding="py-1 px-3"
           text="Restaurar"
           type="button"
-          onClick={onRestore}
+          onClick={handleRestore}
           bgColor="bg-white"
           bgColorHover="hover:bg-purple-dark"
           shadowAndColor="shadow-sm shadow-lavender"
@@ -45,7 +44,7 @@ export default function SessionModal ({
           padding="py-1 px-2"
           text="Inicio"
           type="button"
-          onClick={onHome}
+          onClick={handleHome}
           bgColor="bg-white"
           bgColorHover="hover:bg-red-rusty"
           shadowAndColor="shadow-sm shadow-red-rusty"
