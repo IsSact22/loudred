@@ -9,11 +9,10 @@ import { useSession } from "next-auth/react";
 // React
 import { useState } from "react";
 // Utils
-import { useAuthBroadcast } from "@/src/hooks/useAuthBroadcast";
+import { broadcastLogout } from "@/src/utils/authChannel";
 
 export default function Home() {
   const { data: session } = useSession();
-  const { broadcastLogout } = useAuthBroadcast();
   const [showForm, setShowForm] = useState(false);
   const [showFormUser, setShowFormUser] = useState(false);
 

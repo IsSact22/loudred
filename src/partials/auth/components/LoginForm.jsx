@@ -12,7 +12,7 @@ import { useSessionStore } from "@/src/stores/sessionStore";
 // Toast
 import toast from "react-hot-toast";
 // Utils
-import { useAuthBroadcast } from "@/src/hooks/useAuthBroadcast";
+import { broadcastLogin } from "@/src/utils/authChannel";
 // Validations
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "@/src/validations/validationSchema";
@@ -25,7 +25,6 @@ export default function LoginForm() {
   });
   const { handleSubmit } = methods; // Extrae métodos de react-hook-form
   const { isLogging, setIsLogging } = useSessionStore();
-  const { broadcastLogin } = useAuthBroadcast();
 
   const onSubmit = async (data) => {
     setIsLogging(true);

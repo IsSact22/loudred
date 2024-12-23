@@ -3,10 +3,10 @@
 import { signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import authChannel, {broadcastLogin, broadcastLogout} from "@/src/utils/authChannel";
 
 export const useAuthBroadcast = () => {
   const router = useRouter();
-  const authChannel = new BroadcastChannel("auth_channel");
 
   // Función para restaurar la pestaña a la última ruta
   const restoreTabs = () => {
@@ -22,29 +22,6 @@ export const useAuthBroadcast = () => {
     setTimeout(() => {
       router.replace("/");
     }, 800);
-  };
-
-  // Función para manejar la transmisión de inicio de sesión
-  const broadcastLogin = async (credentials) => {
-    const result = await signIn("credentials", {
-      redirect: false,
-      ...credentials,
-    });
-
-    if (!result.error) {
-      const logoutReason = sessionStorage.getItem("logoutReason");
-      authChannel.postMessage({ type: "login", reason: logoutReason });
-    }
-
-    return result;
-  };
-
-  // Función para manejar la transmisión de cierre de sesión
-  const broadcastLogout = (reason = "manual") => {
-    // No establecemos 'lastRoute' aquí para evitar sobrescribir en otras pestañas
-    sessionStorage.setItem("logoutReason", reason);
-    authChannel.postMessage({ type: "logout", reason });
-    signOut({ callbackUrl: "/auth/login" });
   };
 
   // Mapeo de manejadores de mensajes

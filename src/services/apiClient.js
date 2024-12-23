@@ -4,7 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 /* Utils */
-import { broadcastLogout } from "@/src/utils/authBroadcast";
+import { broadcastLogout } from "@/src/utils/authChannel";
 
 export const apiClient = axios.create({
   baseURL: "/api", // URL base de la API
