@@ -81,16 +81,6 @@ export async function PUT(req, {params}) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
 //borrar canciones
 export async function DELETE(req, { params }) {
     const { id } = params;
