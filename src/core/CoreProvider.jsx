@@ -2,16 +2,15 @@
 // Components
 import SessionModal from "@/src/partials/auth/components/SessionModal";
 // Hooks
-import { useAuthBroadcast } from "@/src/hooks/useAuthBroadcast";
 import { useIsClient } from "@uidotdev/usehooks";
 import { useSessionDecision } from "@/src/hooks/useSessionDecision";
 // Next
 import { SessionProvider, useSession } from "next-auth/react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 // React
 import { useEffect } from "react";
 // Store
-import { useSessionStore } from "../stores/sessionStore";
+import { useSessionStore } from "@/src/stores/sessionStore";
 // Toast
 import toast from "react-hot-toast";
 
@@ -25,39 +24,42 @@ export const CoreProvider = ({ children }) => {
 
 export const SessionStatus = ({ children }) => {
   const { status } = useSession();
-  const { redirectToHome } = useAuthBroadcast();
   const { handleHome } = useSessionDecision();
   const { isLogging, setIsLogging, showModal, setShowModal } = useSessionStore();
   const pathname = usePathname();
+  const router = useRouter();
   const isClient = useIsClient();
   const searchParams = useSearchParams();
   const from = searchParams.get("from");
 
   useEffect(() => {
-    if (isClient && from === "error") {
+    if (!isClient) return;
+
+    const logoutReason = sessionStorage.getItem("logoutReason");
+
+    if (from === "error") {
       toast.error("Necesitas iniciar sesión para acceder a esa página.");
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("from");
+      router.replace(`${pathname}?${params.toString()}`);
     }
-  }, [isClient, from]);
 
-  useEffect(() => {
-    if (isLogging) {
-      const logoutReason = sessionStorage.getItem("logoutReason");
-
-      if (logoutReason === "manual") {
-        redirectToHome();
-      } else {
-        setShowModal(true);
-      }
-      setIsLogging(false); // Evita el bucle estableciendo isLogging en false
+    if (isLogging && logoutReason === "manual") {
+      handleHome();
+      setIsLogging(false);
+      return;
     }
-  }, [isLogging, redirectToHome, setShowModal]);
 
-  useEffect(() => {
+    if (isLogging && logoutReason !== "manual") {
+      setShowModal(true);
+      setIsLogging(false);
+      return;
+    }
+
     if (pathname !== "/auth/login" && showModal) {
       handleHome();
     }
-  }
-  , [pathname, showModal, handleHome]);
+  }, [isClient, from, isLogging, pathname, showModal]);
 
   if (status === "loading") {
     return <div> Cargando </div>

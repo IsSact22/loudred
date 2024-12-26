@@ -1,9 +1,9 @@
 "use client";
 
-import { signIn, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import authChannel, {broadcastLogin, broadcastLogout} from "@/src/utils/authChannel";
+import authChannel from "@/src/utils/authChannel";
 
 export const useAuthBroadcast = () => {
   const router = useRouter();
@@ -63,8 +63,6 @@ export const useAuthBroadcast = () => {
   }, []);
 
   return {
-    broadcastLogin,
-    broadcastLogout,
     redirectToHome,
     restoreTabs,
     authChannel,

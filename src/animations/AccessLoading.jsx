@@ -5,7 +5,7 @@ import { motion, useAnimate } from "framer-motion";
 import { useEffect } from "react";
 
 export const AccessLoading = () => {
-  const text = "● ● ● L O U D R E ● ● ●";
+  const text = "● ● ● L O U D R E D ● ● ●";
   const characters = text.split("");
 
   const fontSize = "18px";
