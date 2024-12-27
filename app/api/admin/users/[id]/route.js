@@ -18,27 +18,11 @@ function validateNameField(field, fieldName) {
 
 // READ UNO POR UNO CON CANCIONES QUE HAN SUBIDO
 export async function GET(req, { params }) {
+  const userId = params?.id;
+  const { search } = Object.fromEntries(new URL(req.url).searchParams);
+
   try {
-
-    
-    const userId = params?.id;
-
-    if (!userId) {
-      return new Response(
-        JSON.stringify({ error: "ID no proporcionado en la ruta" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Validar que el ID sea un número
-    if (isNaN(Number(userId))) {
-      return new Response(
-        JSON.stringify({ error: "El ID proporcionado no es válido" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Conexión a la base de datos
+    // Configuración de conexión a la base de datos
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USERNAME,
@@ -47,44 +31,82 @@ export async function GET(req, { params }) {
     });
 
     try {
-      // Buscar el usuario por ID
-      const [user] = await connection.execute(
-        "SELECT id, name, lastname, username, roleId, created_at FROM User WHERE id = ?",
-        [userId]
-      );
+      // Caso 1: Buscar canciones de un usuario específico
+      if (userId) {
+        // Validar que el ID sea un número
+        if (isNaN(Number(userId))) {
+          return new Response(
+            JSON.stringify({ error: "El ID proporcionado no es válido" }),
+            { status: 400, headers: { "Content-Type": "application/json" } }
+          );
+        }
 
-      if (user.length === 0) {
+        // Buscar el usuario por ID
+        const [user] = await connection.execute(
+          "SELECT id, name, lastname, username, roleId, created_at FROM User WHERE id = ?",
+          [userId]
+        );
+
+        if (user.length === 0) {
+          return new Response(
+            JSON.stringify({ error: "Usuario no encontrado" }),
+            { status: 404, headers: { "Content-Type": "application/json" } }
+          );
+        }
+
+        // Buscar canciones del usuario
+        const [songs] = await connection.execute(
+          "SELECT * FROM Songs WHERE userId = ? AND title LIKE ?",
+          [userId, `%${search || ""}%`]
+        );
+
+        let message;
+        if (songs.length === 0) {
+          message = search
+            ? "El usuario no tiene canciones que coincidan con la búsqueda."
+            : "El usuario no tiene canciones disponibles aún.";
+        }
+
+        const response = {
+          ...user[0],
+          songs: songs || [],
+          message,
+        };
+
+        return new Response(JSON.stringify(response), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // Caso 2: Búsqueda global por título o nombre de usuario
+      if (search) {
+        const [songs] = await connection.execute(
+          `SELECT Songs.*, User.username 
+           FROM Songs 
+           LEFT JOIN User ON Songs.userId = User.id
+           WHERE Songs.title LIKE ? OR User.username LIKE ?`,
+          [`%${search}%`, `%${search}%`]
+        );
+
+        const message = songs.length === 0 ? "No se encontraron resultados." : undefined;
+
         return new Response(
-          JSON.stringify({ error: "Usuario no encontrado" }),
-          { status: 404, headers: { "Content-Type": "application/json" } }
+          JSON.stringify({ songs, message }),
+          { status: 200, headers: { "Content-Type": "application/json" } }
         );
       }
 
-      // Buscar canciones del usuario
-      const [songs] = await connection.execute(
-        "SELECT * FROM Songs WHERE userId = ?",
-        [userId]
+      // Caso 3: No se proporcionaron parámetros válidos
+      return new Response(
+        JSON.stringify({ error: "Debe proporcionar un ID o un término de búsqueda." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
-
-      // Combinar resultados
-      const response = {
-        ...user[0],
-        songs: songs || [],
-        message: songs.length === 0 ? "El usuario no tiene canciones aún" : undefined,
-      };
-
-      // Respuesta exitosa
-      return new Response(JSON.stringify(response), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
     } finally {
       await connection.end(); // Cierra la conexión en el bloque finally
     }
   } catch (error) {
     console.error("Error interno del servidor:", error);
-
-    // Manejo de errores internos
     return new Response(
       JSON.stringify({ error: "Error interno del servidor" }),
       { status: 500, headers: { "Content-Type": "application/json" } }
@@ -211,8 +233,6 @@ export async function PUT(req, { params }) {
   }
 }
 
-
-
 //DELETE
 export async function DELETE(req, { params }) {
   const { id } = params;
@@ -241,3 +261,5 @@ export async function DELETE(req, { params }) {
     return new Response("Error interno del servidor", { status: 500 });
   }
 }
+
+//buscador de canciones en un usuario en particular

@@ -30,7 +30,6 @@ model User {
 model Songs {
   id          Int           @id @default(autoincrement())
   title       String
-  artist      String
   categories  categories?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   categoryId  Int?
   validate      Boolean?

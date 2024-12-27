@@ -16,16 +16,15 @@ export async function POST(req) {
 
     // Obtener los otros datos del formulario
     const title = data.get("title");
-    const artist = data.get("artist");
     const validateRaw = data.get("validate"); // Obtén validate como string
     const validate = validateRaw === "true";
     const userId = parseInt(data.get("userId"));
     const categoryId = parseInt(data.get("categoryId"));
 
-    console.log("Datos recibidos:", { title, artist, validate, userId, categoryId });
+    console.log("Datos recibidos:", { title, validate, userId, categoryId });
 
     // Validación
-    if (!title || !artist || !userId || !categoryId) {
+    if (!title || !userId || !categoryId) {
       return new Response(
         JSON.stringify({ error: "Todos los campos son obligatorios." }),
         { status: 400, headers: { "Content-Type": "application/json" } }
@@ -67,7 +66,6 @@ export async function POST(req) {
     const newSong = await prisma.songs.create({
       data: {
         title,
-        artist,
         validate,
         userId,  // Usar userId como número
         categoryId,  // Usar categoryId como número
