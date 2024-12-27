@@ -1,8 +1,6 @@
-'use client';
+"use client";
 
-// COMPONENTE
-/* Botón Básico */
-export const TextIconButton = ({
+export default function TextIconButton({
   bgColor = "bg-gray",
   bgColorHover = "hover:bg-gray-dark",
   disabled = false,
@@ -24,15 +22,17 @@ export const TextIconButton = ({
   textWeightHover = "",
   type = "button",
   style = {},
-}) => (
-  <button
-    className={`${padding} ${margin} inline-flex items-center justify-center ${bgColor} ${rounded} ${shadowAndColor} ${borderAndColor} ${textColor} ${textSize} ${textWeight} transition duration-300 ${bgColorHover} ${textColorHover} ${textWeightHover} ${shadowAndColorHover} ${borderAndColorHover} ${scale} focus:outline-none`}
-    disabled={disabled}
-    onClick={onClick}
-    type={type}
-    style={style}
-  >
-    {icon}
-    {text}
-  </button>
-);
+}) {
+  return (
+    <button
+      className={`${padding} ${margin} inline-flex items-center justify-center ${bgColor} ${rounded} ${shadowAndColor} ${borderAndColor} ${textColor} ${textSize} ${textWeight} transition duration-300 ${bgColorHover} ${textColorHover} ${textWeightHover} ${shadowAndColorHover} ${borderAndColorHover} ${scale} focus:outline-none`}
+      disabled={disabled}
+      onClick={onClick}
+      type={type}
+      style={style}
+    >
+      {icon}
+      {text}
+    </button>
+  );
+}

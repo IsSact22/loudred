@@ -2,81 +2,80 @@ import {
   Dialog,
   DialogPanel,
   DialogTitle,
-  Transition,
-  TransitionChild,
+  Description,
 } from "@headlessui/react";
-import { IoIosClose } from "react-icons/io";
+import { AnimatePresence, motion } from "framer-motion";
+import { TbX } from "react-icons/tb";
+import React from "react";
 
-export default function BasicsModal({
-  children,
-  closeModal,
-  handleKeyDown,
-  icon,
+export default function BasicsModal2({
   isOpen,
-  item,
+  onClose,
   title,
-  titleCenter,
+  description,
+  children,
+  isCentered = false,
+  icon,
 }) {
   return (
-    <Transition appear show={isOpen}>
-      <Dialog
-        as="div"
-        className="relative z-50"
-        onClose={closeModal}
-        onKeyDown={handleKeyDown}
-      >
-        {/* Backdrop */}
-        <TransitionChild as="div">
-          <div
-            className="
-              fixed inset-0 bg-black/25
-              transition duration-300 
-              data-[closed]:opacity-0
-            "
+    <AnimatePresence>
+      {isOpen && (
+        <Dialog
+          static
+          open={isOpen}
+          onClose={onClose}
+          className="relative z-50"
+        >
+          {/* Fondo oscuro con Framer Motion */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/30"
           />
-        </TransitionChild>
-
-        <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
-            {/* Panel del modal */}
-            <TransitionChild as="div">
-              <DialogPanel
-                className="
-                  min-w-80 max-w-[506px] transform rounded-xl bg-white p-6 
-                  text-left align-middle shadow-xl 
-                  transition duration-300 ease-out
-                  data-[closed]:opacity-0
-                  data-[closed]:scale-95
-                "
+          {/* Contenedor que centra el contenido del modal */}
+          <div className="fixed inset-0 flex w-screen items-center justify-center">
+            {/* Panel del diálogo con animaciones de entrada y salida */}
+            <DialogPanel
+              as={motion.div}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="max-w-80 space-y-4 rounded-xl bg-indigo-50 px-6 pb-6 pt-4 shadow-xl relative"
+            >
+              {/* Botón de cierre en la esquina superior derecha */}
+              <button
+                onClick={onClose}
+                className="absolute top-2 right-2 text-gray-500 hover:text-red-rusty duration-300"
+                aria-label="Close modal"
               >
-                {/* Botón de cerrar */}
-                <button className="absolute top-1 right-2" onClick={closeModal}>
-                  <IoIosClose className="w-7 h-7 hover:text-red-rusty" />
-                </button>
-                {/* Cabecera (ícono + título) */}
-                <DialogTitle
-                  as="h3"
-                  className="relative truncate text-lg font-medium leading-6 text-gray-900"
+                <TbX size={24} />
+              </button>
+              {/* Título del modal */}
+              <DialogTitle
+                className={`flex items-center gap-2 text-transparent font-semibold bg-gradient-to-t bg-clip-text from-lavender to-purple-dark ${
+                  isCentered ? "justify-center" : ""
+                }`}
+              >
+                {icon}
+                {title}
+              </DialogTitle>
+              {/* Descripción opcional */}
+              {description && (
+                <Description
+                  className={`text-gray-700 font-normal ${
+                    isCentered ? "text-center" : ""
+                  }`}
                 >
-                  <div
-                    className={`flex items-center ${
-                      titleCenter ? "justify-center" : ""
-                    } gap-2 bg-gradient-to-t bg-clip-text from-lavender to-purple-dark 
-                    text-transparent font-bold text-lg`}
-                  >
-                    {icon}
-                    {title}
-                    <span className="truncate text-lavender">{item?.name}</span>
-                  </div>
-                </DialogTitle>
-
-                {/* Contenido del modal */}
-                {children}
-              </DialogPanel>
-            </TransitionChild>
+                  {description}
+                </Description>
+              )}
+              {/* Contenido del modal */}
+              <div>{children}</div>
+            </DialogPanel>
           </div>
-        </div>
-      </Dialog>
-    </Transition>
+        </Dialog>
+      )}
+    </AnimatePresence>
   );
 }

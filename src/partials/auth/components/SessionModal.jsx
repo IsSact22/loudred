@@ -1,6 +1,6 @@
 // Components
 import BasicsModal from "@/src/components/modals/BasicsModal";
-import { TextIconButton } from "@/src/components/buttons/TextIconButton";
+import TextIconButton from "@/src/components/buttons/TextIconButton";
 // Hooks
 import { useSessionDecision } from "@/src/hooks/useSessionDecision";
 // Icons
@@ -13,17 +13,12 @@ export default function SessionModal ({
   return (
     <BasicsModal
       isOpen={isOpen}
-      closeModal={handleHome}
+      onClose={handleHome}
       icon={<TbExclamationCircle className="text-red-rusty" />}
       title="¿Qué desea hacer?"
-      titleCenter
+      description={"¿Desea restaurar su sesión o ir a inicio?"}
+      isCentered
     >
-      <div className="my-4 text-center">
-        <p className="text-navy-dark text-md font-bold">
-          ¿Desea restaurar su sesión
-        </p>
-        <p className="text-navy-dark text-md font-bold">o ir a inicio?</p>
-      </div>
       <div className="flex items-center justify-center gap-2 ">
         <TextIconButton
           margin="my"
@@ -32,11 +27,11 @@ export default function SessionModal ({
           type="button"
           onClick={handleRestore}
           bgColor="bg-white"
-          bgColorHover="hover:bg-purple-dark"
-          shadowAndColor="shadow-sm shadow-lavender"
+          bgColorHover="hover:bg-lavender"
+          shadowAndColor="shadow-lg shadow-lavender/50"
           shadowAndColorHover="hover:shadow-md hover:shadow-lavender"
           scale="hover:scale-105"
-          textColor="text-purple-dark"
+          textColor="text-lavender"
           textWeight="font-bold"
         />
         <TextIconButton
@@ -47,7 +42,7 @@ export default function SessionModal ({
           onClick={handleHome}
           bgColor="bg-white"
           bgColorHover="hover:bg-red-rusty"
-          shadowAndColor="shadow-sm shadow-red-rusty"
+          shadowAndColor="shadow-lg shadow-red-rusty/20"
           shadowAndColorHover="hover:shadow-md hover:shadow-red-rusty"
           scale="hover:scale-105"
           textColor="text-red-rusty"
