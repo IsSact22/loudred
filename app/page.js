@@ -3,6 +3,15 @@
 import SidebarLeft from "@/src/components/bars/SidebarLeft";
 import SidebarRight from "@/src/components/bars/SidebarRight"; 
 import SearchBar from "@/src/components/navegation/SearchBar";
+import React from "react";
+import SongCard from "@/src/components/cards/SongsCard";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 // Next
 import { useSession } from "next-auth/react";
 // Utils
@@ -31,7 +40,7 @@ export default function Home() {
       <div className="flex-1 p-6">
         <div className="flex flex-col items-center justify-center gap-2">
           {/* Barra de búsqueda */}
-          <div className="w-full flex justify-end mb-2">
+          <div className="w-full flex justify-center mb-2">
             <SearchBar onSearch={handleSearch} />
           </div>
           {/* <h1>

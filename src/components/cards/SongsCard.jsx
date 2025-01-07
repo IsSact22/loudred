@@ -1,0 +1,44 @@
+import React, { useState } from "react";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
+
+const SongCard = ({ image, title, artist, onFavorite }) => {
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  const handleFavoriteClick = () => {
+    setIsFavorited(!isFavorited);
+    if (onFavorite) {
+      onFavorite(title, !isFavorited); // Enviar el estado actualizado al callback
+    }
+  };
+
+  return (
+    <div className="w-40 bg-purple-900 rounded-lg overflow-hidden shadow-md">
+      {/* Imagen de la canción */}
+      <img
+        src={image}
+        alt={title}
+        className="w-full h-32 object-cover"
+      />
+
+      {/* Contenido del card */}
+      <div className="p-2 text-white">
+        <h3 className="text-sm font-semibold truncate">{title}</h3>
+        <p className="text-xs text-purple-300 truncate">{artist}</p>
+
+        {/* Ícono de "me gusta" */}
+        <div className="flex justify-end mt-2">
+          <button
+            onClick={handleFavoriteClick}
+            className={`${
+              isFavorited ? "text-red-500" : "text-purple-300"
+            } hover:text-red-400 transition-colors`}
+          >
+            {isFavorited ? <FaHeart /> : <FaRegHeart />}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SongCard;
