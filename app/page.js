@@ -3,15 +3,10 @@
 import SidebarLeft from "@/src/components/bars/SidebarLeft";
 import SidebarRight from "@/src/components/bars/SidebarRight"; 
 import SearchBar from "@/src/components/navegation/SearchBar";
+import { CarouselSongs } from "@/src/components/navegation/Carrousel";
+// React
 import React from "react";
-import SongCard from "@/src/components/cards/SongsCard";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+
 // Next
 import { useSession } from "next-auth/react";
 // Utils
@@ -25,25 +20,29 @@ export default function Home() {
 
   const handleSearch = (query) => {
     console.log("Buscando:", query);
-    // Aquí puedes agregar lo que desees hacer con la búsqueda, como filtrar resultados o hacer una consulta.
   };
 
-
   return (
-    <div className="flex bg-slate-950">
-      {/* Sidebar */}
-      <SidebarLeft />
-      <SidebarRight />
-
+    <div className="flex h-screen bg-slate-950">
+      {/* Sidebar izquierdo */}
+      <div className="w-64">
+        <SidebarLeft />
+      </div>
 
       {/* Contenido principal */}
-      <div className="flex-1 p-6">
-        <div className="flex flex-col items-center justify-center gap-2">
-          {/* Barra de búsqueda */}
-          <div className="w-full flex justify-center mb-2">
-            <SearchBar onSearch={handleSearch} />
-          </div>
-          {/* <h1>
+      <div className="flex-1 flex flex-col items-center justify-start p-6">
+        {/* Barra de búsqueda */}
+        <div className="w-full max-w-2xl mb-4">
+          <SearchBar onSearch={handleSearch} />
+        </div>
+
+        {/* Carrusel */}
+        <div className="w-full max-w-4xl">
+          <CarouselSongs />
+        </div>
+
+        <div>
+            {/* <h1>
             Bienvenido, {session?.user.name}{" "}
             {userRoleName === "SUPERADMIN" ? "(SUPERADMIN)" : ""}
           </h1> */}
@@ -70,8 +69,13 @@ export default function Home() {
               <h2>Bienvenido, webones proveedores de nuestra locura.</h2>
             </div>
           )} */}
-          
         </div>
+
+      </div>
+
+      {/* Sidebar derecho */}
+      <div className="w-64 bg-slate-800">
+        <SidebarRight />
       </div>
     </div>
   );
