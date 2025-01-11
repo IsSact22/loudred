@@ -1,7 +1,6 @@
 import * as React from "react"
 import useEmblaCarousel from "embla-carousel-react";
 import { ArrowLeft, ArrowRight } from "lucide-react"
-import { HiChevronLeft } from "react-icons/hi";
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -150,55 +149,45 @@ const CarouselItem = React.forwardRef(({ className, ...props }, ref) => {
 CarouselItem.displayName = "CarouselItem"
 
 const CarouselPrevious = React.forwardRef(({ className, variant = "outline", size = "icon", ...props }, ref) => {
-  const { orientation, scrollPrev, canScrollPrev } = useCarousel();
+  const { orientation, scrollPrev, canScrollPrev } = useCarousel()
 
   return (
-    <Button
+    (<Button
       ref={ref}
       variant={variant}
       size={size}
-      className={cn(
-        "absolute h-10 w-10 rounded-full bg-white text-black shadow-md flex items-center justify-center hover:bg-gray-200 transition", 
-        orientation === "horizontal"
-          ? "-left-16 top-1/2 -translate-y-1/2 z-10" // Ajustado más a la izquierda (-16)
-          : "-top-6 left-1/2 -translate-x-1/2 rotate-90",
-        className
-      )}
+      className={cn("absolute  h-8 w-8 rounded-full", orientation === "horizontal"
+        ? "-left-12 top-1/2 -translate-y-1/2"
+        : "-top-12 left-1/2 -translate-x-1/2 rotate-90", className)}
       disabled={!canScrollPrev}
       onClick={scrollPrev}
-      {...props}
-    >
-      <HiChevronLeft className="h-6 w-6" />
+      {...props}>
+      <ArrowLeft className="h-4 w-4" />
       <span className="sr-only">Previous slide</span>
-    </Button>
+    </Button>)
   );
-});
-CarouselPrevious.displayName = "CarouselPrevious";
+})
+CarouselPrevious.displayName = "CarouselPrevious"
 
 const CarouselNext = React.forwardRef(({ className, variant = "outline", size = "icon", ...props }, ref) => {
-  const { orientation, scrollNext, canScrollNext } = useCarousel();
+  const { orientation, scrollNext, canScrollNext } = useCarousel()
 
   return (
-    <Button
+    (<Button
       ref={ref}
       variant={variant}
       size={size}
-      className={cn(
-        "absolute h-10 w-10 rounded-full bg-white text-black shadow-md flex items-center justify-center hover:bg-gray-200 transition", 
-        orientation === "horizontal"
-          ? "-right-16 top-1/2 -translate-y-1/2 z-10" // Ajustado más a la derecha (-16)
-          : "-bottom-6 left-1/2 -translate-x-1/2 rotate-90",
-        className
-      )}
+      className={cn("absolute h-8 w-8 rounded-full", orientation === "horizontal"
+        ? "-right-12 top-1/2 -translate-y-1/2"
+        : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90", className)}
       disabled={!canScrollNext}
       onClick={scrollNext}
-      {...props}
-    >
-      <ArrowRight className="h-6 w-6" />
+      {...props}>
+      <ArrowRight className="h-4 w-4" />
       <span className="sr-only">Next slide</span>
-    </Button>
+    </Button>)
   );
-});
-CarouselNext.displayName = "CarouselNext";
+})
+CarouselNext.displayName = "CarouselNext"
 
 export { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext };

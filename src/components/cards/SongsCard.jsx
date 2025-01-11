@@ -7,17 +7,17 @@ const SongCard = ({ image, title, artist, onFavorite }) => {
   const handleFavoriteClick = () => {
     setIsFavorited(!isFavorited);
     if (onFavorite) {
-      onFavorite(title, !isFavorited); // Enviar el estado actualizado al callback
+      onFavorite(title, !isFavorited); 
     }
   };
 
   return (
-    <div className="w-40 bg-purple-900 rounded-lg overflow-hidden shadow-md">
+    <div className="w-40  bg-slate-900 hover:bg-slate-800 rounded-lg overflow-hidden shadow-md">
       {/* Imagen de la canción */}
       <img
         src={image}
         alt={title}
-        className="w-full h-32 object-cover"
+        className="w-full h-40 object-cover"
       />
 
       {/* Contenido del card */}
