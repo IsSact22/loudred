@@ -99,14 +99,14 @@ export async function POST(req) {
     let musicPath = null;
     if (music) {
       const newMusicFilename = `${uuidv4()}.${music.name.split(".").pop()}`;
-      const musicUploadPath = path.join(process.cwd(), "public/uploads/songs", newMusicFilename);
+      const musicUploadPath = path.join(process.cwd(), "public/uploads/music", newMusicFilename);
 
       const audioBytes = await music.arrayBuffer();
       const audioBuffer = Buffer.from(audioBytes);
 
       try {
         await writeFile(musicUploadPath, audioBuffer);
-        musicPath = `/uploads/songs/${newMusicFilename}`;
+        musicPath = `/uploads/music/${newMusicFilename}`;
         console.log("Canción guardada:", newMusicFilename);
       } catch (error) {
         console.error("Error al guardar la canción:", error);

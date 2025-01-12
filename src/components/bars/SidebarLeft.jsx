@@ -1,10 +1,13 @@
+"use client";
 import { useRouter } from "next/navigation";
 // components/Sidebar.js
 import React, { useState } from "react";
 import SongsForm from "@/src/partials/songs/SongsForm";
 import UpdateForm from "@/src/partials/profile/UpdateForm";
 import { broadcastLogout } from "@/src/utils/authChannel";
-import { toast } from "react-hot-toast"; // Importa toast
+import { toast } from "react-hot-toast";
+// Next
+import { useSession } from "next-auth/react";
 //iconos
 import { HiHome } from "react-icons/hi";
 import { HiOutlineCloudUpload } from "react-icons/hi";
@@ -12,8 +15,15 @@ import { HiOutlineLogout } from "react-icons/hi";
 import { HiOutlineCog } from "react-icons/hi";
 import { HiUser } from "react-icons/hi";
 import { HiOutlineHeart } from "react-icons/hi";
+import { HiOutlineViewGridAdd } from "react-icons/hi";
+
 
 const SidebarLeft = () => {
+  const { data: session } = useSession();
+
+  // Usar directamente el rol desde la sesión
+  const userRoleName = session?.user?.role?.name;
+
   const [isOpen, setIsOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("home"); // Controla la pestaña activa
   const router = useRouter(); // Usamos useRouter de next/navigation
@@ -26,6 +36,7 @@ const SidebarLeft = () => {
     { name: "Favoritos", key: "favourites", icon: <HiOutlineHeart /> },
     { name: "Subir", key: "upload", icon: <HiOutlineCloudUpload /> },
     { name: "Ajustes", key: "settings", icon: <HiOutlineCog /> },
+    { name: "Administrador", key: "admin", icon: <HiOutlineViewGridAdd /> },
     { name: "Salir", key: "logout", icon: <HiOutlineLogout /> },
   ];
 
@@ -124,6 +135,12 @@ const SidebarLeft = () => {
         )}
 
         {activeTab === "settings" && (
+          <div>
+            <UpdateForm />
+          </div>
+        )}
+
+        {activeTab === "admin" && (
           <div>
             <UpdateForm />
           </div>
