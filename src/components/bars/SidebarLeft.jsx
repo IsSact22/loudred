@@ -22,8 +22,8 @@ const SidebarLeft = () => {
   const { data: session } = useSession();
 
   // Usar directamente el rol desde la sesión
-  const userRoleName = session?.user?.role?.name;
-
+  const userRoleId = session?.user?.role?.id;
+  
   const [isOpen, setIsOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("home"); // Controla la pestaña activa
   const router = useRouter(); // Usamos useRouter de next/navigation
@@ -36,7 +36,10 @@ const SidebarLeft = () => {
     { name: "Favoritos", key: "favourites", icon: <HiOutlineHeart /> },
     { name: "Subir", key: "upload", icon: <HiOutlineCloudUpload /> },
     { name: "Ajustes", key: "settings", icon: <HiOutlineCog /> },
-    { name: "Administrador", key: "admin", icon: <HiOutlineViewGridAdd /> },
+    // Mostrar "Administrador" solo si el rol es SUPERADMIN (id=2)
+    ...(userRoleId === 2
+      ? [{ name: "Administrador", key: "admin", icon: <HiOutlineViewGridAdd /> }]
+      : []),
     { name: "Salir", key: "logout", icon: <HiOutlineLogout /> },
   ];
 

@@ -11,6 +11,8 @@ import SongCard from "../cards/SongsCard";
 
 const SongCarousel = ({ songs }) => {
   return (
+
+    // Carrusel de canciones
     <Carousel className="flex w-full max-w-3xl mt-4">
       {/* Ajuste del espaciado entre items */}
       <CarouselContent className="-ml-1">
@@ -32,6 +34,7 @@ const SongCarousel = ({ songs }) => {
       <CarouselPrevious className="bg-slate-50" />
       <CarouselNext className="bg-slate-50" />
     </Carousel>
+
   );
 };
 

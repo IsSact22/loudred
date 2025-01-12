@@ -3,6 +3,7 @@ import { CoreProvider } from "@/src/core/CoreProvider";
 import './globals.css';
 import '@fontsource/poppins';
 import { Toaster } from 'react-hot-toast';
+import '@madzadev/audio-player/dist/index.css'
 
 const poppins = Poppins({
   subsets: ["latin"],

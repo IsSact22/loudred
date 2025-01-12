@@ -1,5 +1,7 @@
 import React from "react";
 import NextSongCard from "../cards/NextSongCard";
+import PlayerCard from "@/src/components/cards/PlayerCard";
+
 
 const SidebarRight = () => {
   // Datos de la próxima canción (puedes cargarlos dinámicamente desde tu base de datos)
@@ -21,14 +23,13 @@ const SidebarRight = () => {
           <NextSongCard image={nextSong.image} title={nextSong.title} artist={nextSong.artist} />
           <NextSongCard image={nextSong.image} title={nextSong.title} artist={nextSong.artist} />
           <NextSongCard image={nextSong.image} title={nextSong.title} artist={nextSong.artist} />
-          
         </div>
+
+        {/* Reproductor principal */}
+        <PlayerCard />
+
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 p-6 ml-0">
-        {/* Aquí va el contenido principal de tu aplicación */}
-      </div>
     </div>
   );
 };
