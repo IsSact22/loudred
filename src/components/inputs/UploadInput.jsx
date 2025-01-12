@@ -40,10 +40,11 @@ const UploadInput = ({
           },
         }}
         render={({ field: { onChange, value, ...field } }) => (
-          <div
+          <label
             className={`w-60 h-48 flex flex-col items-center mt-1 pt-10 border-dashed border-2 rounded-lg p-4 border-purple-900 text-center cursor-pointer ${className} ${
               errors[name] ? "border-red-500" : "border-gray-300"
             }`}
+            htmlFor={name}
           >
             <input
               type="file"
@@ -63,7 +64,7 @@ const UploadInput = ({
               Debe ser en formato {accept.replace(/,/g, ", ")} y menor a{" "}
               {maxSize / 1024 / 1024} MB.
             </p>
-          </div>
+          </label>
         )}
       />
 
