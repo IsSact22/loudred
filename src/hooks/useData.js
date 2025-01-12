@@ -5,15 +5,21 @@ import { useState } from "react";
 
 export function useData(
   endpoint,
-  { id = null, pagination = false, params = {} } = {}
+  { id = null, pagination = false, params = {} } = {},
+  shouldFetch = true // true por defecto, si no lo pasas, hace fetch automático
 ) {
+  // URL base (si viene un id, se añade a la URL)
   const url = id ? `${endpoint}/${id}` : endpoint;
-  const combinedParams = { pagination, ...params };
-  const key = [url, JSON.stringify(combinedParams)];
 
-  const { data, error, isLoading, mutate } = useSWR(
-    key,
-    ([url, params]) => fetcher(url, JSON.parse(params))
+  // Unir paginación y otros parámetros
+  const combinedParams = { pagination, ...params };
+
+  // Clave que SWR usará para el caché (o null para no fetchear)
+  const key = shouldFetch ? [url, JSON.stringify(combinedParams)] : null;
+
+  // Hook de SWR para el GET (solo funciona si key no es null)
+  const { data, error, isLoading, mutate } = useSWR(key, ([url, params]) =>
+    fetcher(url, JSON.parse(params))
   );
 
   // Estados para mutaciones
@@ -25,38 +31,48 @@ export function useData(
     setIsMutating(true);
     setMutationError(null);
     try {
-      await fetcher.post(url, newData);
+      const response = await fetcher.post(url, newData);
       mutate(); // Revalidar datos después de la mutación
+      return response;
     } catch (error) {
       setMutationError(error);
+      throw error;
     } finally {
       setIsMutating(false);
     }
   };
 
   // Función para actualizar datos (PUT)
-  const updateData = async (updatedData) => {
+  const updateData = async (updatedData, overrideId = null) => {
     setIsMutating(true);
     setMutationError(null);
+    const putUrl = overrideId ? `${endpoint}/${overrideId}` : url;
+
     try {
-      await fetcher.put(url, updatedData);
+      const response = await fetcher.put(putUrl, updatedData);
       mutate();
+      return response;
     } catch (error) {
       setMutationError(error);
+      throw error;
     } finally {
       setIsMutating(false);
     }
   };
 
   // Función para eliminar datos (DELETE)
-  const deleteData = async () => {
+  const deleteData = async (overrideId = null) => {
     setIsMutating(true);
     setMutationError(null);
+    const deleteUrl = overrideId ? `${endpoint}/${overrideId}` : url;
+
     try {
-      await fetcher.delete(url);
+      const response = await fetcher.delete(deleteUrl);
       mutate();
+      return response;
     } catch (error) {
       setMutationError(error);
+      throw error;
     } finally {
       setIsMutating(false);
     }

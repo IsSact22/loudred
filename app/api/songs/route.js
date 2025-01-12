@@ -99,19 +99,19 @@ export async function POST(req) {
     let musicPath = null;
     if (music) {
       const newMusicFilename = `${uuidv4()}.${music.name.split(".").pop()}`;
-      const musicUploadPath = path.join(process.cwd(), "public/uploads/musics", newMusicFilename);
+      const musicUploadPath = path.join(process.cwd(), "public/uploads/songs", newMusicFilename);
 
       const audioBytes = await music.arrayBuffer();
       const audioBuffer = Buffer.from(audioBytes);
 
       try {
         await writeFile(musicUploadPath, audioBuffer);
-        musicPath = `/uploads/musics/${newMusicFilename}`;
-        console.log("Música guardada:", newMusicFilename);
+        musicPath = `/uploads/songs/${newMusicFilename}`;
+        console.log("Canción guardada:", newMusicFilename);
       } catch (error) {
-        console.error("Error al guardar la música:", error);
+        console.error("Error al guardar la canción:", error);
         return new Response(
-          JSON.stringify({ success: false, message: "Error al guardar la música" }),
+          JSON.stringify({ success: false, message: "Error al guardar la canción" }),
           { status: 500, headers: { "Content-Type": "application/json" } }
         );
       }

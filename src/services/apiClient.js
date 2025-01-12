@@ -44,12 +44,16 @@ const handleNetworkError = (config, error) => {
 const handleValidationErrors = (errorMessage, error) => {
   const data = error.response.data;
   if (data) {
-    const validationErrors = data.message || data.messages;
-    Object.keys(validationErrors).forEach((field) => {
-      validationErrors[field].forEach((msg) => {
-        toast.error(msg);
+    if (typeof data.error === "string") {
+      toast.error(data.error);
+    } else {
+      const validationErrors = data.message || data.messages || data.error;
+      Object.keys(validationErrors).forEach((field) => {
+        validationErrors[field].forEach((msg) => {
+          toast.error(msg);
+        });
       });
-    });
+    }
   } else {
     toast.error(errorMessage || "Error de validación.");
   }

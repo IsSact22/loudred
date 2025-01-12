@@ -27,7 +27,7 @@ export default function LoginForm() {
   const { isLogging, setIsLogging } = useSessionStore();
 
   const onSubmit = async (data) => {
-    setIsLogging(true);
+    
     const result = await broadcastLogin({
       username: data.username,
       password: data.password,
@@ -35,10 +35,10 @@ export default function LoginForm() {
 
     if (result?.error) {
       toast.error(result.error || "Oops, credenciales inválidas.");
-      setIsLogging(false);
     } else {
       // Limpiamos la razón del logout del sessionStorage
       sessionStorage.removeItem("logoutReason");
+      setIsLogging(true);
     }
   };
 
