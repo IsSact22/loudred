@@ -8,6 +8,7 @@ import UsersSelect from "@/src/components/select/UsersSelect";
 // Hooks
 import { useForm, FormProvider } from "react-hook-form";
 import { useData } from "@/src/hooks/useData";
+import { useSession } from "next-auth/react";
 // Validations
 import { yupResolver } from "@hookform/resolvers/yup";
 import { songsSchema } from "@/src/validations/validationSchema";
@@ -15,10 +16,14 @@ import { songsSchema } from "@/src/validations/validationSchema";
 import toast from 'react-hot-toast';
 
 export default function SongsForm() {
+  const { data: session } = useSession();
 
   const methods = useForm({
     resolver: yupResolver(songsSchema),
     mode: "onChange",
+    defaultValues: {
+      artist: session?.user?.name || "",
+    },
   });
   const { handleSubmit } = methods; // Extrae métodos de react-hook-form
   const { createData, isMutating: isLoading } = useData("/songs", {}, false);
@@ -27,7 +32,7 @@ export default function SongsForm() {
   try {
     const formData = new FormData();
     formData.append("title", data.title);
-    formData.append("userId", data.artist.id);
+    formData.append("userId", session?.user?.id);
     formData.append("categoryId", data.category?.id || "");
     formData.append("music", data.audio?.[0] || "");
     formData.append("image", data.cover?.[0] || "");
@@ -68,15 +73,14 @@ export default function SongsForm() {
             />
 
             {/* Input para el artista */}
-            <UsersSelect
+            <Input
               name="artist"
               label="Artistas"
-              notFound="No se encontraron artistas"
               labelClass="text-purple-900"
-              placeholder="Selecciona un artista"
               containerClass="mb-6"
-              />
-             
+              className="bg-purple-50"
+              disabled={true}
+            />
 
             {/* Seleccionar una categoria */}
             <CategorySelect

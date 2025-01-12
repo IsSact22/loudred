@@ -60,10 +60,6 @@ export const songsSchema = yup.object().shape({
     .required("El nombre de la canción es obligatorio")
     .min(1, "El nombre debe tener al menos 1 caracter"),
 
-  artist: yup
-    .object().nullable()
-    .required("El nombre del artista es obligatorio"),
-
   category: yup.object().nullable().required("Debes seleccionar una categoría"),
 
   audio: yup
