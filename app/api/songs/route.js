@@ -163,38 +163,79 @@ export async function POST(req) {
 
 
 //función read para las canciones
-export async function GET(req){
-  try{
-    //conexión a la bd
+
+export async function GET(req) {
+  try {
+    // Conexión a la base de datos MySQL
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-    })
+    });
 
-    //consultar canciones
-    const [songs]= await connection.execute("SELECT * FROM Songs");
-    await connection.end();
+    // Consulta para obtener canciones con sus imágenes y música
+    const [songs] = await connection.execute(`
+      SELECT 
+        Songs.id AS songId,
+        Songs.title,
+        Songs.validate,
+        Songs.createdAt,
+        Songs.userId,
+        Songs.categoryId,
+        categories.name AS categoryName, -- Agregamos el nombre de la categoría
+        Image.fileName AS imageFileName,
+        Music.fileName AS musicFileName
+      FROM Songs
+      LEFT JOIN categories ON Songs.categoryId = categories.id -- Unión con la tabla categories
+      LEFT JOIN Image ON Songs.id = Image.songId -- Unión con la tabla Image
+      LEFT JOIN Music ON Songs.id = Music.songId -- Unión con la tabla Music
+    `);
     
-    if(songs.length===0){
+    await connection.end();
+
+    if (songs.length === 0) {
       return new Response(
         JSON.stringify({ error: "No hay canciones aún!" }),
         { status: 404, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    const response = {
-      Canciones:songs[0],
-    }
-    
-    return new Response(JSON.stringify(response), {
-      status:200,
+    // Agrupar resultados por canción
+    const groupedSongs = songs.reduce((acc, song) => {
+      const existingSong = acc.find((s) => s.songId === song.songId);
+
+      if (existingSong) {
+        // Si ya existe la canción en el grupo, agrega imagen/música adicional
+        if (song.imageFileName) existingSong.images.push(song.imageFileName);
+        if (song.musicFileName) existingSong.music.push(song.musicFileName);
+      } else {
+        // Si es una nueva canción, crea un nuevo objeto
+        acc.push({
+          songId: song.songId,
+          title: song.title,
+          validate: song.validate,
+          createdAt: song.createdAt,
+          userId: song.userId,
+          categoryId: song.categoryId,
+          categoryName: song.categoryName || null,
+          images: song.imageFileName ? [song.imageFileName] : [],
+          music: song.musicFileName ? [song.musicFileName] : [],
+        });
+      }
+
+      return acc;
+    }, []);
+
+    return new Response(JSON.stringify({ songs: groupedSongs }), {
+      status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  }catch(error){
+  } catch (error) {
     console.error("Error al obtener canciones", error);
-    return new Response("Error interno del servidor", { status: 500 });
+    return new Response(
+      JSON.stringify({ error: "Error interno del servidor." }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
-
 }

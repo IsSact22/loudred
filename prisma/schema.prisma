@@ -42,7 +42,7 @@ model Songs {
   Playlists   Playlist[]     @relation("PlaylistSongs") // Relación muchos a muchos
 }
 
-model categories {
+model categories { 
   id    Int     @id @default(autoincrement())
   name  String
   Songs Songs[]
@@ -58,7 +58,7 @@ model Image {
 }
 
 model Music {
-  id       Int      @id @default(autoincrement())
+  id       Int      @id @default(autoincrement()) 
   fileName String   @db.VarChar(255)
   songId   Int
   userId   Int

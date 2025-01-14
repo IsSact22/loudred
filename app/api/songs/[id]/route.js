@@ -111,3 +111,90 @@ export async function DELETE(req, { params }) {
   }
 
 //mostrar una canción en específico
+export async function GET(req, context) {
+  const { params } = await context; // Esperar el objeto params dinámicamente
+  const songId = params.id; // Acceder al ID de la canción
+  try {
+    // Configuración de conexión a la base de datos
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+    });
+
+    // Validación del ID de la canción
+    if (!songId || isNaN(Number(songId))) {
+      return new Response(
+        JSON.stringify({ error: "El ID de la canción no es válido" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Consultar la canción por ID
+    const [songResult] = await connection.execute(
+      `
+      SELECT 
+        s.id, 
+        s.title, 
+        s.userId, 
+        s.categoryId, 
+        c.name AS categoryName, 
+        s.validate, 
+        s.createdAt
+      FROM Songs s
+      LEFT JOIN categories c ON s.categoryId = c.id
+      WHERE s.id = ?
+      `,
+      [songId]
+    );
+
+    if (songResult.length === 0) {
+      await connection.end();
+      return new Response(
+        JSON.stringify({ error: "La canción no existe" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const song = songResult[0];
+
+    // Consultar las imágenes relacionadas con la canción
+    const [images] = await connection.execute(
+      "SELECT fileName FROM Image WHERE songId = ?",
+      [songId]
+    );
+
+    // Consultar las músicas relacionadas con la canción
+    const [music] = await connection.execute(
+      "SELECT fileName FROM Music WHERE songId = ?",
+      [songId]
+    );
+
+    await connection.end();
+    // Estructurar la respuesta
+    const response = {
+      id: song.id,
+      title: song.title,
+      userId: song.userId,
+      categoryId: song.categoryId,
+      categoryName: song.categoryName || null,
+      validate: song.validate,
+      createdAt: song.createdAt,
+      images: images.map((img) => img.fileName),
+      music: music.map((mus) => mus.fileName),  
+    };
+
+
+    return new Response(JSON.stringify(response), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error al obtener la canción específica:", error.message);
+    return new Response(
+      JSON.stringify({ error: "Error interno del servidor" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+}
