@@ -1,0 +1,116 @@
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient(); // Instanciamos prisma
+
+// Agregar canción a favoritos
+export async function POST(req) {
+    try {
+      const data = await req.json(); // Obtener datos del cuerpo de la solicitud
+      const { userId, songId } = data;
+      const missingFields = [];
+  
+      if (!userId) missingFields.push("userId");
+      if (!songId) missingFields.push("songId");
+  
+      if (missingFields.length > 0) {
+        const errorMessage =
+          missingFields.length === 2
+            ? "Todos los campos son requeridos"
+            : `Los siguientes campos son requeridos: ${missingFields.join(", ")}`;
+        return createErrorResponse(errorMessage);
+      }
+  
+      // Verificar si el usuario y la canción existen
+      const user = await prisma.user.findUnique({ where: { id: userId } });
+      const song = await prisma.songs.findUnique({ where: { id: songId } });
+  
+      if (!user || !song) {
+        return new Response(
+          JSON.stringify({ error: "Usuario o canción no encontrados." }),
+          { status: 404, headers: { "Content-Type": "application/json" } }
+        );
+      }
+  
+      // Verificar si la playlist de Favoritos ya existe para el usuario
+      let playlist = await prisma.playlist.findFirst({
+        where: { userId: userId, name: "Favoritos" },
+      });
+  
+      // Si no existe la playlist, la creamos
+      if (!playlist) {
+        playlist = await prisma.playlist.create({
+          data: {
+            userId: userId,
+            name: "Favoritos",
+          },
+        });
+      }
+  
+      // Agregar la canción a la playlist de Favoritos
+      await prisma.playlist.update({
+        where: { id: playlist.id },
+        data: {
+          Songs: {
+            connect: { id: songId },
+          },
+        },
+      });
+  
+      return new Response(
+        JSON.stringify({ message: "Canción agregada a Favoritos." }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    } catch (error) {
+      // Verificamos si el error es un objeto y tiene propiedades
+      const errorMessage = error && error instanceof Error ? error.message : "Unknown error";
+  
+      // Asegúrate de que el error no sea null o un tipo incorrecto
+      console.error("Error al agregar canción a favoritos", errorMessage);
+  
+      return new Response(
+        JSON.stringify({ error: errorMessage }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+  }
+  
+  
+
+  // Obtener canciones de favoritos
+  export async function GET(req) {
+    try {
+        // Obtener el userId de los parámetros de la URL
+        const userId = req.nextUrl.searchParams.get('userId');
+
+        if (!userId) {
+            return new Response(
+                JSON.stringify({ error: "Se requiere userId." }),
+                { status: 400, headers: { "Content-Type": "application/json" } }
+            );
+        }
+
+        // Obtener la playlist de Favoritos del usuario
+        const playlist = await prisma.playlist.findFirst({
+            where: { userId: parseInt(userId), name: "Favoritos" },
+            include: { Songs: true }, // Incluir las canciones en la respuesta
+        });
+
+        if (!playlist) {
+            return new Response(
+                JSON.stringify({ error: "No se encontró la playlist de Favoritos." }),
+                { status: 404, headers: { "Content-Type": "application/json" } }
+            );
+        }
+
+        return new Response(
+            JSON.stringify({ songs: playlist.Songs }),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+        );
+    } catch (error) {
+        console.error("Error al obtener canciones de favoritos", error);
+        return new Response(
+            JSON.stringify({ error: "Error interno del servidor." }),
+            { status: 500, headers: { "Content-Type": "application/json" } }
+        );
+    }
+}

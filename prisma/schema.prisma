@@ -25,6 +25,7 @@ model User {
   Songs      Songs[]   // Relación uno a muchos con Songs
   Image      Image[]   // Relación uno a muchos con imágenes
   Music      Music[]   // Relación uno a muchos con Musics
+  Playlists  Playlist[] // Relación con playlists
 }
 
 model Songs {
@@ -38,6 +39,7 @@ model Songs {
   user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   Image       Image[]        // Relación uno a muchos con imágenes
   Music       Music[]        // Relación uno a muchos con Musics
+  Playlists   Playlist[]     @relation("PlaylistSongs") // Relación muchos a muchos
 }
 
 model categories {
@@ -63,3 +65,12 @@ model Music {
   song     Songs    @relation(fields: [songId], references: [id], onDelete: Cascade)
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model Playlist {
+  id      Int      @id @default(autoincrement())
+  name    String   @db.VarChar(255)
+  userId  Int      // Clave foránea hacia el modelo User
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Songs   Songs[]  @relation("PlaylistSongs")
+}
+
