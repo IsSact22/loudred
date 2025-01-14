@@ -24,11 +24,18 @@ export async function POST(req) {
     console.log("Datos recibidos:", { title, validate, userId, categoryId });
 
     // Validación
-    if (!title || !userId || !categoryId) {
-      return new Response(
-        JSON.stringify({ error: "Todos los campos son obligatorios." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+    const missingFields=[];
+    if(!title) missingFields.push("Titulo");
+    if(!userId) missingFields.push("UserId");
+    if(!categoryId) missingFields.push("Categoria");
+    
+    if (missingFields.length>0){
+      const errorMessage=
+        missingFields.length===5
+          ? "Todos los campos son requeridos"
+          : `Los siguientes campos son requeridos: ${missingFields.join(", ")}`;
+      return createErrorResponse(errorMessage);
+
     }
 
     // Validar si se han enviado los archivos de imagen y música

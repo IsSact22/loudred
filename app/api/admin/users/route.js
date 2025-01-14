@@ -54,10 +54,22 @@ export async function POST(req) {
   try {
     const { name, lastname, username, password, confirmPassword } = await req.json();
 
-    // Validaciones iniciales
-    if (!name || !lastname || !username || !password || !confirmPassword) {
-      return createErrorResponse("Todos los campos son requeridos");
-    }
+// Validacion
+const missingFields = [];
+
+if (!name) missingFields.push("Nombre");
+if (!lastname) missingFields.push("Apellido");
+if (!username) missingFields.push("Usuario");
+if (!password) missingFields.push("Contraseña");
+if (!confirmPassword) missingFields.push("Confirmar contraseña");
+
+if (missingFields.length > 0) {
+  const errorMessage =
+    missingFields.length === 5
+      ? "Todos los campos son requeridos"
+      : `Los siguientes campos son requeridos: ${missingFields.join(", ")}`;
+  return createErrorResponse(errorMessage);
+}
 
     // Validar nombre
     const nameError = validateNameField(name, "Nombre");

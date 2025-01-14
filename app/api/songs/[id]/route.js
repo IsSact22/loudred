@@ -109,3 +109,5 @@ export async function DELETE(req, { params }) {
       return new Response("Error interno del servidor", { status: 500 });
     }
   }
+
+//mostrar una canción en específico
