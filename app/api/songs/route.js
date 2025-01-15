@@ -166,7 +166,7 @@ export async function POST(req) {
 
 export async function GET(req) {
   try {
-    // Conexión a la base de datos MySQL
+    // Conexión a la base de datos
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USERNAME,
@@ -174,7 +174,6 @@ export async function GET(req) {
       database: process.env.DB_DATABASE,
     });
 
-    // Consulta para obtener canciones con sus imágenes y música
     const [songs] = await connection.execute(`
       SELECT 
         Songs.id AS songId,
@@ -183,15 +182,15 @@ export async function GET(req) {
         Songs.createdAt,
         Songs.userId,
         Songs.categoryId,
-        categories.name AS categoryName, -- Agregamos el nombre de la categoría
+        categories.name AS categoryName,
         Image.fileName AS imageFileName,
         Music.fileName AS musicFileName
       FROM Songs
-      LEFT JOIN categories ON Songs.categoryId = categories.id -- Unión con la tabla categories
-      LEFT JOIN Image ON Songs.id = Image.songId -- Unión con la tabla Image
-      LEFT JOIN Music ON Songs.id = Music.songId -- Unión con la tabla Music
+      LEFT JOIN categories ON Songs.categoryId = categories.id
+      LEFT JOIN Image ON Songs.id = Image.songId
+      LEFT JOIN Music ON Songs.id = Music.songId
     `);
-    
+
     await connection.end();
 
     if (songs.length === 0) {
@@ -201,33 +200,19 @@ export async function GET(req) {
       );
     }
 
-    // Agrupar resultados por canción
-    const groupedSongs = songs.reduce((acc, song) => {
-      const existingSong = acc.find((s) => s.songId === song.songId);
+    const formattedSongs = songs.map((song) => ({
+      songId: song.songId,
+      title: song.title,
+      validate: song.validate,
+      createdAt: song.createdAt,
+      userId: song.userId,
+      categoryId: song.categoryId,
+      categoryName: song.categoryName || null,
+      image: song.imageFileName ? `${song.imageFileName}` : null,
+      music: song.musicFileName ? `${song.musicFileName}` : null,
+    }));
 
-      if (existingSong) {
-        // Si ya existe la canción en el grupo, agrega imagen/música adicional
-        if (song.imageFileName) existingSong.images.push(song.imageFileName);
-        if (song.musicFileName) existingSong.music.push(song.musicFileName);
-      } else {
-        // Si es una nueva canción, crea un nuevo objeto
-        acc.push({
-          songId: song.songId,
-          title: song.title,
-          validate: song.validate,
-          createdAt: song.createdAt,
-          userId: song.userId,
-          categoryId: song.categoryId,
-          categoryName: song.categoryName || null,
-          images: song.imageFileName ? [song.imageFileName] : [],
-          music: song.musicFileName ? [song.musicFileName] : [],
-        });
-      }
-
-      return acc;
-    }, []);
-
-    return new Response(JSON.stringify({ songs: groupedSongs }), {
+    return new Response(JSON.stringify({ songs: formattedSongs }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

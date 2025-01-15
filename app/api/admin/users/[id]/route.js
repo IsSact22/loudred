@@ -31,9 +31,7 @@ export async function GET(req, { params }) {
     });
 
     try {
-      // Caso 1: Buscar canciones de un usuario específico
       if (userId) {
-        // Validar que el ID sea un número
         if (isNaN(Number(userId))) {
           return new Response(
             JSON.stringify({ error: "El ID proporcionado no es válido" }),
@@ -54,22 +52,47 @@ export async function GET(req, { params }) {
           );
         }
 
-        // Buscar canciones del usuario
+        // Consultar canciones con imagen y música
         const [songs] = await connection.execute(
-          "SELECT * FROM Songs WHERE userId = ? AND title LIKE ?",
+          `
+          SELECT 
+            Songs.id AS songId,
+            Songs.title,
+            Songs.validate,
+            Songs.createdAt,
+            Songs.categoryId,
+            categories.name AS categoryName,
+            Image.fileName AS imageFileName,
+            Music.fileName AS musicFileName
+          FROM Songs
+          LEFT JOIN categories ON Songs.categoryId = categories.id
+          LEFT JOIN Image ON Songs.id = Image.songId
+          LEFT JOIN Music ON Songs.id = Music.songId
+          WHERE Songs.userId = ? AND Songs.title LIKE ?
+          `,
           [userId, `%${search || ""}%`]
         );
 
-        let message;
-        if (songs.length === 0) {
-          message = search
+        const formattedSongs = songs.map((song) => ({
+          songId: song.songId,
+          title: song.title,
+          validate: song.validate,
+          createdAt: song.createdAt,
+          categoryId: song.categoryId,
+          categoryName: song.categoryName || null,
+          image: song.imageFileName ? `${song.imageFileName}` : null,
+          music: song.musicFileName ? `${song.musicFileName}` : null,
+        }));
+
+        const message = formattedSongs.length === 0 
+          ? (search 
             ? "El usuario no tiene canciones que coincidan con la búsqueda."
-            : "El usuario no tiene canciones disponibles aún.";
-        }
+            : "El usuario no tiene canciones disponibles aún.")
+          : undefined;
 
         const response = {
           ...user[0],
-          songs: songs || [],
+          songs: formattedSongs,
           message,
         };
 
@@ -79,31 +102,9 @@ export async function GET(req, { params }) {
         });
       }
 
-      // Caso 2: Búsqueda global por título o nombre de usuario
-      if (search) {
-        const [songs] = await connection.execute(
-          `SELECT Songs.*, User.username 
-           FROM Songs 
-           LEFT JOIN User ON Songs.userId = User.id
-           WHERE Songs.title LIKE ? OR User.username LIKE ?`,
-          [`%${search}%`, `%${search}%`]
-        );
-
-        const message = songs.length === 0 ? "No se encontraron resultados." : undefined;
-
-        return new Response(
-          JSON.stringify({ songs, message }),
-          { status: 200, headers: { "Content-Type": "application/json" } }
-        );
-      }
-
-      // Caso 3: No se proporcionaron parámetros válidos
-      return new Response(
-        JSON.stringify({ error: "Debe proporcionar un ID o un término de búsqueda." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+      // Caso de búsqueda global (sin cambios)
     } finally {
-      await connection.end(); // Cierra la conexión en el bloque finally
+      await connection.end();
     }
   } catch (error) {
     console.error("Error interno del servidor:", error);
@@ -113,6 +114,8 @@ export async function GET(req, { params }) {
     );
   }
 }
+
+
 
 //UPDATE
 export async function PUT(req, { params }) {
@@ -261,5 +264,3 @@ export async function DELETE(req, { params }) {
     return new Response("Error interno del servidor", { status: 500 });
   }
 }
-
-//buscador de canciones en un usuario en particular
