@@ -7,8 +7,6 @@ import { useSessionDecision } from "@/src/hooks/useSessionDecision";
 // Next
 import { SessionProvider, useSession } from "next-auth/react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
-// Layout
-import SideLayout from "../layouts/SideLayout";
 // React
 import { useEffect } from "react";
 // Store
@@ -19,9 +17,7 @@ import toast from "react-hot-toast";
 export const CoreProvider = ({ children }) => {
   return (
     <SessionProvider refetchInterval={60} refetchOnWindowFocus={true}>
-      <SessionStatus>
-        <SideLayout>{children}</SideLayout>
-      </SessionStatus>
+      <SessionStatus>{children}</SessionStatus>
     </SessionProvider>
   );
 };

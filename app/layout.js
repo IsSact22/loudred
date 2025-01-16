@@ -4,6 +4,7 @@ import './globals.css';
 import '@fontsource/poppins';
 import { Toaster } from 'react-hot-toast';
 import '@madzadev/audio-player/dist/index.css'
+import SideLayout from "@/src/layouts/SideLayout";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -20,9 +21,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
         <CoreProvider>
-          
-          {children}
-         
+          <SideLayout> {children}</SideLayout>
         </CoreProvider>
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       </body>
