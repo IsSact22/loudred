@@ -53,9 +53,8 @@ export default function BasicsModal2({
               </button>
               {/* Título del modal */}
               <DialogTitle
-                className={`flex items-center gap-2 text-transparent font-semibold bg-gradient-to-t bg-clip-text from-lavender to-purple-dark ${
-                  isCentered ? "justify-center" : ""
-                }`}
+                className={`flex items-center gap-2 text-transparent font-semibold bg-gradient-to-t bg-clip-text from-lavender to-purple-dark 
+                ${isCentered ? "justify-center" : ""}`}
               >
                 {icon}
                 {title}

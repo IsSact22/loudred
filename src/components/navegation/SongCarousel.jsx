@@ -11,13 +11,15 @@ import SongCard from "../cards/SongsCard";
 
 const SongCarousel = ({ songs }) => {
   return (
-
     // Carrusel de canciones
     <Carousel className="flex w-full max-w-3xl mt-4">
       {/* Ajuste del espaciado entre items */}
       <CarouselContent className="-ml-1">
-        {songs.map((song) => (
-          <CarouselItem key={song.id} className="pl-1 md:basis-1/3 lg:basis-1/4">
+        {songs.map((song, index) => (
+          <CarouselItem
+            key={`${song.id}-${index}`}
+            className="pl-1 md:basis-1/3 lg:basis-1/4"
+          >
             <div>
               <SongCard
                 image={song.image}
@@ -34,7 +36,6 @@ const SongCarousel = ({ songs }) => {
       <CarouselPrevious className="bg-slate-50" />
       <CarouselNext className="bg-slate-50" />
     </Carousel>
-
   );
 };
 

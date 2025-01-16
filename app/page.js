@@ -73,11 +73,6 @@ export default function Home() {
 
   return (
     <div className="flex h-screen bg-slate-950">
-      {/* Sidebar izquierdo */}
-      <div className="w-64">
-        <SidebarLeft />
-      </div>
-
       {/* Contenido principal */}
       <div className="flex-1 flex flex-col items-center justify-start p-6 ml-64 mr-64">
         {/* Barra de búsqueda */}
@@ -88,14 +83,7 @@ export default function Home() {
         {/* Carrusel */}
         <SongCarousel songs={songs} />
 
-        <div>
-            {/* Aquí puedes agregar el contenido adicional */}
-        </div>
-      </div>
-
-      {/* Sidebar derecho */}
-      <div className="w-64 bg-slate-800 fixed right-0 top-0 bottom-0">
-        <SidebarRight />
+        <div>{/* Aquí puedes agregar el contenido adicional */}</div>
       </div>
     </div>
   );

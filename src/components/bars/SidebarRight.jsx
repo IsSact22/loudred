@@ -2,7 +2,6 @@ import React from "react";
 import NextSongCard from "../cards/NextSongCard";
 import PlayerCard from "@/src/components/cards/PlayerCard";
 
-
 const SidebarRight = () => {
   // Datos de la próxima canción (puedes cargarlos dinámicamente desde tu base de datos)
   const nextSong = {
@@ -12,7 +11,7 @@ const SidebarRight = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="absolute">
       {/* Sidebar Derecho */}
       <div className="bg-gradient-to-b from-purple-900 to-purple-950 text-white h-screen w-80 fixed right-0 top-0">
         {/* Contenido del sidebar */}

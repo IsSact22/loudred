@@ -28,7 +28,7 @@ export default function SessionModal ({
           onClick={handleRestore}
           bgColor="bg-white"
           bgColorHover="hover:bg-lavender"
-          shadowAndColor="shadow-lg shadow-lavender/50"
+          shadowAndColor="shadow-lg shadow-lavender/40"
           shadowAndColorHover="hover:shadow-md hover:shadow-lavender"
           scale="hover:scale-105"
           textColor="text-lavender"

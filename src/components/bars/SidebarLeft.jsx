@@ -62,7 +62,7 @@ const SidebarLeft = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="absolute">
       {/* Sidebar */}
       <div
         className={`bg-gradient-to-b from-purple-900 to-purple-950 text-white h-screen transition-all duration-300 ${
