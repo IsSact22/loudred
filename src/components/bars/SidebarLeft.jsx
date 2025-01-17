@@ -28,8 +28,8 @@ const SidebarLeft = () => {
     { name: "Inicio", path: "/", icon: <HiHome /> },
     { name: "Perfil", path: "/home/profile", icon: <HiUser /> },
     { name: "Favoritos", path: "/home/favourites", icon: <HiOutlineHeart /> },
-    { name: "Subir", path: "/home/upload", icon: <HiOutlineCloudUpload /> },
-    { name: "Ajustes", path: "/home/settings", icon: <HiOutlineCog /> },
+    { name: "Subir", path: "/upload", icon: <HiOutlineCloudUpload /> },
+    { name: "Ajustes", path: "settings", icon: <HiOutlineCog /> },
     ...(userRoleId === 2
       ? [{ name: "Administrador", path: "/superAdmin", icon: <HiOutlineViewGridAdd /> }]
       : []),

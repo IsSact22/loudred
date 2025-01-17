@@ -1,7 +1,5 @@
 "use client";
 // Components
-import SidebarLeft from "@/src/components/bars/SidebarLeft";
-import SidebarRight from "@/src/components/bars/SidebarRight"; 
 import SearchBar from "@/src/components/navegation/SearchBar";
 import SongCarousel from "@/src/components/navegation/SongCarousel";
 // React
@@ -9,8 +7,6 @@ import React from "react";
 
 // Next
 import { useSession } from "next-auth/react";
-// Utils
-import { broadcastLogout } from "@/src/utils/authChannel";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -72,9 +68,9 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex h-screen bg-slate-950">
+    <div className="flex h-screen bg-slate-950 flex-1 flex-col items-center justify-start p-6">
       {/* Contenido principal */}
-      <div className="flex-1 flex flex-col items-center justify-start p-6 ml-64 mr-64">
+      
         {/* Barra de búsqueda */}
         <div className="w-full max-w-2xl mb-4">
           <SearchBar onSearch={handleSearch} />
@@ -83,8 +79,6 @@ export default function Home() {
         {/* Carrusel */}
         <SongCarousel songs={songs} />
 
-        <div>{/* Aquí puedes agregar el contenido adicional */}</div>
-      </div>
     </div>
   );
 }
