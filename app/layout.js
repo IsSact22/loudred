@@ -1,5 +1,6 @@
 import { Poppins } from "next/font/google";
 import { CoreProvider } from "@/src/core/CoreProvider";
+import { SidebarProvider } from "@/src/contexts/sidebarContext";
 import './globals.css';
 import '@fontsource/poppins';
 import { Toaster } from 'react-hot-toast';
@@ -21,7 +22,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
         <CoreProvider>
-          <SideLayout> {children}</SideLayout>
+        <SidebarProvider>
+            <SideLayout> {children}</SideLayout>
+          </SidebarProvider>
         </CoreProvider>
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       </body>

@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { broadcastLogout } from "@/src/utils/authChannel";
 import { toast } from "react-hot-toast";
 import { useSession } from "next-auth/react";
+
 // Iconos
 import {
   HiHome,
@@ -16,12 +17,12 @@ import {
   HiOutlineViewGridAdd,
 } from "react-icons/hi";
 
-const SidebarLeft = () => {
+const SidebarLeft = ({isOpen, setIsOpen}) => {
   const pathname = usePathname(); // Detecta la ruta actual
   const { data: session } = useSession();
   const userRoleId = session?.user?.role?.id;
 
-  const [isOpen, setIsOpen] = useState(true);
+  //const [isOpen, setIsOpen] = useState(true);
 
   // Opciones del menú
   const menuItems = [
