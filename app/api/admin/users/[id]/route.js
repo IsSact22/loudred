@@ -118,7 +118,7 @@ export async function GET(req, { params }) {
 
 
 //UPDATE
-export async function PUT(req, { params }) {
+export async function PATCH(req, { params }) {
   const { id } = params; // Obtener el ID de la ruta
   const { name, lastname, password, confirmPassword, roleId } = await req.json();
 
@@ -203,6 +203,13 @@ export async function PUT(req, { params }) {
       updates.push("roleId = ?");
       values.push(roleId);
     }
+
+    connection= await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE
+    })
 
     // Asegurar que el usuario existe antes de actualizar
     const [existingUser] = await connection.execute("SELECT id FROM User WHERE id = ?", [id]);
