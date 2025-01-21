@@ -1,4 +1,3 @@
-// DataTable.jsx
 "use client";
 
 import * as React from "react";
@@ -9,83 +8,59 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
+// Columnas predeterminadas como ejemplo
 export const defaultColumns = [
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "number",
+    header: "No.",
+    cell: ({ row }) => <div className="text-white">{row.getValue("number")}</div>,
+  },
+  {
+    accessorKey: "image",
+    header: "",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
+      <img
+        src={row.getValue("image")}
+        alt="Album cover"
+        className="w-10 h-10 rounded-md"
+      />
     ),
   },
   {
-    accessorKey: "email",
-    header: () => <div>Email</div>,
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    accessorKey: "title",
+    header: "Title",
+    cell: ({ row }) => (
+      <div className="flex flex-col">
+        <span className="text-white font-semibold">{row.getValue("title")}</span>
+        <span className="text-purple-300 text-sm">{row.original.artist}</span>
+      </div>
+    ),
   },
   {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-      return <div className="text-right font-medium">{formatted}</div>;
-    },
+    accessorKey: "duration",
+    header: "Duration",
+    cell: ({ row }) => (
+      <div className="text-white text-sm">{row.getValue("duration")}</div>
+    ),
   },
   {
     id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const rowData = row.original;
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => alert(`ID: ${rowData?.id}`)}>
-              Copiar ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => alert("Ver cliente")}>
-              Ver cliente
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => alert("Ver detalles")}>
-              Ver detalles
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    header: "Actions",
+    cell: () => (
+      <div className="flex gap-2">
+        <button className="bg-red-600 p-2 rounded-full hover:bg-red-700">
+          👎
+        </button>
+        <button className="bg-green-600 p-2 rounded-full hover:bg-green-700">
+          👍
+        </button>
+      </div>
+    ),
   },
 ];
 
+// Componente de tabla
 export function DataTable({ data = [], columns = defaultColumns }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -105,73 +80,57 @@ export function DataTable({ data = [], columns = defaultColumns }) {
   });
 
   return (
-    <div className="overflow-x-auto h-full w-full">
-      <div className="rounded-md border h-full">
-        <Table className="min-w-full border-collapse border border-gray-300">
-          <TableHeader>
+    <div className="overflow-x-auto h-full w-full bg-slate-950 p-6 rounded-lg">
+      <div className="border border-purple-600 rounded-lg">
+        <table className="w-full border-collapse">
+          <thead className="bg-purple-800 text-white">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <th
+                    key={header.id}
+                    className="px-4 py-3 text-left text-sm font-medium"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
                           header.getContext()
                         )}
-                  </TableHead>
+                  </th>
                 ))}
-              </TableRow>
+              </tr>
             ))}
-          </TableHeader>
-
-          <TableBody>
+          </thead>
+          <tbody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <tr
+                  key={row.id}
+                  className="border-b border-purple-700 last:border-none hover:bg-purple-700"
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <td key={cell.id} className="px-4 py-3 text-sm">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
                       )}
-                    </TableCell>
+                    </td>
                   ))}
-                </TableRow>
+                </tr>
               ))
             ) : (
-              <TableRow>
-                <TableCell
+              <tr>
+                <td
                   colSpan={table.getVisibleLeafColumns().length}
-                  className="h-24 text-center"
+                  className="h-24 text-center text-white"
                 >
                   No results.
-                </TableCell>
-              </TableRow>
+                </td>
+              </tr>
             )}
-          </TableBody>
-        </Table>
-      </div>
-
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
+          </tbody>
+        </table>
       </div>
     </div>
   );
