@@ -4,11 +4,12 @@ import { useState, useRef, useEffect } from "react";
 import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
+import { useData } from "../hooks/useData";
 
 export default function MusicPlayer() {
   // Estado para la lista completa de canciones
-  const [songs, setSongs] = useState([]);
+  const { data = [], error, isLoading } = useData("/songs");
+  const songs = data.songs ?? [];
   // Estado para el índice de la canción actual
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
 
@@ -18,25 +19,6 @@ export default function MusicPlayer() {
   const [duration, setDuration] = useState(0);
 
   const audioRef = useRef(null);
-
-  // Al montar el componente, hacemos el fetch de las canciones
-  useEffect(() => {
-    const fetchSongs = async () => {
-      try {
-        const res = await fetch("/api/songs");
-        const data = await res.json();
-
-        // data.songs debería ser un array de canciones
-        if (data.songs) {
-          setSongs(data.songs);
-        }
-      } catch (error) {
-        toast.error("Error al cargar las canciones: " , error);
-      }
-    };
-
-    fetchSongs();
-  }, []);
 
   // Efecto para configurar listeners cuando cambie la fuente del <audio>
   useEffect(() => {
