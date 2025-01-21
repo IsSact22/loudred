@@ -38,7 +38,7 @@ export default function SongsForm() {
 
     await createData(formData); // Ajusta createData para multipart/form-data
     toast.success("Canción subida con éxito");
-    onClose?.();
+    //onClose?.();
   } catch (error) {
     console.error(error);
   }
