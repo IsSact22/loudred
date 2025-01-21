@@ -3,6 +3,8 @@ import mysql from "mysql2/promise";
 import { v4 as uuidv4 } from "uuid";
 import { writeFile } from "fs/promises";
 import path from "path";
+import { dir } from "console";
+import { buffer } from "stream/consumers";
 
 const prisma = new PrismaClient();
 
@@ -79,22 +81,46 @@ export async function POST(req) {
       },
     });
     console.log("Canción creada:", newSong);
+    
+    //crear directorio donde se alojará la multimedia en caso de no tenerlo
+    const fs = require('fs');
+    const path = require('path');
+    const {v4:uuidv4} = require('uuid');
+    const {writeFile} = require('fs/promises');
 
-    // Subir imagen si existe
+    const uploadsPath = path.join(process.cwd(), 'public/uploads');
+    const imagesPath = path.join(uploadsPath, 'images');
+    const musicsPath = path.join(uploadsPath, 'music');
+
+    const ensureDirectoryExists= (dirPath)=> {
+      if (!fs.existsSync(dirPath)){
+        fs.mkdirSync(dirPath, {recursive:true});
+        console.log(`Directorio creado correctamente: ${dirPath}`)
+      }else{
+        console.log(`El directorio ya existe: ${dirPath}`)
+      }
+    }
+
+    //Asegurar de que existen los directorios
+    ensureDirectoryExists(imagesPath);
+    ensureDirectoryExists(musicsPath);
+
+    //Generar un nombre único para ambos archivos
+    const uniqueFilename= uuidv4();
+    // Subir imagen
     let imagePath = null;
-    if (image) {
-      const newImageFilename = `${uuidv4()}.${image.name.split(".").pop()}`;
-      const imageUploadPath = path.join(process.cwd(), "public/uploads/images", newImageFilename);
-
-      const imageBytes = await image.arrayBuffer();
-      const imageBuffer = Buffer.from(imageBytes);
-
-      try {
+    if(image){
+      const imageExtension = image.name.split(".").pop();
+      const newImageFilename = `${uniqueFilename}.${imageExtension}`;
+      const imageUploadPath = path.join(imagesPath, newImageFilename);
+      const imageBytes= await image.arrayBuffer();
+      const imageBuffer= Buffer.from(imageBytes);
+      try{
         await writeFile(imageUploadPath, imageBuffer);
-        imagePath = `/uploads/images/${newImageFilename}`;
-        console.log("Imagen guardada:", newImageFilename);
-      } catch (error) {
-        console.error("Error al guardar la imagen:", error);
+        imagePath= `/uploads/images/${newImageFilename}`;
+        console.log("Imagen guardada: ", newImageFilename)
+      }catch (error){
+        console.error("Error al guardar la imagen: ", error)
         return new Response(
           JSON.stringify({ success: false, message: "Error al guardar la imagen" }),
           { status: 500, headers: { "Content-Type": "application/json" } }
@@ -102,27 +128,72 @@ export async function POST(req) {
       }
     }
 
-    // Subir audio (ahora música) si existe
-    let musicPath = null;
-    if (music) {
-      const newMusicFilename = `${uuidv4()}.${music.name.split(".").pop()}`;
-      const musicUploadPath = path.join(process.cwd(), "public/uploads/music", newMusicFilename);
-
-      const audioBytes = await music.arrayBuffer();
-      const audioBuffer = Buffer.from(audioBytes);
-
-      try {
-        await writeFile(musicUploadPath, audioBuffer);
-        musicPath = `/uploads/music/${newMusicFilename}`;
-        console.log("Canción guardada:", newMusicFilename);
-      } catch (error) {
-        console.error("Error al guardar la canción:", error);
+    //subir música
+    let musicPath =null;
+    if(music){
+      const musicExtension= music.name.split(".").pop();
+      const newMusicFilename= `${uniqueFilename}.${musicExtension}`;
+      const musicUploadPath= path.join(musicsPath, newMusicFilename);
+      const MusicBytes= await music.arrayBuffer();
+      const MusicBuffer= Buffer.from(MusicBytes);
+      try{
+        await writeFile(musicUploadPath, MusicBuffer);
+        musicPath=`/uploads/music/${newMusicFilename}`;
+        console.log("Audio guardado: ", newMusicFilename)
+      }catch (error){
+        console.error("Error al guardar el audio: ", error)
         return new Response(
-          JSON.stringify({ success: false, message: "Error al guardar la canción" }),
+          JSON.stringify({ success: false, message: "Error al guardar el audio" }),
           { status: 500, headers: { "Content-Type": "application/json" } }
         );
       }
     }
+
+
+
+
+    // let imagePath = null;
+    // if (image) {
+    //   const newImageFilename = `${uuidv4()}.${image.name.split(".").pop()}`;
+    //   const imageUploadPath = path.join(process.cwd(), "public/uploads/images", newImageFilename);
+
+    //   const imageBytes = await image.arrayBuffer();
+    //   const imageBuffer = Buffer.from(imageBytes);
+
+    //   try {
+    //     await writeFile(imageUploadPath, imageBuffer);
+    //     imagePath = `/uploads/images/${newImageFilename}`;
+    //     console.log("Imagen guardada:", newImageFilename);
+    //   } catch (error) {
+    //     console.error("Error al guardar la imagen:", error);
+    //     return new Response(
+    //       JSON.stringify({ success: false, message: "Error al guardar la imagen" }),
+    //       { status: 500, headers: { "Content-Type": "application/json" } }
+    //     );
+    //   }
+    // }
+
+    // // Subir audio (ahora música) si existe
+    // let musicPath = null;
+    // if (music) {
+    //   const newMusicFilename = `${uuidv4()}.${music.name.split(".").pop()}`;
+    //   const musicUploadPath = path.join(process.cwd(), "public/uploads/music", newMusicFilename);
+
+    //   const audioBytes = await music.arrayBuffer();
+    //   const audioBuffer = Buffer.from(audioBytes);
+
+    //   try {
+    //     await writeFile(musicUploadPath, audioBuffer);
+    //     musicPath = `/uploads/music/${newMusicFilename}`;
+    //     console.log("Canción guardada:", newMusicFilename);
+    //   } catch (error) {
+    //     console.error("Error al guardar la canción:", error);
+    //     return new Response(
+    //       JSON.stringify({ success: false, message: "Error al guardar la canción" }),
+    //       { status: 500, headers: { "Content-Type": "application/json" } }
+    //     );
+    //   }
+    // }
 
     // Registrar los archivos de imagen y música en la base de datos, si existen
     if (imagePath) {

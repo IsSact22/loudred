@@ -14,9 +14,9 @@ function validacionInput({ name, lastname, username, password, confirmPassword }
   if (!nameRegex.test(lastname)) {
     return "El apellido no puede contener números ni caracteres especiales";
   }
-  const UsuarRegex = /^[A-Z][a-z]*\d+$/;
+  const UsuarRegex = /^[A-Z][a-z]*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]*\d+[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]+$/;
   if (!UsuarRegex.test(username)) {
-    return "El Usuario no es válido. Debe comenzar con una letra mayúscula, seguir con minúsculas y contener al menos un número.";
+    return "El Usuario no es válido. Debe comenzar con una letra mayúscula, seguir con minúsculas, contener al menos un número y contener caracteres especiales.";
   }
   if (password !== confirmPassword) {
     return "Las contraseñas no coinciden";
