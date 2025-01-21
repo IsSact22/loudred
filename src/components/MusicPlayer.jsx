@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
 
 export default function MusicPlayer() {
   // Estado para la lista completa de canciones
@@ -30,7 +31,7 @@ export default function MusicPlayer() {
           setSongs(data.songs);
         }
       } catch (error) {
-        console.error("Error fetching songs:", error);
+        toast.error("Error al cargar las canciones: " , error);
       }
     };
 
