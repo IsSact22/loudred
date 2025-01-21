@@ -80,21 +80,48 @@ export const songsSchema = yup.object().shape({
 
 // Esquema de validación para ajustes de usuario
 export const updateSchema = yup.object().shape({
-  name: yup.string()
+  name: yup
+    .string()
     .matches(/^[a-zA-Z\s]+$/, "El nombre solo puede contener letras y espacios")
-    .min(3, "El nombre debe tener al menos 3 caracteres"),
+    .min(3, "El nombre debe tener al menos 3 caracteres")
+    .notRequired(),
 
-  lastname: yup.string()
-    .matches(/^[a-zA-Z\s]+$/, "El apellido solo puede contener letras y espacios")
-    .min(3, "El apellido debe tener al menos 3 caracteres"),
+  lastname: yup
+    .string()
+    .matches(
+      /^[a-zA-Z\s]+$/,
+      "El apellido solo puede contener letras y espacios"
+    )
+    .min(3, "El apellido debe tener al menos 3 caracteres")
+    .notRequired(),
 
-  password: yup.string()
-    .min(8, "La contraseña debe tener al menos 8 caracteres")
-    .matches(/[A-Z]/, "La contraseña debe incluir al menos una letra mayúscula")
-    .matches(/[a-z]/, "La contraseña debe incluir al menos una letra minúscula")
-    .matches(/\d/, "La contraseña debe incluir al menos un número"),
+  password: yup
+    .string()
+    .transform((value) => (value?.trim() === "" ? undefined : value))
+    // si se ingresó algo, se cumplen las reglas; si no, no se valida nada
+    .when([], {
+      is: (value) => value !== undefined,
+      then: (schema) =>
+        schema
+          .min(8, "La contraseña debe tener al menos 8 caracteres")
+          .matches(
+            /[A-Z]/,
+            "La contraseña debe incluir al menos una letra mayúscula"
+          )
+          .matches(
+            /[a-z]/,
+            "La contraseña debe incluir al menos una letra minúscula"
+          )
+          .matches(/\d/, "La contraseña debe incluir al menos un número"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
 
-  confirmPassword: yup.string()
-    .oneOf([yup.ref("password")], "Las contraseñas no coinciden"),
-  
+  confirmPassword: yup.string().when("password", {
+    is: (value) => value !== undefined,
+    then: (schema) =>
+      schema
+        .required("Debes confirmar tu contraseña")
+        .oneOf([yup.ref("password")], "Las contraseñas no coinciden"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
 });

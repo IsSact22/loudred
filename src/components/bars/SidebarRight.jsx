@@ -12,7 +12,7 @@ const SidebarRight = () => {
   };
 
   return (
-    <div className="absolute">
+    <div className="absolute top-0">
       {/* Sidebar Derecho */}
       <div className="bg-gradient-to-b from-purple-900 to-purple-950 text-white h-screen w-80 fixed right-0 top-0">
         {/* Contenido del sidebar */}

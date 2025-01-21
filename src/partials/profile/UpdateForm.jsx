@@ -5,76 +5,69 @@ import PasswordInput from "@/src/components/inputs/PasswordInput";
 import StartButton from "@/src/components/buttons/StartButton";
 // Next
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 // Hooks
 import { useForm, FormProvider } from "react-hook-form";
-import { useState } from "react";
+import { useData } from "@/src/hooks/useData";
 // Validations
 import { yupResolver } from "@hookform/resolvers/yup";
 import { updateSchema } from "@/src/validations/validationSchema";
 // Toast
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
-export default function UpdateForm({ userId }) {
+export default function UpdateForm() {
   const router = useRouter();
-  
+  const { data: session } = useSession();
+  const userId = session.user.id
+
   const methods = useForm({
     resolver: yupResolver(updateSchema),
     mode: "onChange",
+    defaultValues: {
+      name: session.user.name,
+      lastname: session.user.lastname,
+      password: "",
+      confirmPassword: ""
+    },
   });
   const { handleSubmit } = methods;
-  const [isLoading, setIsLoading] = useState(false);
+  const { updateData, isMutating } = useData("/admin/users", {}, false);
 
-  
-
-  const onSubmit = async (data) => {
-    setIsLoading(true);
+  const onSubmit = async (formData) => {
     try {
-      const response = await fetch(`api/admin/users/${userId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        // Manejar errores del backend
-        toast.error(result.message || "Error al actualizar el perfil");
+      const filteredData = Object.fromEntries(
+        Object.entries(formData).filter(([key, value]) => {
+          if (!value || value.trim?.() === "") return false;
+          if (session.user[key] && value.trim?.() === session.user[key]) return false;
+          return true;
+        })
+      );
+      if (Object.keys(filteredData).length === 0) {
+        toast.error("No hay cambios que actualizar.");
         return;
       }
-
+      await updateData(filteredData, userId);
       toast.success("Perfil actualizado exitosamente");
       setTimeout(() => {
-        router.refresh(); // Recargar la página o redirigir si es necesario
+        window.location.reload();
       }, 1000);
     } catch (error) {
-      toast.error(
-        error.message || "Ocurrió un error inesperado. Intenta nuevamente."
-      );
-    } finally {
-      setIsLoading(false);
+      toast.error(error.message || "Ocurrió un error inesperado. Intenta nuevamente.");
     }
   };
 
   const onError = (errors) => {
-    const mensajes = Object.values(errors)
-      .map((error) => error.message)
-      .join(", ");
+    const mensajes = Object.values(errors).map((error) => error.message).join(", ");
     toast.error(`Errores: ${mensajes}`);
   };
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="flex flex-col mt-14 bg-gradient-to-br from-white to-purple-100 p-8 rounded-2xl mt-10 shadow-md min-h-[600px] min-w-[600px]">
-      <h2 className="text-4xl font-bold text-red-500 mb-10 ml-1">Ajustes</h2>
-        
-        {/* FORMULARIO DE ACTUALIZAR DATOS */}
+      <div className="flex flex-col bg-gradient-to-br from-white to-purple-100 p-8 rounded-2xl mt-10 shadow-md min-h-[600px] min-w-[600px]">
+        <h2 className="text-4xl font-bold text-red-500 mb-10 ml-1">Ajustes</h2>
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col">
-
             <div className="flex gap-4 mb-4">
-
-              {/* Input para el nombre del usuario */}
               <Input
                 name="name"
                 label="Nombre"
@@ -82,10 +75,7 @@ export default function UpdateForm({ userId }) {
                 placeholder="Ingresa tu nombre"
                 containerClass="mb-6"
                 className="bg-purple-200"
-
               />
-
-              {/* Input para el apellido del usuario */}
               <Input
                 name="lastname"
                 label="Apellido"
@@ -95,9 +85,6 @@ export default function UpdateForm({ userId }) {
                 className="bg-purple-200"
               />
             </div>
-
-
-            {/* Contraseña */}
             <PasswordInput
               name="password"
               label="Contraseña"
@@ -106,8 +93,6 @@ export default function UpdateForm({ userId }) {
               containerClass="mb-6"
               className="bg-purple-200"
             />
-
-            {/* Confirmar contraseña */}
             <PasswordInput
               name="confirmPassword"
               label="Confirmar contraseña"
@@ -116,14 +101,13 @@ export default function UpdateForm({ userId }) {
               containerClass="mb-6"
               className="bg-purple-200"
             />
-
             <div className="mx-44">
               <StartButton
                 text="Enviar"
                 type="submit"
-                isLoading={isLoading}
-                disabled={isLoading}
-                padding="p-4"
+                isLoading={isMutating}
+                disabled={isMutating}
+                padding="p-8"
               />
             </div>
           </form>

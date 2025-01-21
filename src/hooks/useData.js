@@ -49,7 +49,7 @@ export function useData(
     const putUrl = overrideId ? `${endpoint}/${overrideId}` : url;
 
     try {
-      const response = await fetcher.put(putUrl, updatedData);
+      const response = await fetcher.patch(putUrl, updatedData);
       mutate();
       return response;
     } catch (error) {

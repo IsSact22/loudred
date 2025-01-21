@@ -4,7 +4,6 @@ import Input from "@/src/components/inputs/Input";
 import UploadInput from "@/src/components/inputs/UploadInput";
 import StartButton from "@/src/components/buttons/StartButton";
 import CategorySelect from "@/src/components/select/CategoriesSelect";
-import UsersSelect from "@/src/components/select/UsersSelect";
 // Hooks
 import { useForm, FormProvider } from "react-hook-form";
 import { useData } from "@/src/hooks/useData";

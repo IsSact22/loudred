@@ -1,11 +1,8 @@
 import mysql from "mysql2/promise";
 import bcrypt from "bcrypt";
-
-/* Next Auth */
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-// Centralizar configuración de base de datos
 const getDatabaseConnection = async () => {
   try {
     return await mysql.createConnection({
@@ -20,7 +17,7 @@ const getDatabaseConnection = async () => {
   }
 };
 
-const authOptions = {
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -33,40 +30,50 @@ const authOptions = {
         try {
           connection = await getDatabaseConnection();
 
-          // Buscar al usuario con su rol
           const [rows] = await connection.execute(
-            `SELECT User.id, User.name, User.lastname, User.username, User.password, role.id AS roleId, role.name AS roleName
-             FROM User 
+            `SELECT 
+               User.id, 
+               User.name, 
+               User.lastname, 
+               User.username, 
+               User.password, 
+               role.id AS roleId, 
+               role.name AS roleName
+             FROM User
              JOIN role ON User.roleId = role.id
              WHERE User.username = ?`,
             [credentials.username]
           );
 
           const user = rows[0];
-
-          // Validar existencia del usuario y la contraseña
-          if (user) {
-            const isValidPassword = await bcrypt.compare(
-              credentials.password,
-              user.password
-            );
-
-            if (isValidPassword) {
-              return {
-                id: user.id,
-                name: user.name,
-                lastname: user.lastname,
-                username: user.username,
-                role: { id: user.roleId, name: user.roleName },
-              };
-            } else {
-              console.warn(`Contraseña inválida para el usuario: ${credentials.username}`);
-              throw new Error("Credenciales inválidas");
-            }
-          } else {
+          if (!user) {
             console.warn(`Usuario no encontrado: ${credentials.username}`);
             throw new Error("Usuario no encontrado");
           }
+
+          const isValidPassword = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+
+          if (!isValidPassword) {
+            console.warn(
+              `Contraseña inválida para usuario: ${credentials.username}`
+            );
+            throw new Error("Credenciales inválidas");
+          }
+
+          // Devuelve un objeto user para que NextAuth lo meta en el token
+          return {
+            id: user.id,
+            name: user.name,
+            lastname: user.lastname,
+            username: user.username,
+            role: {
+              id: user.roleId,
+              name: user.roleName,
+            },
+          };
         } catch (error) {
           console.error("Error durante la autenticación:", error.message);
           throw new Error(error.message || "Error de autenticación");
@@ -82,29 +89,71 @@ const authOptions = {
       },
     }),
   ],
+
   callbacks: {
+    // Se ejecuta al crear/actualizar el token JWT en el login
     async jwt({ token, user }) {
       if (user) {
-        // Asignar datos seguros al token
         token.id = user.id;
-        token.name = user.name;
-        token.lastname = user.lastname;
         token.username = user.username;
-        token.role = user.role; // Si planeas usar roles
+        // Podríamos guardar estos campos por conveniencia,
+        // pero no serán el source of truth final.
+        // El "source of truth" será el callback session con DB.
       }
       return token;
     },
+
+    // AQUÍ vuelve a leerse la DB para tener datos frescos
     async session({ session, token }) {
-      session.user = {
-        id: token.id,
-        name: token.name,
-        lastname: token.lastname,
-        username: token.username,
-        role: token.role,
-      };
+      let connection;
+      try {
+        connection = await getDatabaseConnection();
+        // Consulta la DB para obtener el usuario más reciente
+        const [rows] = await connection.execute(
+          `SELECT 
+             User.id, 
+             User.name, 
+             User.lastname, 
+             User.username, 
+             role.id AS roleId, 
+             role.name AS roleName
+           FROM User
+           JOIN role ON User.roleId = role.id
+           WHERE User.id = ?`,
+          [token.id] // id que guardamos en el JWT
+        );
+
+        const dbUser = rows[0];
+        if (!dbUser) {
+          // Si no se encuentra, podría ser que el usuario haya sido borrado.
+          // Manejar ese caso como convenga (forzar signOut, etc.).
+          console.warn(`Usuario con ID ${token.id} no existe en DB`);
+          return session;
+        }
+
+        // Sobrescribimos la session con los datos recién consultados
+        session.user = {
+          id: dbUser.id,
+          name: dbUser.name,
+          lastname: dbUser.lastname,
+          username: dbUser.username,
+          role: {
+            id: dbUser.roleId,
+            name: dbUser.roleName,
+          },
+        };
+      } catch (error) {
+        console.error("Error al refrescar la sesión:", error);
+      } finally {
+        if (connection) {
+          await connection.end();
+        }
+      }
+
       return session;
     },
   },
+
   pages: {
     signIn: "/auth/login",
   },

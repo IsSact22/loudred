@@ -1,5 +1,6 @@
 "use client";
-import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 import { broadcastLogout } from "@/src/utils/authChannel";
 import { toast } from "react-hot-toast";
@@ -16,7 +17,6 @@ import {
 } from "react-icons/hi";
 
 const SidebarLeft = () => {
-  const router = useRouter();
   const pathname = usePathname(); // Detecta la ruta actual
   const { data: session } = useSession();
   const userRoleId = session?.user?.role?.id;
@@ -26,12 +26,19 @@ const SidebarLeft = () => {
   // Opciones del menú
   const menuItems = [
     { name: "Inicio", path: "/", icon: <HiHome /> },
-    { name: "Perfil", path: "/home/profile", icon: <HiUser /> },
-    { name: "Favoritos", path: "/home/favourites", icon: <HiOutlineHeart /> },
+    { name: "Perfil", path: "/profile", icon: <HiUser /> },
+    { name: "Favoritos", path: "/favourites", icon: <HiOutlineHeart /> },
     { name: "Subir", path: "/upload", icon: <HiOutlineCloudUpload /> },
-    { name: "Ajustes", path: "settings", icon: <HiOutlineCog /> },
+    // Importante: la barra inicial
+    { name: "Ajustes", path: "/settings", icon: <HiOutlineCog /> },
     ...(userRoleId === 2
-      ? [{ name: "Administrador", path: "/superAdmin", icon: <HiOutlineViewGridAdd /> }]
+      ? [
+          {
+            name: "Administrador",
+            path: "/superAdmin",
+            icon: <HiOutlineViewGridAdd />,
+          },
+        ]
       : []),
     { name: "Salir", key: "logout", icon: <HiOutlineLogout /> },
   ];
@@ -62,7 +69,7 @@ const SidebarLeft = () => {
   };
 
   return (
-    <div className="absolute">
+    <div className="absolute top-0">
       {/* Sidebar */}
       <div
         className={`bg-gradient-to-b from-purple-900 to-purple-950 text-white h-screen transition-all duration-300 ${
@@ -82,24 +89,33 @@ const SidebarLeft = () => {
               <h1 className="text-2xl font-bold">LOUDRED</h1>
             </div>
             <nav className="mt-10 space-y-4">
-              {menuItems.map((item) => (
-                <button
-                  key={item.path || item.key}
-                  onClick={() => {
-                    if (item.key === "logout") {
-                      handleLogout();
-                    } else {
-                      router.push(item.path); // Navegar a la ruta
-                    }
-                  }}
-                  className={`flex items-center px-4 py-2 text-lg transition-all rounded relative ${
-                    pathname === item.path ? "bg-red-500 text-white" : "hover:bg-purple-800"
-                  }`}
-                >
-                  <span className="text-xl">{item.icon}</span>
-                  <span className="ml-4">{item.name}</span>
-                </button>
-              ))}
+              {menuItems.map((item) => {
+                if (item.key === "logout") {
+                  return (
+                    <button
+                      key={item.key}
+                      onClick={handleLogout}
+                      className="flex items-center px-4 py-2 text-lg transition-all rounded relative hover:bg-purple-800"
+                    >
+                      <span className="text-xl">{item.icon}</span>
+                      <span className="ml-4">{item.name}</span>
+                    </button>
+                  );
+                }
+
+                return (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    className={`flex items-center px-4 py-2 text-lg transition-all rounded hover:bg-purple-800 ${
+                      pathname === item.path ? "bg-red-500 text-white" : ""
+                    }`}
+                  >
+                    <span className="text-xl">{item.icon}</span>
+                    <span className="ml-4">{item.name}</span>
+                  </Link>
+                );
+              })}
             </nav>
           </div>
         )}
