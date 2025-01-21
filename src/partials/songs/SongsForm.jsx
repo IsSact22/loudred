@@ -25,7 +25,7 @@ export default function SongsForm() {
     },
   });
   const { handleSubmit } = methods; // Extrae métodos de react-hook-form
-  const { createData, isMutating: isLoading } = useData("/songs", {}, false);
+  const { createData, isMutating: isLoading } = useData("/songs", {}, true);
 
   const onSubmit = async (data) => {
   try {
