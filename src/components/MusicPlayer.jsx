@@ -12,10 +12,6 @@ export default function MusicPlayer() {
   const songs = data.songs ?? [];
   // Estado para el índice de la canción actual
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
-
-  
-
-
   // Estados para controlar la reproducción
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);

@@ -10,6 +10,10 @@ import {
 import SongCard from "../cards/SongsCard";
 
 const SongCarousel = ({ songs }) => {
+  if (!songs || !songs.length) {
+    return <div>No hay canciones disponibles</div>;
+  }
+  
   return (
     // Carrusel de canciones
     <Carousel className="flex w-full max-w-3xl mt-4">
