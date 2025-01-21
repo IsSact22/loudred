@@ -74,7 +74,7 @@ export default function SongsForm() {
             {/* Input para el artista */}
             <Input
               name="artist"
-              label="Artistas"
+              label="Artista"
               labelClass="text-purple-900"
               containerClass="mb-6"
               className="bg-purple-50"

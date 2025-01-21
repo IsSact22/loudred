@@ -95,6 +95,7 @@ apiClient.interceptors.response.use(
     const errorMessage =
       response?.data?.messages ||
       response?.data?.message ||
+      response?.data?.error ||
       "Ocurrió un error.";
 
     // Manejo de problemas de red
