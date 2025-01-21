@@ -23,7 +23,9 @@ export default function RootLayout({ children }) {
       <body className={`${poppins.className} antialiased`}>
         <CoreProvider>
         <SidebarProvider>
-            <SideLayout> {children}</SideLayout>
+            <SideLayout> 
+                {children}
+              </SideLayout>
           </SidebarProvider>
         </CoreProvider>
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />

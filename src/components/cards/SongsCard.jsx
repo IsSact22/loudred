@@ -12,7 +12,7 @@ const SongCard = ({ image, title, artist, onFavorite }) => {
   };
 
   return (
-    <div className="w-40  bg-slate-900 hover:bg-slate-800 rounded-lg overflow-hidden shadow-md">
+    <div className="w-40 mr-20 bg-slate-900 hover:bg-slate-800 rounded-lg overflow-hidden shadow-md">
       {/* Imagen de la canción */}
       <img
         src={image}

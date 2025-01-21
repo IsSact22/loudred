@@ -45,7 +45,7 @@ export default function AdminPage() {
             <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 pb-2">
               Roles
             </h2>
-            <DataTable data={rolesData} columns={rolesColumns} />
+            <DataTable />
           </div>
         );
       case "users":
@@ -54,7 +54,7 @@ export default function AdminPage() {
             <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 pb-2">
               Usuarios
             </h2>
-            <DataTable data={usersData} columns={usersColumns} />
+            <DataTable />
           </div>
         );
       case "verify":
@@ -90,12 +90,12 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-slate-950 text-white mr-10">
       {/* Header */}
       <header className="p-6 flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <div className="text-5xl">👤</div>
-          <h1 className="text-3xl font-bold">Usuarios</h1>
+          <h1 className="text-3xl font-bold">Administrador</h1>
         </div>
 
         {/* Navigation Buttons */}
