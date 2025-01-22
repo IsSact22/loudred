@@ -1,0 +1,33 @@
+"use client";
+
+import React from "react";
+import { Play } from "lucide-react";
+
+export function PlaylistCard({ song, onPlay }) {
+  return (
+    <div className="flex items-center p-4 bg-gray-800 rounded-lg shadow-md text-white gap-4">
+      {/* Imagen de la portada */}
+      <img
+        src={song.image || "/placeholder.svg"}
+        alt={`Portada de ${song.title}`}
+        className="w-16 h-16 rounded object-cover"
+      />
+
+      {/* Información de la canción */}
+      <div className="flex-1">
+        <h2 className="text-lg font-bold">{song.title}</h2>
+        <p className="text-sm text-gray-400">{song.artist}</p>
+        <p className="text-sm text-gray-500">{song.duration}</p>
+      </div>
+
+      {/* Botón para reproducir */}
+      <button
+        className="flex items-center justify-center p-2 bg-purple-600 hover:bg-purple-700 rounded-full"
+        onClick={() => onPlay(song)}
+        aria-label={`Reproducir ${song.title}`}
+      >
+        <Play className="h-5 w-5 text-white" />
+      </button>
+    </div>
+  );
+}

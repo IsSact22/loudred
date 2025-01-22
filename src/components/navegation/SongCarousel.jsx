@@ -13,16 +13,16 @@ const SongCarousel = ({ songs }) => {
   if (!songs || !songs.length) {
     return <div>No hay canciones disponibles</div>;
   }
-  
+
   return (
     // Carrusel de canciones
-    <Carousel className="flex w-full max-w-3xl mt-4">
+    <Carousel className="flex w-full max-w-6xl mt-4">
       {/* Ajuste del espaciado entre items */}
-      <CarouselContent className="-ml-1">
+      <CarouselContent className="-ml-2">
         {songs.map((song, index) => (
           <CarouselItem
             key={`${song.id}-${index}`}
-            className="pl-1 md:basis-1/3 lg:basis-1/4"
+            className="pl-2 md:basis-1/5 lg:basis-1/6"
           >
             <div>
               <SongCard
