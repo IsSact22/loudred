@@ -20,14 +20,13 @@ export default function MusicPlayer() {
     if (audioRef.current) {
       audioRef.current.addEventListener("timeupdate", handleTimeUpdate);
       audioRef.current.addEventListener("loadedmetadata", handleLoadedMetadata);
+      audioRef.current.addEventListener("ended", handleSongEnd); // Escuchar el evento "ended"
     }
     return () => {
       if (audioRef.current) {
         audioRef.current.removeEventListener("timeupdate", handleTimeUpdate);
-        audioRef.current.removeEventListener(
-          "loadedmetadata",
-          handleLoadedMetadata
-        );
+        audioRef.current.removeEventListener("loadedmetadata", handleLoadedMetadata);
+        audioRef.current.removeEventListener("ended", handleSongEnd); // Limpiar el evento
       }
     };
   }, [audioRef.current]);
@@ -42,6 +41,10 @@ export default function MusicPlayer() {
     if (audioRef.current) {
       setDuration(audioRef.current.duration);
     }
+  };
+
+  const handleSongEnd = () => {
+    handleSkipForward(); // Cuando una canción termine, avanzamos a la siguiente
   };
 
   const formatTime = (time) => {
@@ -77,7 +80,7 @@ export default function MusicPlayer() {
       prevIndex === 0 ? songs.length - 1 : prevIndex - 1
     );
     setCurrentTime(0);
-    setIsPlaying(false);
+    setIsPlaying(true); // Aseguramos que la canción comience a reproducirse automáticamente
   };
 
   const handleSkipForward = () => {
@@ -85,7 +88,7 @@ export default function MusicPlayer() {
       prevIndex === songs.length - 1 ? 0 : prevIndex + 1
     );
     setCurrentTime(0);
-    setIsPlaying(false);
+    setIsPlaying(true); // Aseguramos que la canción comience a reproducirse automáticamente
   };
 
   if (songs.length === 0) {
@@ -116,7 +119,7 @@ export default function MusicPlayer() {
             max={duration}
             step={1}
             onValueChange={handleSeek}
-            className="w-full h-1"
+            className="w-full h-1 bg-red-300"
           />
           <div className="flex justify-between text-xs mt-1 text-gray-400">
             <span>{formatTime(currentTime)}</span>
@@ -142,7 +145,7 @@ export default function MusicPlayer() {
         </div>
       </div>
 
-      <audio ref={audioRef} src={currentSong.music} />
+      <audio ref={audioRef} src={currentSong.music} autoPlay />
     </div>
   );
 }

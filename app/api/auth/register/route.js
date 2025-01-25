@@ -14,15 +14,15 @@ function validacionInput({ name, lastname, username, password, confirmPassword }
   if (!nameRegex.test(lastname)) {
     return "El apellido no puede contener números ni caracteres especiales";
   }
-  const UsuarRegex = /^[A-Z][a-z]*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]*\d+[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]+$/;
+  const UsuarRegex = /^[A-Z][a-z]*\d+$/;
   if (!UsuarRegex.test(username)) {
-    return "El Usuario no es válido. Debe comenzar con una letra mayúscula, seguir con minúsculas, contener al menos un número y contener caracteres especiales.";
+    return "El Usuario no es válido. Debe comenzar con una letra mayúscula, seguir con minúsculas y contener al menos un número.";
   }
   if (password !== confirmPassword) {
     return "Las contraseñas no coinciden";
   }
   if (!isStrongPassword(password)) {
-    return "La contraseña no es fuerte. Debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.";
+    return "La contraseña no es fuerte. Debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un caracter especial.";
   }
   return null; // No hay errores
 }
@@ -30,7 +30,7 @@ function validacionInput({ name, lastname, username, password, confirmPassword }
 // Fortaleza de contraseña
 function isStrongPassword(password) {
   const strongPasswordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]{8,}$/;
   return strongPasswordRegex.test(password);
 }
 
