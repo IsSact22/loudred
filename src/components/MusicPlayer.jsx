@@ -1,16 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { useData } from "../hooks/useData";
+import { usePlayerStore } from "../stores/usePlayerStore";
 
 export default function MusicPlayer() {
-  const { data = [], error, isLoading } = useData("/songs");
-  const songs = data.songs ?? [];
-  const [currentSongIndex, setCurrentSongIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const { currentSong, isPlaying, setIsPlaying, playSong, currentPlaylist } = usePlayerStore();
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
@@ -20,13 +17,13 @@ export default function MusicPlayer() {
     if (audioRef.current) {
       audioRef.current.addEventListener("timeupdate", handleTimeUpdate);
       audioRef.current.addEventListener("loadedmetadata", handleLoadedMetadata);
-      audioRef.current.addEventListener("ended", handleSongEnd); // Escuchar el evento "ended"
+      audioRef.current.addEventListener("ended", handleSongEnd);
     }
     return () => {
       if (audioRef.current) {
         audioRef.current.removeEventListener("timeupdate", handleTimeUpdate);
         audioRef.current.removeEventListener("loadedmetadata", handleLoadedMetadata);
-        audioRef.current.removeEventListener("ended", handleSongEnd); // Limpiar el evento
+        audioRef.current.removeEventListener("ended", handleSongEnd);
       }
     };
   }, [audioRef.current]);
@@ -44,7 +41,7 @@ export default function MusicPlayer() {
   };
 
   const handleSongEnd = () => {
-    handleSkipForward(); // Cuando una canción termine, avanzamos a la siguiente
+    handleSkipForward(); // Avanzar a la siguiente canción cuando termine
   };
 
   const formatTime = (time) => {
@@ -62,7 +59,7 @@ export default function MusicPlayer() {
       } else {
         await audioRef.current.play();
       }
-      setIsPlaying(!isPlaying);
+      setIsPlaying(!isPlaying); // Actualiza el estado de reproducción en Zustand
     } catch (error) {
       console.error("Error toggling play/pause:", error);
     }
@@ -76,26 +73,23 @@ export default function MusicPlayer() {
   };
 
   const handleSkipBack = () => {
-    setCurrentSongIndex((prevIndex) =>
-      prevIndex === 0 ? songs.length - 1 : prevIndex - 1
-    );
+    const prevIndex = currentPlaylist.indexOf(currentSong);
+    const newIndex = prevIndex === 0 ? currentPlaylist.length - 1 : prevIndex - 1;
+    const newSong = currentPlaylist[newIndex];
+    playSong(newSong, currentPlaylist);
     setCurrentTime(0);
-    setIsPlaying(true); // Aseguramos que la canción comience a reproducirse automáticamente
   };
 
   const handleSkipForward = () => {
-    setCurrentSongIndex((prevIndex) =>
-      prevIndex === songs.length - 1 ? 0 : prevIndex + 1
-    );
+    const nextIndex = (currentPlaylist.indexOf(currentSong) + 1) % currentPlaylist.length;
+    const newSong = currentPlaylist[nextIndex];
+    playSong(newSong, currentPlaylist);
     setCurrentTime(0);
-    setIsPlaying(true); // Aseguramos que la canción comience a reproducirse automáticamente
   };
 
-  if (songs.length === 0) {
-    return <div className="m-4">Cargando canciones...</div>;
+  if (!currentSong) {
+    return <div className="m-4">Cargando canción...</div>;
   }
-
-  const currentSong = songs[currentSongIndex];
 
   return (
     <div className="w-full max-w-[18rem] mx-auto bg-slate-950/80 rounded-lg shadow-sm overflow-hidden mt-10">
@@ -133,11 +127,7 @@ export default function MusicPlayer() {
             <SkipBack className="h-3 w-3" />
           </Button>
           <Button variant="outline" size="icon" className="p-1" onClick={togglePlayPause}>
-            {isPlaying ? (
-              <Pause className="h-3 w-3" />
-            ) : (
-              <Play className="h-3 w-3" />
-            )}
+            {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
           </Button>
           <Button variant="outline" size="icon" className="p-1" onClick={handleSkipForward}>
             <SkipForward className="h-3 w-3" />
