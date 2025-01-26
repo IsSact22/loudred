@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function NextSongCard({ image, title, artist }) {
+export default function NextSongCard({ image, title, artist}) {
   return (
     <div className="flex items-center p-4 bg-gradient-to-r from-purple-600 to-pink-500 rounded-lg shadow-lg">
       {/* Imagen de la canción */}
