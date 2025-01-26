@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import NextSongCard from "../cards/NextSongCard";
-import PlayerCard from "@/src/components/cards/PlayerCard";
 import MusicPlayer from "../MusicPlayer";
 
 const SidebarRight = () => {

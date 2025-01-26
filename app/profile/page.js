@@ -1,15 +1,20 @@
 "use client";
+
 // Components
 import { PlaylistCard } from "@/src/components/cards/PlaylistCard";
 import { useSession } from "next-auth/react";
-import { useData } from "@/src/hooks/useData"; // Asegúrate de tener este hook
+import { useData } from "@/src/hooks/useData";
 import React, { useEffect, useState } from "react";
+import { usePlayerStore } from "@/src/stores/usePlayerStore";
 
 export default function ProfilePage() {
   // Obtener la sesión actual
   const { data: session } = useSession();
   const [userSongs, setUserSongs] = useState([]);
   const { data = {}, isLoading, error } = useData("/songs");
+
+  // Acceder al estado global del reproductor
+  const { playSong, setPlaylist } = usePlayerStore();
 
   // Filtrar las canciones del usuario
   useEffect(() => {
@@ -61,8 +66,10 @@ export default function ProfilePage() {
                 <PlaylistCard
                   key={song.id || index}
                   song={song}
-                  onPlay={(song) => {
-                    // Aquí puedes llamar a la función onPlay desde el contexto para actualizar la canción en el reproductor
+                  onPlay={() => {
+                    // Reproducir la canción seleccionada y establecer la lista de reproducción
+                    setPlaylist(userSongs); // Configura todas las canciones del usuario
+                    playSong(song, userSongs); // Reproduce la canción seleccionada
                   }}
                 />
               ))}

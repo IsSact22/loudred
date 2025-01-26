@@ -8,14 +8,16 @@ import CategorySelect from "@/src/components/select/CategoriesSelect";
 import { useForm, FormProvider } from "react-hook-form";
 import { useData } from "@/src/hooks/useData";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation"; // Hook para redirección
 // Validations
 import { yupResolver } from "@hookform/resolvers/yup";
 import { songsSchema } from "@/src/validations/validationSchema";
 // Toast
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
 export default function SongsForm() {
   const { data: session } = useSession();
+  const router = useRouter(); // Hook de Next.js para redirección
 
   const methods = useForm({
     resolver: yupResolver(songsSchema),
@@ -24,25 +26,27 @@ export default function SongsForm() {
       artist: session?.user?.name || "",
     },
   });
-  const { handleSubmit } = methods; // Extrae métodos de react-hook-form
+  const { handleSubmit } = methods;
   const { createData, isMutating: isLoading } = useData("/songs", {}, true);
 
   const onSubmit = async (data) => {
-  try {
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("userId", session?.user?.id);
-    formData.append("categoryId", data.category?.id || "");
-    formData.append("music", data.audio?.[0] || "");
-    formData.append("image", data.cover?.[0] || "");
+    try {
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("userId", session?.user?.id);
+      formData.append("categoryId", data.category?.id || "");
+      formData.append("music", data.audio?.[0] || "");
+      formData.append("image", data.cover?.[0] || "");
 
-    await createData(formData); // Ajusta createData para multipart/form-data
-    toast.success("Canción subida con éxito");
-    //onClose?.();
-  } catch (error) {
-    console.error(error);
-  }
-};
+      await createData(formData); // Subir los datos
+      toast.success("Canción subida con éxito");
+
+      router.push("/"); // Redirigir al home
+    } catch (error) {
+      console.error(error);
+      toast.error("Ocurrió un error al subir la canción");
+    }
+  };
 
   const onError = (errors) => {
     const mensajes = Object.values(errors)
@@ -68,7 +72,6 @@ export default function SongsForm() {
               placeholder="Ingrese el título de la canción"
               containerClass="mb-6"
               className="bg-purple-50"
-
             />
 
             {/* Input para el artista */}
@@ -111,7 +114,6 @@ export default function SongsForm() {
                 maxSize={10 * 1024 * 1024} // 10MB
                 containerClass="mb-6"
                 className="text-purple-900"
-
               />
             </div>
 
