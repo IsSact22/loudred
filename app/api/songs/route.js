@@ -272,7 +272,7 @@ export async function GET(req) {
     }
 
     const formattedSongs = songs.map((song) => ({
-      songId: song.songId,
+      id: song.songId,
       title: song.title,
       validate: song.validate,
       createdAt: song.createdAt,

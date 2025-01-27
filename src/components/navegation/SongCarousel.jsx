@@ -18,7 +18,7 @@ const SongCarousel = ({ songs }) => {
   const playSong = usePlayerStore((state) => state.playSong);
 
   // Usamos el hook useData para interactuar con los favoritos
-  const { createData } = useData("/favourite");
+  const { createData } = useData("/favourite", {}, false);
 
   if (!songs || !songs.length) {
     return <div>No hay canciones disponibles</div>;
@@ -39,9 +39,14 @@ const SongCarousel = ({ songs }) => {
       return;
     }
 
+    const payload = {
+      userId: session.user.id,
+      songId,
+    };
+
     try {
       // Llamada al backend para agregar la canción a favoritos
-      await createData({ userId: session.user.id, songId });
+      await createData(payload);
       toast.success("Canción agregada a favoritos.");
     } catch (error) {
       console.error("Error al manejar favoritos:", error);

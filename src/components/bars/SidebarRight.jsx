@@ -28,8 +28,8 @@ const SidebarRight = () => {
           {nextSongs.length > 0 ? (
             nextSongs.map((song, index) => (
               <NextSongCard
-                key={song.id} // Asegúrate de que cada tarjeta tenga una 'key' única
-                index={index}  // Pasa el index a cada tarjeta
+                key={`${song.id}-${index}`}
+                index={index} // Pasa el index a cada tarjeta
                 image={song.image}
                 title={song.title}
                 artist={song.artist}
