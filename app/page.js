@@ -36,7 +36,7 @@ export default function Home() {
       {/* Contenido principal */}
       
         {/* Barra de búsqueda */}
-        <div className="w-full max-w-2xl mb-4">
+        <div className="w-full max-w-2xl mb-4 ml-8">
           <SearchBar onSearch={handleSearch} />
         </div>
 

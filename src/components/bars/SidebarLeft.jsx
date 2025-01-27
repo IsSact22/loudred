@@ -1,10 +1,11 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
 import { broadcastLogout } from "@/src/utils/authChannel";
 import { toast } from "react-hot-toast";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 // Iconos
 import {
@@ -46,7 +47,7 @@ const SidebarLeft = ({isOpen, setIsOpen}) => {
 
   const handleLogout = () => {
     toast((t) => (
-      <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-lg text-center">
+      <div className="flex flex-col items-center p-6 bg-white rounded-lg text-center">
         <span className="text-xl mb-4">¿Seguro que deseas cerrar sesión?</span>
         <div className="flex gap-4">
           <button
@@ -78,7 +79,7 @@ const SidebarLeft = ({isOpen, setIsOpen}) => {
         } relative`}
       >
         <button
-          className="absolute top-4 right-[-16px] bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg focus:outline-none z-10"
+          className="absolute top-8 right-[-16px] bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg focus:outline-none z-10"
           onClick={() => setIsOpen(!isOpen)}
         >
           ☰
@@ -87,9 +88,19 @@ const SidebarLeft = ({isOpen, setIsOpen}) => {
         {isOpen && (
           <div>
             <div className="flex items-center justify-between px-4 py-4">
-              <h1 className="text-2xl font-bold">LOUDRED</h1>
+              <h1 className="text-2xl font-bold">
+                <Image
+                  src={"/assets/loudred-logo4.png"}
+                  alt="Logo"
+                  width={150}
+                  height={75}
+                  className={`mt-4 ml-6 transition-opacity duration-300 ${
+                    !isOpen ? "opacity-0" : "opacity-100"
+                  }`}
+                />
+              </h1>
             </div>
-            <nav className="mt-10 space-y-4">
+            <nav className="mt-8 space-y-4">
               {menuItems.map((item) => {
                 if (item.key === "logout") {
                   return (
