@@ -8,21 +8,45 @@ import {
 } from "@/components/ui/carousel";
 import SongCard from "../cards/SongsCard";
 import { usePlayerStore } from "@/src/stores/usePlayerStore";
+import { useSession } from "next-auth/react"; // Importamos useSession
+import { useData } from "@/src/hooks/useData"; // Usamos useData
+import toast from "react-hot-toast";
 
 const SongCarousel = ({ songs }) => {
-  const playSong = usePlayerStore((state) => state.playSong); // Método para reproducir una canción
+  // Obtener la sesión actual
+  const { data: session } = useSession();
+  const playSong = usePlayerStore((state) => state.playSong);
+
+  // Usamos el hook useData para interactuar con los favoritos
+  const { createData } = useData("/favourite");
 
   if (!songs || !songs.length) {
     return <div>No hay canciones disponibles</div>;
   }
 
-  // Ordenar las canciones por fecha de creación (de más reciente a más antigua)
+  // Ordenar canciones
   const sortedSongs = [...songs].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
 
   const handlePlay = (song) => {
-    playSong(song, sortedSongs); // Reproduce la canción seleccionada y pasa la playlist completa
+    playSong(song, sortedSongs); // Reproducir canción
+  };
+
+  const handleFavoriteClick = async (songId) => {
+    if (!session?.user?.id) {
+      toast.error("Por favor, inicia sesión para agregar a favoritos.");
+      return;
+    }
+
+    try {
+      // Llamada al backend para agregar la canción a favoritos
+      await createData({ userId: session.user.id, songId });
+      toast.success("Canción agregada a favoritos.");
+    } catch (error) {
+      console.error("Error al manejar favoritos:", error);
+      toast.error("Hubo un problema al actualizar favoritos.");
+    }
   };
 
   return (
@@ -37,9 +61,9 @@ const SongCarousel = ({ songs }) => {
               image={song.image}
               title={song.title}
               artist={song.artist}
-              onFavorite={(title, isFavorited) =>
-                console.log(`Song: ${title}, Favorited: ${isFavorited}`)
-              }
+              songId={song.id} // Pasamos el songId
+              userId={session?.user?.id} // Usamos el userId de la sesión
+              onFavoriteClick={() => handleFavoriteClick(song.id)} // Ahora pasamos el songId correctamente
               onClick={() => handlePlay(song)} // Reproducir la canción al hacer clic
             />
           </CarouselItem>
@@ -50,5 +74,6 @@ const SongCarousel = ({ songs }) => {
     </Carousel>
   );
 };
+
 
 export default SongCarousel;

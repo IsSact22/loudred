@@ -7,6 +7,7 @@ export async function POST(req) {
     try {
       const data = await req.json(); // Obtener datos del cuerpo de la solicitud
       const { userId, songId } = data;
+      console.log("Datos recibidos:", data);
       const missingFields = [];
   
       if (!userId) missingFields.push("userId");
