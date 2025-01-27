@@ -107,7 +107,7 @@ const SidebarLeft = ({isOpen, setIsOpen}) => {
                     <button
                       key={item.key}
                       onClick={handleLogout}
-                      className="flex items-center px-4 py-2 text-lg transition-all rounded relative hover:bg-purple-800"
+                      className="flex items-center px-4 py-2 w-full text-lg transition-all rounded relative hover:bg-purple-800"
                     >
                       <span className="text-xl">{item.icon}</span>
                       <span className="ml-4">{item.name}</span>
@@ -132,11 +132,7 @@ const SidebarLeft = ({isOpen, setIsOpen}) => {
           </div>
         )}
       </div>
-
-      {/* Main Content */}
-      <div className="flex-1 p-6">
-        {/* Aquí Next.js cargará automáticamente las páginas según la ruta */}
-      </div>
+      
     </div>
   );
 };

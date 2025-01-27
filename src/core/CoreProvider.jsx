@@ -62,11 +62,19 @@ export const SessionStatus = ({ children }) => {
   }, [isClient, from, isLogging, pathname, showModal]);
 
   if (status === "loading") {
-    return <div> Cargando </div>
+    return (
+      <div className="flex justify-center items-center text-center w-full min-h-screen bg-black">
+        <span className="refreshLoader"></span>
+      </div>
+    );
   }
 
   if (status === "authenticated" && pathname === "/auth/login" && !showModal) {
-    return <div> Estas logueandote </div>
+    return (
+      <div className="flex justify-center items-center text-center w-full min-h-screen bg-black">
+        <span className="accessLoader"></span>
+      </div>
+    );
   }
 
   return (
