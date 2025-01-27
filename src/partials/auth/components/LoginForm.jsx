@@ -37,7 +37,6 @@ export default function LoginForm() {
       toast.error(result.error || "Oops, credenciales inválidas.");
     } else {
       // Limpiamos la razón del logout del sessionStorage
-      sessionStorage.removeItem("logoutReason");
       setIsLogging(true);
     }
   };
