@@ -1,6 +1,9 @@
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { useState } from "react";
 
-const SongCard = ({ songId, userId, image, title, artist, onClick, onFavoriteClick }) => {
+const SongCard = ({ image, title, artist, onClick, onFavoriteClick }) => {
+  const [isFavorite, setIsFavorite] = useState(false); // Estado para controlar favoritos
+
   return (
     <div
       onClick={onClick} // Agregar la funcionalidad de clic en toda la tarjeta
@@ -19,17 +22,19 @@ const SongCard = ({ songId, userId, image, title, artist, onClick, onFavoriteCli
           <button
             onClick={(e) => {
               e.stopPropagation(); // Evitar que el evento se propague al contenedor
+              setIsFavorite(!isFavorite); // Alternar el estado de favorito
               onFavoriteClick(); // Llamar a la función del carrusel
             }}
-            className="text-purple-300 hover:text-red-400 transition-colors"
+            className={`transition-colors ${
+              isFavorite ? "text-red-400" : "text-purple-300 hover:text-red-400"
+            }`}
           >
-            <FaRegHeart />
+            {isFavorite ? <FaHeart /> : <FaRegHeart />}
           </button>
         </div>
       </div>
     </div>
   );
 };
-
 
 export default SongCard;

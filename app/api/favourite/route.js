@@ -80,38 +80,58 @@ export async function POST(req) {
   // Obtener canciones de favoritos
   export async function GET(req) {
     try {
-        // Obtener el userId de los parámetros de la URL
-        const userId = req.nextUrl.searchParams.get('userId');
-
-        if (!userId) {
-            return new Response(
-                JSON.stringify({ error: "Se requiere userId." }),
-                { status: 400, headers: { "Content-Type": "application/json" } }
-            );
-        }
-
-        // Obtener la playlist de Favoritos del usuario
-        const playlist = await prisma.playlist.findFirst({
-            where: { userId: parseInt(userId), name: "Favoritos" },
-            include: { Songs: true }, // Incluir las canciones en la respuesta
-        });
-
-        if (!playlist) {
-            return new Response(
-                JSON.stringify({ error: "No se encontró la playlist de Favoritos." }),
-                { status: 404, headers: { "Content-Type": "application/json" } }
-            );
-        }
-
+      // Obtener el userId de los parámetros de la URL
+      const userId = req.nextUrl.searchParams.get("userId");
+  
+      if (!userId) {
         return new Response(
-            JSON.stringify({ songs: playlist.Songs }),
-            { status: 200, headers: { "Content-Type": "application/json" } }
+          JSON.stringify({ error: "Se requiere userId." }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
         );
+      }
+  
+      // Obtener la playlist de Favoritos del usuario
+      const playlist = await prisma.playlist.findFirst({
+        where: { userId: parseInt(userId), name: "Favoritos" },
+        include: { 
+          Songs: {
+            include: {
+              Image: true, // Incluir la imagen asociada a cada canción
+              Music: true, // Incluir el audio asociado a cada canción
+            },
+          },
+        },
+      });
+  
+      if (!playlist) {
+        return new Response(
+          JSON.stringify({ error: "No se encontró la playlist de Favoritos." }),
+          { status: 404, headers: { "Content-Type": "application/json" } }
+        );
+      }
+  
+      // Formatear las canciones con sus datos e incluir imagen/audio si existen
+      const formattedSongs = playlist.Songs.map((song) => ({
+        id: song.id,
+        title: song.title,
+        validate: song.validate,
+        createdAt: song.createdAt,
+        userId: song.userId,
+        categoryId: song.categoryId,
+        image: song.imageFileName ? `${song.imageFileName}` : null,
+        music: song.musicFileName ? `${song.musicFileName}` : null, 
+      }));
+  
+      return new Response(
+        JSON.stringify({ songs: formattedSongs }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
     } catch (error) {
-        console.error("Error al obtener canciones de favoritos", error);
-        return new Response(
-            JSON.stringify({ error: "Error interno del servidor." }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
-        );
+      console.error("Error al obtener canciones de favoritos", error);
+      return new Response(
+        JSON.stringify({ error: "Error interno del servidor." }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
     }
-}
+  }
+  
