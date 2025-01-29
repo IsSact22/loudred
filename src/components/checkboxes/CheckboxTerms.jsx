@@ -104,8 +104,7 @@ const CheckboxWithDialog = ({
                 <li>
                   <strong>Aceptación de los Términos:</strong> Al utilizar esta
                   plataforma, aceptas cumplir con los presentes Términos y
-                  Condiciones. Si no estás de acuerdo, no deberás usar esta
-                  aplicación.
+                  Condiciones.
                   <br />
                 </li>
                 <li>

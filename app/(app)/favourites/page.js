@@ -26,14 +26,9 @@ export default function FavoritesPage() {
     return <div className="m-4">Cargando canciones favoritas...</div>;
   }
 
-  if (error) {
-    return (
-      <div className="m-4">
-        Error al cargar las canciones favoritas: {error}
-      </div>
-    );
-  }
 
+
+   
   return (
     <div className="min-h-screen bg-slate-950 text-white mr-10">
       {/* Header */}
@@ -62,7 +57,7 @@ export default function FavoritesPage() {
         </h2>
         <div>
           {favoriteSongs.length === 0 ? (
-            <p>No tienes canciones favoritas disponibles.</p>
+            <p>No has guardado ninguna canción aún ¡Agrega una!</p>
           ) : (
             <div className="space-y-4 mr-10">
               {favoriteSongs.map((song, index) => (

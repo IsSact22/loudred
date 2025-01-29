@@ -110,7 +110,7 @@ export default function SongsForm() {
                 name="cover"
                 label="Portada"
                 labelClass="text-purple-900"
-                accept="image/png"
+                accept="image/png/jpg"
                 maxSize={10 * 1024 * 1024} // 10MB
                 containerClass="mb-6"
                 className="text-purple-900"

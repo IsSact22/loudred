@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useData } from "@/src/hooks/useData";
 import React, { useEffect, useState } from "react";
 import { usePlayerStore } from "@/src/stores/usePlayerStore";
+import Link from "next/link";
 
 export default function ProfilePage() {
   // Obtener la sesión actual
@@ -58,7 +59,11 @@ export default function ProfilePage() {
         <div>
           {/* Si no hay canciones */}
           {userSongs.length === 0 ? (
-            <p>No tienes canciones disponibles.</p>
+            <p>No has subido una canción aún
+              <Link href="/upload" className="text-red-400 ml-1">
+                ¡Sube una!
+              </Link> 
+            </p>
           ) : (
             <div className="space-y-4 mr-10">
               {/* Muestra cada canción usando PlaylistCard */}

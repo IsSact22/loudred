@@ -3,49 +3,58 @@ import { persist } from "zustand/middleware";
 import Cookies from "js-cookie";
 
 export const usePlayerStore = create(
-    persist(
-      (set) => ({
-        // Estado para controlar la reproducción
-        isPlaying: false,
-        currentSong: null, // Canción actual en reproducción
-        currentPlaylist: [], // Lista de canciones activa
-  
-        setPlaylist: (playlist) => set({ currentPlaylist: playlist }),
-        setCurrentSong: (song) => set({ currentSong: song }),
-        setIsPlaying: (value) => set({ isPlaying: value }),
-  
-        // Control de reproducción
-        playSong: (song, playlist) =>
+  persist(
+    (set, get) => ({
+      isPlaying: false,
+      currentSong: null,
+      currentPlaylist: [],
+      originalPlaylist: [], // Guarda la lista original
+      isShuffled: false,
+
+      setPlaylist: (playlist) => set({ currentPlaylist: playlist, originalPlaylist: playlist }),
+      setCurrentSong: (song) => set({ currentSong: song }),
+      setIsPlaying: (value) => set({ isPlaying: value }),
+
+      playSong: (song, playlist) =>
+        set({ currentSong: song, currentPlaylist: playlist, isPlaying: true }),
+
+      toggleShuffle: () => {
+        const { isShuffled, originalPlaylist, currentSong } = get();
+
+        if (isShuffled) {
+          // Desactiva aleatorio y restaura el orden original
+          set({ currentPlaylist: originalPlaylist, isShuffled: false });
+          // Asegurarse de que la canción actual se reproduzca correctamente
+          set({ currentSong: originalPlaylist.find(song => song.id === currentSong?.id) });
+        } else {
+          // Activa aleatorio solo para las canciones siguientes
+          const currentIndex = originalPlaylist.findIndex(song => song.id === currentSong?.id);
+          const nextSongs = originalPlaylist.slice(currentIndex + 1);
+
+          // Aleatorizamos las canciones siguientes
+          for (let i = nextSongs.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [nextSongs[i], nextSongs[j]] = [nextSongs[j], nextSongs[i]];
+          }
+
+          // Reajustamos la lista de reproducción
           set({
-            currentSong: song,
-            currentPlaylist: playlist,
-            isPlaying: true,
-          }),
-  
-        // Avanzar a la siguiente canción
-        playNextSong: () =>
-          set((state) => {
-            const currentIndex = state.currentPlaylist.findIndex(
-              (s) => s.id === state.currentSong?.id
-            );
-            const nextSong =
-              currentIndex >= 0 && currentIndex < state.currentPlaylist.length - 1
-                ? state.currentPlaylist[currentIndex + 1]
-                : null;
-            return {
-              currentSong: nextSong,
-              isPlaying: !!nextSong,
-            };
-          }),
+            currentPlaylist: [
+              ...originalPlaylist.slice(0, currentIndex + 1), // Deja las canciones anteriores intactas
+              ...nextSongs, // Y solo aleatorizamos las siguientes
+            ],
+            isShuffled: true,
+          });
+        }
+      },
+    }),
+    {
+      name: "player-store",
+      getStorage: () => ({
+        getItem: (name) => Cookies.get(name),
+        setItem: (name, value) => Cookies.set(name, value),
+        removeItem: (name) => Cookies.remove(name),
       }),
-      {
-        name: "player-store",
-        getStorage: () => ({
-          getItem: (name) => Cookies.get(name),
-          setItem: (name, value) => Cookies.set(name, value),
-          removeItem: (name) => Cookies.remove(name),
-        }),
-      }
-    )
-  );
-  
+    }
+  )
+);

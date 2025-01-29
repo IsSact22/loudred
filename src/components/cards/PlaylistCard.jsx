@@ -17,7 +17,6 @@ export function PlaylistCard({ song, onPlay }) {
       <div className="flex-1">
         <h2 className="text-lg font-bold">{song.title}</h2>
         <p className="text-sm text-gray-400">{song.artist}</p>
-        <p className="text-sm text-gray-500">{song.duration}</p>
       </div>
 
       {/* Botón para reproducir */}

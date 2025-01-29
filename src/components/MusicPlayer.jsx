@@ -1,48 +1,51 @@
-"use client";
-
 import { useState, useEffect, useRef } from "react";
 import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { usePlayerStore } from "../stores/usePlayerStore";
+import { FaRandom } from "react-icons/fa";
+import { toast } from "react-hot-toast";
 
 export default function MusicPlayer() {
-  const { currentSong, isPlaying, setIsPlaying, playSong, currentPlaylist } = usePlayerStore();
+  const { currentSong, isPlaying, setIsPlaying, playSong, currentPlaylist, toggleShuffle, isShuffled } = usePlayerStore();
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-
   const audioRef = useRef(null);
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.addEventListener("timeupdate", handleTimeUpdate);
-      audioRef.current.addEventListener("loadedmetadata", handleLoadedMetadata);
-      audioRef.current.addEventListener("ended", handleSongEnd);
-    }
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.removeEventListener("timeupdate", handleTimeUpdate);
-        audioRef.current.removeEventListener("loadedmetadata", handleLoadedMetadata);
-        audioRef.current.removeEventListener("ended", handleSongEnd);
-      }
-    };
-  }, [audioRef.current]);
+      const audio = audioRef.current;
+      const handleTimeUpdate = () => {
+        const newTime = audio.currentTime;
+        // Optimizar actualizaciones del tiempo, solo actualizar cada 100ms
+        if (Math.abs(newTime - currentTime) >= 0.1) {
+          setCurrentTime(newTime);
+        }
+      };
+      const handleLoadedMetadata = () => {
+        setDuration(audio.duration);
+      };
+      const handleSongEnd = () => {
+        handleSkipForward();
+      };
 
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
+      audio.addEventListener("timeupdate", handleTimeUpdate);
+      audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.addEventListener("ended", handleSongEnd);
 
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
+      return () => {
+        audio.removeEventListener("timeupdate", handleTimeUpdate);
+        audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+        audio.removeEventListener("ended", handleSongEnd);
+      };
     }
-  };
+  }, [currentTime]);
 
-  const handleSongEnd = () => {
-    handleSkipForward(); // Avanzar a la siguiente canción cuando termine
-  };
+  useEffect(() => {
+    if (currentSong && isPlaying && audioRef.current) {
+      audioRef.current.play();  // Reproducir automáticamente cuando cambia la canción
+    }
+  }, [currentSong, isPlaying]);
 
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
@@ -59,7 +62,7 @@ export default function MusicPlayer() {
       } else {
         await audioRef.current.play();
       }
-      setIsPlaying(!isPlaying); // Actualiza el estado de reproducción en Zustand
+      setIsPlaying(!isPlaying);
     } catch (error) {
       console.error("Error toggling play/pause:", error);
     }
@@ -87,6 +90,14 @@ export default function MusicPlayer() {
     setCurrentTime(0);
   };
 
+  const handleToggleShuffle = () => {
+    toggleShuffle();
+    // Usar un setTimeout para mostrar el mensaje correcto después de que se haya actualizado el estado
+    setTimeout(() => {
+      toast.success(isShuffled ? "Reproducción en orden activada" : "Reproducción aleatoria activada");
+    }, 0);
+  };
+
   if (!currentSong) {
     return <div className="m-4">Cargando canción...</div>;
   }
@@ -106,7 +117,6 @@ export default function MusicPlayer() {
           {currentSong.title}
         </div>
 
-        {/* Barra de reproducción */}
         <div className="mt-3">
           <Slider
             value={[currentTime]}
@@ -121,7 +131,6 @@ export default function MusicPlayer() {
           </div>
         </div>
 
-        {/* Controles */}
         <div className="mt-3 flex justify-center space-x-1">
           <Button variant="outline" size="icon" className="p-1" onClick={handleSkipBack}>
             <SkipBack className="h-3 w-3" />
@@ -132,10 +141,13 @@ export default function MusicPlayer() {
           <Button variant="outline" size="icon" className="p-1" onClick={handleSkipForward}>
             <SkipForward className="h-3 w-3" />
           </Button>
+          <Button size="icon" className={`p-1 ${isShuffled ? "bg-red-500" : "bg-purple-500"}`} onClick={handleToggleShuffle}>
+            <FaRandom className="h-3 w-3 text-white" />
+          </Button>
         </div>
       </div>
 
-      <audio ref={audioRef} src={currentSong.music} autoPlay />
+      <audio ref={audioRef} src={currentSong.music} />
     </div>
   );
 }

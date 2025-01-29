@@ -109,6 +109,8 @@ export async function DELETE(req, { params }) {
       return new Response("Error interno del servidor", { status: 500 });
     }
   }
+
+//get de una sola canción
   export async function GET(req, context) {
     const { params } = await context;
     const songId = params.id;
