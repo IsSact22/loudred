@@ -1,23 +1,48 @@
+// ProfilePage
 "use client";
 
-// Components
-import { PlaylistCard } from "@/src/components/cards/PlaylistCard";
+import { PlaylistCard } from "@/src/components/cards/PlaylistCardProfile";
 import { useSession } from "next-auth/react";
 import { useData } from "@/src/hooks/useData";
 import React, { useEffect, useState } from "react";
 import { usePlayerStore } from "@/src/stores/usePlayerStore";
 import Link from "next/link";
+import { toast } from "react-hot-toast"; // Asegúrate de importar toast si no lo has hecho
 
 export default function ProfilePage() {
-  // Obtener la sesión actual
   const { data: session } = useSession();
   const [userSongs, setUserSongs] = useState([]);
   const { data = {}, isLoading, error } = useData("/songs");
 
-  // Acceder al estado global del reproductor
   const { playSong, setPlaylist } = usePlayerStore();
 
-  // Filtrar las canciones del usuario
+  // Función para eliminar la canción por completo
+  const handleRemoveSong = async (song) => {
+    if (!session?.user?.id || !song?.id) {
+      console.error("Error: userId o songId no definidos.");
+      toast.error("Error interno: No se puede eliminar la canción.");
+      return;
+    }
+
+    try {
+      // Realiza la solicitud DELETE a tu backend para eliminar la canción
+      const response = await fetch(`/api/songs/${song.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error("No se pudo eliminar la canción.");
+      }
+
+      // Actualiza el estado después de la eliminación
+      setUserSongs((prev) => prev.filter((s) => s.id !== song.id)); 
+      toast.success("Canción eliminada con éxito.");
+    } catch (error) {
+      console.error("Error al eliminar la canción:", error);
+      toast.error("No se pudo eliminar la canción.");
+    }
+  };
+
   useEffect(() => {
     if (session?.user?.id && data?.songs) {
       const userSongs = data.songs.filter((song) => song.userId === session.user.id);
@@ -35,7 +60,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white mr-10">
-      {/* Header */}
       <header className="p-6 flex flex-col gap-4 items-start">
         <div className="flex items-center gap-3">
           <div className="text-5xl">
@@ -57,7 +81,6 @@ export default function ProfilePage() {
           Mis Canciones
         </h2>
         <div>
-          {/* Si no hay canciones */}
           {userSongs.length === 0 ? (
             <p>No has subido una canción aún
               <Link href="/upload" className="text-red-400 ml-1">
@@ -66,16 +89,18 @@ export default function ProfilePage() {
             </p>
           ) : (
             <div className="space-y-4 mr-10">
-              {/* Muestra cada canción usando PlaylistCard */}
               {userSongs.map((song, index) => (
                 <PlaylistCard
                   key={song.id || index}
                   song={song}
                   onPlay={() => {
-                    // Reproducir la canción seleccionada y establecer la lista de reproducción
-                    setPlaylist(userSongs); // Configura todas las canciones del usuario
-                    playSong(song, userSongs); // Reproduce la canción seleccionada
+                    setPlaylist(userSongs);
+                    playSong(song, userSongs);
                   }}
+                  onConfirmDelete={handleRemoveSong} // Aquí pasas la nueva función para eliminar la canción
+                  deleteActionLabel="Eliminar canción"
+                  deleteConfirmationMessage="¿Seguro que deseas eliminar esta canción?"
+                  isOwner={session?.user?.id === song.userId} // Solo mostrar el botón si el usuario es el propietario
                 />
               ))}
             </div>

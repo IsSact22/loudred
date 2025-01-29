@@ -1,9 +1,8 @@
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useState } from "react";
+import FavButton from "../buttons/FavButton";
 
-const SongCard = ({ image, title, artist, onClick, onFavoriteClick }) => {
-  const [isFavorite, setIsFavorite] = useState(false); // Estado para controlar favoritos
-
+const SongCard = ({ image, title, artist, onClick, songId }) => {
   return (
     <div
       onClick={onClick} // Agregar la funcionalidad de clic en toda la tarjeta
@@ -17,20 +16,9 @@ const SongCard = ({ image, title, artist, onClick, onFavoriteClick }) => {
         <h3 className="text-sm font-semibold truncate">{title}</h3>
         <p className="text-xs text-purple-300 truncate">{artist}</p>
 
-        {/* Ícono de "me gusta" */}
+        {/* Ícono de "agregar a favoritos" */}
         <div className="flex justify-end mt-2">
-          <button
-            onClick={(e) => {
-              e.stopPropagation(); // Evitar que el evento se propague al contenedor
-              setIsFavorite(!isFavorite); // Alternar el estado de favorito
-              onFavoriteClick(); // Llamar a la función del carrusel
-            }}
-            className={`transition-colors ${
-              isFavorite ? "text-red-400" : "text-purple-300 hover:text-red-400"
-            }`}
-          >
-            {isFavorite ? <FaHeart /> : <FaRegHeart />}
-          </button>
+          <FavButton songId={songId} /> {/* Usamos el nuevo componente aquí */}
         </div>
       </div>
     </div>

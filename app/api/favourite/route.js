@@ -134,23 +134,27 @@ export async function GET(req) {
   }
 }
 
-// Eliminar canción de favorito
 export async function DELETE(req) {
   try {
-    const data = await req.json(); // Obtener datos del cuerpo de la solicitud
+    let data;
+    try {
+      data = await req.json(); // Intentar parsear el JSON
+    } catch (error) {
+      console.error("Error al parsear JSON:", error);
+      return new Response(
+        JSON.stringify({ error: "Formato de solicitud inválido" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     const { userId, songId } = data;
     console.log("Datos recibidos:", data);
-    const missingFields = [];
 
-    if (!userId) missingFields.push("userId");
-    if (!songId) missingFields.push("songId");
-
-    if (missingFields.length > 0) {
-      const errorMessage =
-        missingFields.length === 2
-          ? "Todos los campos son requeridos"
-          : `Los siguientes campos son requeridos: ${missingFields.join(", ")}`;
-      return createErrorResponse(errorMessage);
+    if (!userId || !songId) {
+      return new Response(
+        JSON.stringify({ error: "Todos los campos son requeridos" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
     }
 
     // Verificar si el usuario y la canción existen
@@ -166,11 +170,10 @@ export async function DELETE(req) {
 
     // Buscar la playlist de Favoritos
     let playlist = await prisma.playlist.findFirst({
-      where: { userId: userId, name: "Favoritos" },
-      include: { Songs: true }, // Asegurarnos de que las canciones estén incluidas
+      where: { userId, name: "Favoritos" },
+      include: { Songs: true },
     });
 
-    // Si la playlist no existe, devolver un error
     if (!playlist) {
       return new Response(
         JSON.stringify({ error: "La playlist de Favoritos no existe." }),
@@ -187,7 +190,7 @@ export async function DELETE(req) {
       );
     }
 
-    // Desconectar la canción de la playlist de Favoritos
+    // Eliminar la canción de la playlist
     await prisma.playlist.update({
       where: { id: playlist.id },
       data: {
@@ -203,15 +206,10 @@ export async function DELETE(req) {
     );
 
   } catch (error) {
-    const errorMessage = error && error instanceof Error ? error.message : "Unknown error";
-    console.error("Error al eliminar canción de favoritos", errorMessage);
-
+    console.error("Error interno del servidor:", error);
     return new Response(
       JSON.stringify({ error: "Error interno del servidor." }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 }
-
-
-

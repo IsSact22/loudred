@@ -1,34 +1,37 @@
 "use client";
 
 // Components
-import { PlaylistCard } from "@/src/components/cards/PlaylistCard";
+import { PlaylistCard } from "@/src/components/cards/PlaylistCardFav";
 import { useSession } from "next-auth/react";
 import { useData } from "@/src/hooks/useData";
 import React, { useEffect, useState } from "react";
 import { usePlayerStore } from "@/src/stores/usePlayerStore";
 
+
 export default function FavoritesPage() {
   const { data: session } = useSession();
+  const userId = session?.user?.id;
+
+  // Asegurarse de que no se haga la petición si userId es undefined
+  const { data = {}, isLoading } = useData(userId ? `/favourite?userId=${userId}` : null);
   const [favoriteSongs, setFavoriteSongs] = useState([]);
-  const { data = {}, isLoading, error } = useData(
-    `/favourite?userId=${session?.user?.id}`
-  );
   const { playSong, setPlaylist } = usePlayerStore();
 
   useEffect(() => {
     if (data?.songs) {
-      console.log("Canciones favoritas obtenidas:", data.songs); // Depuración
+      console.log("Canciones favoritas obtenidas:", data.songs);
       setFavoriteSongs(data.songs);
     }
   }, [data]);
+
+  const handleRemoveFromFavorites = (song) => {
+    setFavoriteSongs((prev) => prev.filter((s) => s.id !== song.id));
+  };
 
   if (isLoading) {
     return <div className="m-4">Cargando canciones favoritas...</div>;
   }
 
-
-
-   
   return (
     <div className="min-h-screen bg-slate-950 text-white mr-10">
       {/* Header */}
@@ -60,15 +63,17 @@ export default function FavoritesPage() {
             <p>No has guardado ninguna canción aún ¡Agrega una!</p>
           ) : (
             <div className="space-y-4 mr-10">
-              {favoriteSongs.map((song, index) => (
+              {favoriteSongs.map((song) => (
                 <PlaylistCard
-                  key={song.id || index}
+                  key={song.id}
                   song={song}
                   onPlay={() => {
-                    console.log("Reproduciendo canción:", song); // Depuración
+                    console.log("Reproduciendo canción:", song);
                     setPlaylist(favoriteSongs);
                     playSong(song, favoriteSongs);
                   }}
+                  userId={userId}
+                  onRemove={handleRemoveFromFavorites}
                 />
               ))}
             </div>

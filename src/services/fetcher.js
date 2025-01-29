@@ -21,4 +21,5 @@ fetcher.put = (url, data) => apiClient.put(url, data).then((res) => res.data);
 
 fetcher.patch = (url, data) => apiClient.patch(url, data).then((res) => res.data);
 
-fetcher.delete = (url) => apiClient.delete(url).then((res) => res.data);
+fetcher.delete = (url, data) => apiClient.delete(url, { data }).then((res) => res.data);
+

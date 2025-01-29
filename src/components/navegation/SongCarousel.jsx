@@ -1,3 +1,5 @@
+// components/carousels/SongCarousel.js
+
 import * as React from "react";
 import {
   Carousel,
@@ -9,16 +11,10 @@ import {
 import SongCard from "../cards/SongsCard";
 import { usePlayerStore } from "@/src/stores/usePlayerStore";
 import { useSession } from "next-auth/react"; // Importamos useSession
-import { useData } from "@/src/hooks/useData"; // Usamos useData
-import toast from "react-hot-toast";
 
 const SongCarousel = ({ songs }) => {
-  // Obtener la sesión actual
   const { data: session } = useSession();
   const playSong = usePlayerStore((state) => state.playSong);
-
-  // Usamos el hook useData para interactuar con los favoritos
-  const { createData } = useData("/favourite", {}, false);
 
   if (!songs || !songs.length) {
     return <div>No hay canciones disponibles</div>;
@@ -31,27 +27,6 @@ const SongCarousel = ({ songs }) => {
 
   const handlePlay = (song) => {
     playSong(song, sortedSongs); // Reproducir canción
-  };
-
-  const handleFavoriteClick = async (songId) => {
-    if (!session?.user?.id) {
-      toast.error("Por favor, inicia sesión para agregar a favoritos.");
-      return;
-    }
-
-    const payload = {
-      userId: session.user.id,
-      songId,
-    };
-
-    try {
-      // Llamada al backend para agregar la canción a favoritos
-      await createData(payload);
-      toast.success("Canción agregada a favoritos.");
-    } catch (error) {
-      console.error("Error al manejar favoritos:", error);
-      toast.error("Hubo un problema al actualizar favoritos.");
-    }
   };
 
   return (
@@ -67,8 +42,6 @@ const SongCarousel = ({ songs }) => {
               title={song.title}
               artist={song.artist}
               songId={song.id} // Pasamos el songId
-              userId={session?.user?.id} // Usamos el userId de la sesión
-              onFavoriteClick={() => handleFavoriteClick(song.id)} // Ahora pasamos el songId correctamente
               onClick={() => handlePlay(song)} // Reproducir la canción al hacer clic
             />
           </CarouselItem>
@@ -79,6 +52,5 @@ const SongCarousel = ({ songs }) => {
     </Carousel>
   );
 };
-
 
 export default SongCarousel;

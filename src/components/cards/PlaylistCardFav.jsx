@@ -1,11 +1,22 @@
+// PlaylistCard
 "use client";
 
 import React from "react";
 import { Play } from "lucide-react";
+import { RemoveFavButton } from "../buttons/RemoveFavButton";
 
-export function PlaylistCard({ song, onPlay }) {
+export function PlaylistCard({ song, onPlay, userId, onRemove }) {
   return (
     <div className="flex items-center p-4 bg-gray-800 rounded-lg shadow-md text-white gap-4">
+      {/* Mostrar el botón de eliminar solo en la vista de favoritos */}
+      {userId && (
+        <RemoveFavButton
+          song={song}
+          userId={userId}
+          onRemove={onRemove}
+        />
+      )}
+
       {/* Imagen de la portada */}
       <img
         src={song.image || "/placeholder.svg"}
