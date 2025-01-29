@@ -9,13 +9,13 @@ export function useData(
   shouldFetch = true // true por defecto, si no lo pasas, hace fetch automático
 ) {
   // URL base (si viene un id, se añade a la URL)
-  const url = id ? `${endpoint}/${id}` : endpoint;
+  const url = endpoint ? (id ? `${endpoint}/${id}` : endpoint) : null;
 
   // Unir paginación y otros parámetros
   const combinedParams = { pagination, ...params };
 
   // Clave que SWR usará para el caché (o null para no fetchear)
-  const key = shouldFetch ? [url, JSON.stringify(combinedParams)] : null;
+  const key = shouldFetch && url ? [url, JSON.stringify(combinedParams)] : null;
 
   // Hook de SWR para el GET (solo funciona si key no es null)
   const { data, error, isLoading, mutate } = useSWR(key, ([url, params]) =>
@@ -42,14 +42,14 @@ export function useData(
     }
   };
 
-  // Función para actualizar datos (PUT)
+  // Función para actualizar datos (patch)
   const updateData = async (updatedData, overrideId = null) => {
     setIsMutating(true);
     setMutationError(null);
-    const putUrl = overrideId ? `${endpoint}/${overrideId}` : url;
+    const patchUrl = overrideId ? `${endpoint}/${overrideId}` : url;
 
     try {
-      const response = await fetcher.patch(putUrl, updatedData);
+      const response = await fetcher.patch(patchUrl, updatedData);
       mutate();
       return response;
     } catch (error) {
