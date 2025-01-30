@@ -35,6 +35,7 @@ export const authOptions = {
                User.id, 
                User.name, 
                User.lastname, 
+               User.avatar, 
                User.username, 
                User.password, 
                role.id AS roleId, 
@@ -68,6 +69,7 @@ export const authOptions = {
             id: user.id,
             name: user.name,
             lastname: user.lastname,
+            avatar: user.avatar,
             username: user.username,
             role: {
               id: user.roleId,
@@ -113,6 +115,7 @@ export const authOptions = {
           `SELECT 
              User.id, 
              User.name, 
+             User.avatar,
              User.lastname, 
              User.username, 
              role.id AS roleId, 
@@ -136,6 +139,7 @@ export const authOptions = {
           id: dbUser.id,
           name: dbUser.name,
           lastname: dbUser.lastname,
+          avatar: dbUser.avatar,
           username: dbUser.username,
           role: {
             id: dbUser.roleId,
