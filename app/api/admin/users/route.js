@@ -36,7 +36,7 @@ export async function GET(req) {
     });
 
     // Consultar todos los usuarios
-    const [users] = await connection.execute("SELECT id, name, lastname, username, roleId, created_at FROM User");
+    const [users] = await connection.execute("SELECT id, name, lastname, username, roleId, avatar, created_at FROM User");
     await connection.end();
 
     return new Response(JSON.stringify(users), {
@@ -136,11 +136,12 @@ if (missingFields.length > 0) {
       return createErrorResponse("Role no válido", 400);
     }
 
-    // Insertar nuevo usuario con el roleId correspondiente
+    // Insertar nuevo usuario con el roleId correspondiente y asignar avatar
     await connection.execute(
-      "INSERT INTO User (name, lastname, username, password, roleId) VALUES (?, ?, ?, ?, ?)",
-      [name, lastname, username, hashedPassword, roleId]
+      "INSERT INTO User (name, lastname, username, password, roleId, avatar) VALUES (?, ?, ?, ?, ?, ?)",
+      [name, lastname, username, hashedPassword, roleId, "/avatars/default-avatar.jpg"]
     );
+
 
     return new Response(
       JSON.stringify({ message: "Usuario creado exitosamente" }),

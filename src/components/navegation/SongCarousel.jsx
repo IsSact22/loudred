@@ -35,7 +35,7 @@ const SongCarousel = ({ songs }) => {
         {sortedSongs.map((song, index) => (
           <CarouselItem
             key={`${song.id}-${index}`}
-            className="pl-6 md:basis-1/5 lg:basis-1/6"
+            className="pl-6 md:basis-1/5 lg:basis-1/6 space-x-4"
           >
             <SongCard
               image={song.image}

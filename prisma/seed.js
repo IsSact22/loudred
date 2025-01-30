@@ -42,6 +42,7 @@ async function main() {
         username: user.username,
         password: hashedPassword,
         roleId: user.role === "SUPERADMIN" ? superAdminRole.id : userRole.id,
+        avatar: "/avatars/default-avatar.jpg",
       },
     });
     console.log(`username ${user.name} registrado con el rol ${user.role}.`);

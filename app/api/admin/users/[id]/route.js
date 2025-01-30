@@ -1,4 +1,8 @@
 import mysql from "mysql2/promise";
+import { existsSync, mkdirSync } from 'fs';
+import { writeFile } from 'fs/promises';
+import path from 'path';
+import crypto from 'crypto';
 
 function validatePassword(password) {
   const strongPasswordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
@@ -41,7 +45,7 @@ export async function GET(req, { params }) {
 
         // Buscar el usuario por ID
         const [user] = await connection.execute(
-          "SELECT id, name, lastname, username, roleId, created_at FROM User WHERE id = ?",
+          "SELECT id, name, lastname, username, roleId, avatar, created_at FROM User WHERE id = ?",
           [userId]
         );
 
@@ -115,24 +119,22 @@ export async function GET(req, { params }) {
   }
 }
 
-
-
 //UPDATE
-export async function PATCH(req, { params }) {
-  const { id } = params; // Obtener el ID de la ruta
+export async function POST(req, { params }) {
+  const { id } = params;
+  if (!id) {
+    return new Response(JSON.stringify({ message: "ID no proporcionado" }), {
+      status: 400,
+    });
+  }
+
   const { name, lastname, password, confirmPassword, roleId } = await req.json();
+  const formData = await req.formData();
+  const avatar = formData.get("avatar");
 
   let connection;
 
   try {
-
-    if (!name && !lastname && !password && !roleId) {
-      return new Response(
-        JSON.stringify({ message: "Debe proporcionar al menos un campo para actualizar" }),
-        { status: 400 }
-      );
-    }
-
     let updates = [];
     let values = [];
 
@@ -183,7 +185,6 @@ export async function PATCH(req, { params }) {
 
     // Verificar si el roleId está presente y es válido
     if (roleId) {
-      // Conectar a la base de datos
       connection = await mysql.createConnection({
         host: process.env.DB_HOST,
         user: process.env.DB_USERNAME,
@@ -191,7 +192,6 @@ export async function PATCH(req, { params }) {
         database: process.env.DB_DATABASE,
       });
 
-      // Validar que el roleId exista en la base de datos
       const [roles] = await connection.execute("SELECT id FROM role WHERE id = ?", [roleId]);
 
       if (roles.length === 0) {
@@ -204,14 +204,50 @@ export async function PATCH(req, { params }) {
       values.push(roleId);
     }
 
-    connection= await mysql.createConnection({
+    // Si se proporciona una foto de perfil, procesarla
+    if (avatar && avatar.name) {
+      // Validar extensión del archivo
+      const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
+      const avatarExtension = avatar.name.split(".").pop().toLowerCase();
+
+      if (!allowedExtensions.includes(avatarExtension)) {
+        return new Response(JSON.stringify({ message: "Formato de imagen no permitido" }), {
+          status: 400,
+        });
+      }
+
+      const uploadsPath = path.join(process.cwd(), "public/avatars");
+
+      // Asegurar que la carpeta existe
+      if (!existsSync(uploadsPath)) {
+        mkdirSync(uploadsPath, { recursive: true });
+      }
+
+      // Crear un nombre único para el archivo
+      const uniqueFilename = crypto.randomUUID();
+      const newAvatarFilename = `${uniqueFilename}.${avatarExtension}`;
+      const avatarUploadPath = path.join(uploadsPath, newAvatarFilename);
+
+      // Guardar el archivo
+      const avatarBytes = await avatar.arrayBuffer();
+      const avatarBuffer = Buffer.from(avatarBytes);
+      await writeFile(avatarUploadPath, avatarBuffer);
+
+      const avatarPath = `/avatars/${newAvatarFilename}`;
+
+      updates.push("avatar = ?");
+      values.push(avatarPath);
+    }
+
+    // Conectar a la base de datos
+    connection = await mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE
-    })
+      database: process.env.DB_DATABASE,
+    });
 
-    // Asegurar que el usuario existe antes de actualizar
+    // Verificar si el usuario existe
     const [existingUser] = await connection.execute("SELECT id FROM User WHERE id = ?", [id]);
     if (existingUser.length === 0) {
       await connection.end();
@@ -230,11 +266,11 @@ export async function PATCH(req, { params }) {
     await connection.end();
 
     return new Response(
-      JSON.stringify({ message: "Usuario actualizado exitosamente" }),
+      JSON.stringify({ message: "Usuario y foto de perfil actualizados exitosamente" }),
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error al actualizar usuario:", error);
+    console.error("Error al actualizar usuario y foto de perfil:", error);
     return new Response("Error interno del servidor", { status: 500 });
   } finally {
     if (connection) {
@@ -242,6 +278,230 @@ export async function PATCH(req, { params }) {
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//UPDATE
+// export async function PATCH(req, { params }) {
+//   const { id } = params; // Obtener el ID de la ruta
+
+//   const { name, lastname, password, confirmPassword, roleId} = await req.json();
+
+//   let connection;
+
+//   try {
+
+//     if (!name && !lastname && !password && !roleId) {
+//       return new Response(
+//         JSON.stringify({ message: "Debe proporcionar al menos un campo para actualizar" }),
+//         { status: 400 }
+//       );
+//     }
+
+//     let updates = [];
+//     let values = [];
+
+//     // Validar y agregar cambios al nombre
+//     if (name) {
+//       const nameError = validateNameField(name, "Nombre");
+//       if (nameError) {
+//         return new Response(JSON.stringify({ message: nameError }), {
+//           status: 400,
+//         });
+//       }
+//       updates.push("name = ?");
+//       values.push(name);
+//     }
+
+//     // Validar y agregar cambios al apellido
+//     if (lastname) {
+//       const lastnameError = validateNameField(lastname, "Apellido");
+//       if (lastnameError) {
+//         return new Response(JSON.stringify({ message: lastnameError }), {
+//           status: 400,
+//         });
+//       }
+//       updates.push("lastname = ?");
+//       values.push(lastname);
+//     }
+
+//     // Validar y agregar cambios a la contraseña
+//     if (password) {
+//       if (password !== confirmPassword) {
+//         return new Response(
+//           JSON.stringify({ message: "Las contraseñas no coinciden" }),
+//           { status: 400 }
+//         );
+//       }
+
+//       const passwordError = validatePassword(password);
+//       if (passwordError) {
+//         return new Response(JSON.stringify({ message: passwordError }), {
+//           status: 400,
+//         });
+//       }
+
+//       const hashedPassword = await bcrypt.hash(password, 10);
+//       updates.push("password = ?");
+//       values.push(hashedPassword);
+//     }
+
+//     // Verificar si el roleId está presente y es válido
+//     if (roleId) {
+//       // Conectar a la base de datos
+//       connection = await mysql.createConnection({
+//         host: process.env.DB_HOST,
+//         user: process.env.DB_USERNAME,
+//         password: process.env.DB_PASSWORD,
+//         database: process.env.DB_DATABASE,
+//       });
+
+//       // Validar que el roleId exista en la base de datos
+//       const [roles] = await connection.execute("SELECT id FROM role WHERE id = ?", [roleId]);
+
+//       if (roles.length === 0) {
+//         return new Response(JSON.stringify({ message: "Role no válido" }), {
+//           status: 400,
+//         });
+//       }
+
+//       updates.push("roleId = ?");
+//       values.push(roleId);
+//     }
+
+//     connection= await mysql.createConnection({
+//       host: process.env.DB_HOST,
+//       user: process.env.DB_USERNAME,
+//       password: process.env.DB_PASSWORD,
+//       database: process.env.DB_DATABASE
+//     })
+
+//     // Asegurar que el usuario existe antes de actualizar
+//     const [existingUser] = await connection.execute("SELECT id FROM User WHERE id = ?", [id]);
+//     if (existingUser.length === 0) {
+//       await connection.end();
+//       return new Response(JSON.stringify({ message: "Usuario no encontrado" }), {
+//         status: 404,
+//       });
+//     }
+
+//     // Ejecutar la actualización
+//     values.push(id); // Agregar el ID al final para WHERE
+//     await connection.execute(
+//       `UPDATE User SET ${updates.join(", ")} WHERE id = ?`,
+//       values
+//     );
+
+//     await connection.end();
+
+//     return new Response(
+//       JSON.stringify({ message: "Usuario actualizado exitosamente" }),
+//       { status: 200 }
+//     );
+//   } catch (error) {
+//     console.error("Error al actualizar usuario:", error);
+//     return new Response("Error interno del servidor", { status: 500 });
+//   } finally {
+//     if (connection) {
+//       await connection.end(); // Asegurarse de cerrar la conexión al final
+//     }
+//   }
+// }
+
+// //UPDATE de fotos de perfil
+
+// export async function POST(req, { params }) {
+//   const { id } = params;
+//   if (!id) {
+//     return new Response(JSON.stringify({ message: "ID no proporcionado" }), {
+//       status: 400,
+//     });
+//   }
+//   const formData = await req.formData(); 
+//   const avatar = formData.get("avatar");
+
+//   if (!avatar || !avatar.name) {
+//     return new Response(JSON.stringify({ message: "No se proporcionó una imagen válida" }), {
+//       status: 400,
+//     });
+//   }
+
+//   // Validar extensión del archivo
+//   const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
+//   const avatarExtension = avatar.name.split(".").pop().toLowerCase();
+
+//   if (!allowedExtensions.includes(avatarExtension)) {
+//     return new Response(JSON.stringify({ message: "Formato de imagen no permitido" }), {
+//       status: 400,
+//     });
+//   }
+
+//   const uploadsPath = path.join(process.cwd(), "public/avatars");
+
+//   // Asegurar que la carpeta existe
+//   if (!existsSync(uploadsPath)) {
+//     mkdirSync(uploadsPath, { recursive: true });
+//   }
+
+//   // Crear un nombre único para el archivo
+//   const uniqueFilename = crypto.randomUUID();
+//   const newAvatarFilename = `${uniqueFilename}.${avatarExtension}`;
+//   const avatarUploadPath = path.join(uploadsPath, newAvatarFilename);
+
+//   try {
+//     // Guardar el archivo
+//     const avatarBytes = await avatar.arrayBuffer();
+//     const avatarBuffer = Buffer.from(avatarBytes);
+//     await writeFile(avatarUploadPath, avatarBuffer);
+
+//     // Ruta para la BD
+//     const avatarPath = `/avatars/${newAvatarFilename}`;
+
+//     // Conectar a la BD
+//     const connection = await mysql.createConnection({
+//       host: process.env.DB_HOST,
+//       user: process.env.DB_USERNAME,
+//       password: process.env.DB_PASSWORD,
+//       database: process.env.DB_DATABASE,
+//     });
+
+//     // Verificar si el usuario existe
+//     const [existingUser] = await connection.execute("SELECT id FROM User WHERE id = ?", [id]);
+//     if (existingUser.length === 0) {
+//       await connection.end();
+//       return new Response(JSON.stringify({ message: "Usuario no encontrado" }), {
+//         status: 404,
+//       });
+//     }
+
+//     // Actualizar avatar en la BD
+//     await connection.execute("UPDATE User SET avatar = ? WHERE id = ?", [avatarPath, id]);
+
+//     await connection.end();
+
+//     return new Response(
+//       JSON.stringify({ message: "Foto de perfil actualizada exitosamente", avatarPath }),
+//       { status: 200 }
+//     );
+//   } catch (error) {
+//     console.error("Error al actualizar la foto de perfil:", error);
+//     return new Response("Error interno del servidor", { status: 500 });
+//   }
+// }
+
 
 //DELETE
 export async function DELETE(req, { params }) {

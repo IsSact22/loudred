@@ -23,7 +23,7 @@ export default function SongsForm() {
     resolver: yupResolver(songsSchema),
     mode: "onChange",
     defaultValues: {
-      artist: session?.user?.name || "",
+      artist: session?.user?.username || "",
     },
   });
   const { handleSubmit } = methods;

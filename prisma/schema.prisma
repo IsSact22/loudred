@@ -20,13 +20,15 @@ model User {
   username   String    @unique(map: "user") @db.VarChar(255)
   password   String    @db.VarChar(255)
   roleId     Int
-  role       role      @relation(fields: [roleId], references: [id]) // Relación con roles
+  avatar     String?   @default("/avatars/default-avatar.jpg") // Establecer valor predeterminado
+  role       role      @relation(fields: [roleId], references: [id])
   created_at DateTime? @default(now()) @db.Timestamp(0)
   Songs      Songs[]   // Relación uno a muchos con Songs
   Image      Image[]   // Relación uno a muchos con imágenes
   Music      Music[]   // Relación uno a muchos con Musics
   Playlists  Playlist[] // Relación con playlists
 }
+
 
 model Songs {
   id          Int           @id @default(autoincrement())

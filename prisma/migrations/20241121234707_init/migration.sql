@@ -6,7 +6,7 @@ CREATE TABLE `User` (
     `username` VARCHAR(100) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
     `roleId` INT NOT NULL,
-
+    `avatar` VARCHAR(255),
     `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
 
     UNIQUE INDEX `username`(`username`),

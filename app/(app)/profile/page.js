@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 import { usePlayerStore } from "@/src/stores/usePlayerStore";
 import Link from "next/link";
 import { toast } from "react-hot-toast"; // Asegúrate de importar toast si no lo has hecho
+import Image from 'next/image'
 
 export default function ProfilePage() {
   const { data: session } = useSession();
@@ -54,19 +55,18 @@ export default function ProfilePage() {
     return <div className="m-4">Cargando canciones...</div>;
   }
 
-  if (error) {
-    return <div className="m-4">Error al cargar las canciones: {error}</div>;
-  }
-
   return (
     <div className="min-h-screen bg-slate-950 text-white mr-10">
       <header className="p-6 flex flex-col gap-4 items-start">
         <div className="flex items-center gap-3">
           <div className="text-5xl">
-            <img
-              className="rounded-full object-cover w-40 h-40"
-              src="/avatars/d86404c39b651bbf92ccefb4cc5d1826.jpg"
-            />
+            <Image
+              width={200}
+              height={200}
+              alt="avatar"
+              className="rounded-full object-cover"
+              src={session?.user?.avatar ? session.user.avatar : '/avatars/default-avatar.jpg'}
+              />
           </div>
           <div className="flex flex-col items-start">
             <h1 className="text-7xl font-bold">Mi Perfil</h1>

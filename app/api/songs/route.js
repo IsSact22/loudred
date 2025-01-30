@@ -1,10 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import mysql from "mysql2/promise";
-import { v4 as uuidv4 } from "uuid";
-import { writeFile } from "fs/promises";
-import path from "path";
-import { dir } from "console";
-import { buffer } from "stream/consumers";
+// import { v4 as uuidv4 } from "uuid";
+// import { writeFile } from "fs/promises";
+// import path from "path";
+// import { dir } from "console";
+// import { buffer } from "stream/consumers";
 
 const prisma = new PrismaClient();
 
