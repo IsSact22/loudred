@@ -19,68 +19,71 @@ import toast from "react-hot-toast";
 export default function UpdateForm() {
   const router = useRouter();
   const { data: session } = useSession();
-  const userId = session.user.id;
+  const userId = session?.user?.id;
 
   const methods = useForm({
     resolver: yupResolver(updateSchema),
     mode: "onChange",
     defaultValues: {
-      name: session.user.name,
-      lastname: session.user.lastname,
+      name: session?.user?.name,
+      lastname: session?.user?.lastname,
       password: "",
       confirmPassword: "",
       avatar: null,
     },
   });
+
   const { handleSubmit, setValue, watch } = methods;
-  const { updateData, isMutating } = useData("/admin/users", {}, false);
+  const { createData, isMutating } = useData("/admin/users", {}, false);
 
   const onSubmit = async (formData) => {
     try {
-      const filteredData = Object.fromEntries(
-        Object.entries(formData).filter(([key, value]) => {
-          if (!value || value.trim?.() === "") return false;
-          if (session.user[key] && value.trim?.() === session.user[key]) return false;
-          return true;
-        })
-      );
+      const formDataObj = new FormData();
+      let hasChanges = false;
 
-      if (Object.keys(filteredData).length === 0) {
+      // Campos a verificar
+      const fieldsToCheck = {
+        name: session?.user?.name,
+        lastname: session?.user?.lastname,
+        password: "",
+        avatar: null,
+      };
+
+      // Construir FormData solo con cambios
+      for (const [key, value] of Object.entries(formData)) {
+        if (key === "confirmPassword") continue;
+
+        const currentValue =
+          key === "avatar" ? formData[key] : formData[key]?.trim();
+        const originalValue = fieldsToCheck[key];
+
+        if (currentValue && currentValue !== originalValue) {
+          formDataObj.append(key, currentValue);
+          hasChanges = true;
+        }
+      }
+
+      if (!hasChanges) {
         toast.error("No hay cambios que actualizar.");
         return;
       }
 
-      // Manejo de avatar
-      if (filteredData.avatar instanceof File) {
-        const avatarData = new FormData();
-        avatarData.append("avatar", filteredData.avatar);
+      // Enviar todo en una sola petición
+      await createData(formDataObj, userId);
 
-        try {
-          const response = await fetcher.post(`/api/update-avatar/${userId}`, avatarData);
-          if (!response.ok) {
-            throw new Error(response.message || "Error al subir el avatar");
-          }
-
-          filteredData.avatar = response.avatarPath; // Asignar la ruta al avatar que se ha subido
-        } catch (error) {
-          toast.error(error.message || "Error al actualizar la foto de perfil.");
-          return;
-        }
-      }
-
-      // Actualizamos los datos del usuario
-      const response = await updateData(filteredData, userId);
       toast.success("Perfil actualizado exitosamente");
       setTimeout(() => {
         window.location.reload();
       }, 1000);
     } catch (error) {
-      toast.error(error.message || "Ocurrió un error inesperado. Intenta nuevamente.");
+      toast.error(error.message || "Error al actualizar el perfil");
     }
   };
 
   const onError = (errors) => {
-    const mensajes = Object.values(errors).map((error) => error.message).join(", ");
+    const mensajes = Object.values(errors)
+      .map((error) => error.message)
+      .join(", ");
     toast.error(`Errores: ${mensajes}`);
   };
 
@@ -89,13 +92,16 @@ export default function UpdateForm() {
       <div className="flex flex-col bg-gradient-to-br from-white to-purple-100 p-8 rounded-2xl mt-10 shadow-md min-h-[600px] min-w-[600px]">
         <h2 className="text-4xl font-bold text-red-500 mb-10 ml-1">Ajustes</h2>
         <FormProvider {...methods}>
-          <form onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col">
+          <form
+            onSubmit={handleSubmit(onSubmit, onError)}
+            className="flex flex-col"
+          >
             <UploadInput
               name="avatar"
               label="Avatar"
               labelClass="text-purple-900 flex"
               accept="image/png, image/jpeg, image/webp"
-              maxSize={10 * 1024 * 1024} // 10MB
+              maxSize={10 * 1024 * 1024}
               containerClass="mb-6"
               className="text-purple-900"
               onChange={(e) => setValue("avatar", e.target.files[0])}
