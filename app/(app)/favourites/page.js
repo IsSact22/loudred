@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { useData } from "@/src/hooks/useData";
 import React, { useEffect, useState } from "react";
 import { usePlayerStore } from "@/src/stores/usePlayerStore";
-
+import Link from "next/link";
 
 export default function FavoritesPage() {
   const { data: session } = useSession();
@@ -60,7 +60,13 @@ export default function FavoritesPage() {
         </h2>
         <div>
           {favoriteSongs.length === 0 ? (
-            <p>No has guardado ninguna canción aún ¡Agrega una!</p>
+            <p>No has guardado ninguna canción aún
+
+              <Link href="/" className="text-red-400 ml-1">
+                ¡Agrega una!
+              </Link> 
+
+            </p>
           ) : (
             <div className="space-y-4 mr-10">
               {favoriteSongs.map((song) => (

@@ -1,7 +1,10 @@
 "use client";
+//Next
+import { useParams } from "next/navigation";
 // Components
 import SearchBar from "@/src/components/navegation/SearchBar";
 import SongCarousel from "@/src/components/navegation/SongCarousel";
+import UserCarousel from "@/src/components/navegation/UserCarousel";
 // React
 import React from "react";
 // Hooks
@@ -10,13 +13,13 @@ import { useData } from "@/src/hooks/useData";
 export default function Home() {
   //const { data: session } = useSession();
   // Obtener las canciones desde la API
-  const { data = {}, isLoading, error } = useData("/songs");
-  const songs = data.songs ?? [];
+  const { data: songData = {}, isLoading: loadingSongs, error: errorSongs } = useData("/songs");
+  const songs = songData.songs ?? [];
 
-  // Si las canciones están cargando o hay un error
-  if (isLoading) {
-    return <div className="m-4">Cargando canciones...</div>;
-  }
+  //Obtener los usuarios desde la api
+  const { id } = useParams();
+  const { data: userData = {}, isLoading: loadingUsers, error: errorUsers } = useData("/admin/users"); 
+  const users = userData ?? [];  // <-- Ajusta esto para evitar errores si userData es undefined o null
 
   // buscador
   const handleSearch = (query) => {
@@ -34,9 +37,28 @@ export default function Home() {
 
       {/* Carrusel */}
       <div className="mt-10 ml-10">
-        <p className="text-white">Agregados recientemente</p>
-        <SongCarousel songs={songs} />
+        <p className="text-white text-2xl">Agregados recientemente</p>
+        {loadingSongs ? <p className="m-4">Cargando canciones...</p> : errorSongs ? <p>Error al cargar canciones</p> : <SongCarousel songs={songs} />}
       </div>
+
+      {/* Carrusel */}
+      <div className="mt-20 ml-10">
+        <p className="text-white text-2xl">Nuevos usuarios</p>
+        {loadingUsers ? (
+          <p className="m-4">Cargando usuarios...</p>
+        ) : errorUsers ? (
+          <p>Error al cargar usuarios</p>
+        ) : (
+          <>
+            <UserCarousel users={users} />
+          </>
+        )}
+      </div>
+
+
     </div>
+
+
+
   );
 }

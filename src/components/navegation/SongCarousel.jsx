@@ -10,10 +10,8 @@ import {
 } from "@/components/ui/carousel";
 import SongCard from "../cards/SongsCard";
 import { usePlayerStore } from "@/src/stores/usePlayerStore";
-import { useSession } from "next-auth/react"; // Importamos useSession
 
 const SongCarousel = ({ songs }) => {
-  const { data: session } = useSession();
   const playSong = usePlayerStore((state) => state.playSong);
 
   if (!songs || !songs.length) {
@@ -35,9 +33,10 @@ const SongCarousel = ({ songs }) => {
         {sortedSongs.map((song, index) => (
           <CarouselItem
             key={`${song.id}-${index}`}
-            className="pl-6 md:basis-1/5 lg:basis-1/6 space-x-4"
+            className="pl-6  md:basis-1/5 lg:basis-1/6 space-x-4"
           >
             <SongCard
+            className="w-lg h-lg"
               image={song.image}
               title={song.title}
               artist={song.artist}

@@ -2,12 +2,12 @@ import mysql from "mysql2/promise";
 import { existsSync, mkdirSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import path from 'path';
-import crypto from 'crypto';
+import bcrypt from "bcryptjs"; // bcryptjs es más compatible con Next.js
 
 function validatePassword(password) {
-  const strongPasswordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
   if (!password || !strongPasswordRegex.test(password)) {
-    return "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.";
+    return "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.";
   }
   return null;
 }
@@ -120,21 +120,22 @@ export async function GET(req, { params }) {
 }
 
 //UPDATE
-export async function POST(req, { params }) {
-  const { id } = params;
-  if (!id) {
-    return new Response(JSON.stringify({ message: "ID no proporcionado" }), {
-      status: 400,
-    });
-  }
+export async function PATCH(req, context) {
+  const { id } = context.params;
 
-  const { name, lastname, password, confirmPassword, roleId } = await req.json();
-  const formData = await req.formData();
-  const avatar = formData.get("avatar");
+  const { name, lastname, password, confirmPassword, roleId} = await req.json();
 
   let connection;
 
   try {
+
+    if (!name && !lastname && !password && !roleId) {
+      return new Response(
+        JSON.stringify({ message: "Debe proporcionar al menos un campo para actualizar" }),
+        { status: 400 }
+      );
+    }
+
     let updates = [];
     let values = [];
 
@@ -185,6 +186,7 @@ export async function POST(req, { params }) {
 
     // Verificar si el roleId está presente y es válido
     if (roleId) {
+      // Conectar a la base de datos
       connection = await mysql.createConnection({
         host: process.env.DB_HOST,
         user: process.env.DB_USERNAME,
@@ -192,6 +194,7 @@ export async function POST(req, { params }) {
         database: process.env.DB_DATABASE,
       });
 
+      // Validar que el roleId exista en la base de datos
       const [roles] = await connection.execute("SELECT id FROM role WHERE id = ?", [roleId]);
 
       if (roles.length === 0) {
@@ -204,50 +207,14 @@ export async function POST(req, { params }) {
       values.push(roleId);
     }
 
-    // Si se proporciona una foto de perfil, procesarla
-    if (avatar && avatar.name) {
-      // Validar extensión del archivo
-      const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
-      const avatarExtension = avatar.name.split(".").pop().toLowerCase();
-
-      if (!allowedExtensions.includes(avatarExtension)) {
-        return new Response(JSON.stringify({ message: "Formato de imagen no permitido" }), {
-          status: 400,
-        });
-      }
-
-      const uploadsPath = path.join(process.cwd(), "public/avatars");
-
-      // Asegurar que la carpeta existe
-      if (!existsSync(uploadsPath)) {
-        mkdirSync(uploadsPath, { recursive: true });
-      }
-
-      // Crear un nombre único para el archivo
-      const uniqueFilename = crypto.randomUUID();
-      const newAvatarFilename = `${uniqueFilename}.${avatarExtension}`;
-      const avatarUploadPath = path.join(uploadsPath, newAvatarFilename);
-
-      // Guardar el archivo
-      const avatarBytes = await avatar.arrayBuffer();
-      const avatarBuffer = Buffer.from(avatarBytes);
-      await writeFile(avatarUploadPath, avatarBuffer);
-
-      const avatarPath = `/avatars/${newAvatarFilename}`;
-
-      updates.push("avatar = ?");
-      values.push(avatarPath);
-    }
-
-    // Conectar a la base de datos
-    connection = await mysql.createConnection({
+    connection= await mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
-    });
+      database: process.env.DB_DATABASE
+    })
 
-    // Verificar si el usuario existe
+    // Asegurar que el usuario existe antes de actualizar
     const [existingUser] = await connection.execute("SELECT id FROM User WHERE id = ?", [id]);
     if (existingUser.length === 0) {
       await connection.end();
@@ -266,11 +233,11 @@ export async function POST(req, { params }) {
     await connection.end();
 
     return new Response(
-      JSON.stringify({ message: "Usuario y foto de perfil actualizados exitosamente" }),
+      JSON.stringify({ message: "Usuario actualizado exitosamente" }),
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error al actualizar usuario y foto de perfil:", error);
+    console.error("Error al actualizar usuario:", error);
     return new Response("Error interno del servidor", { status: 500 });
   } finally {
     if (connection) {
@@ -280,144 +247,116 @@ export async function POST(req, { params }) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //UPDATE
 // export async function PATCH(req, { params }) {
-//   const { id } = params; // Obtener el ID de la ruta
+//   const { id } = params;
+//   if (!id) {
+//     return new Response(JSON.stringify({ message: "ID no proporcionado" }), {
+//       status: 400,
+//     });
+//   }
 
-//   const { name, lastname, password, confirmPassword, roleId} = await req.json();
+//   const contentType = req.headers.get("content-type") || "";
+//   if (!contentType.includes("multipart/form-data")) {
+//     return new Response(
+//       JSON.stringify({ message: "Content-Type inválido, usa multipart/form-data" }),
+//       { status: 400 }
+//     );
+//   }
 
 //   let connection;
-
 //   try {
+//     const formData = await req.formData();
+//     const name = formData.get("name");
+//     const lastname = formData.get("lastname");
+//     const password = formData.get("password");
+//     const confirmPassword = formData.get("confirmPassword");
+//     const roleId = formData.get("roleId");
+//     const avatar = formData.get("avatar");
 
-//     if (!name && !lastname && !password && !roleId) {
-//       return new Response(
-//         JSON.stringify({ message: "Debe proporcionar al menos un campo para actualizar" }),
-//         { status: 400 }
-//       );
-//     }
+//     connection = await mysql.createConnection({
+//       host: process.env.DB_HOST,
+//       user: process.env.DB_USERNAME,
+//       password: process.env.DB_PASSWORD,
+//       database: process.env.DB_DATABASE,
+//     });
 
 //     let updates = [];
 //     let values = [];
 
-//     // Validar y agregar cambios al nombre
 //     if (name) {
 //       const nameError = validateNameField(name, "Nombre");
-//       if (nameError) {
-//         return new Response(JSON.stringify({ message: nameError }), {
-//           status: 400,
-//         });
-//       }
+//       if (nameError) return new Response(JSON.stringify({ message: nameError }), { status: 400 });
 //       updates.push("name = ?");
 //       values.push(name);
 //     }
 
-//     // Validar y agregar cambios al apellido
 //     if (lastname) {
 //       const lastnameError = validateNameField(lastname, "Apellido");
-//       if (lastnameError) {
-//         return new Response(JSON.stringify({ message: lastnameError }), {
-//           status: 400,
-//         });
-//       }
+//       if (lastnameError) return new Response(JSON.stringify({ message: lastnameError }), { status: 400 });
 //       updates.push("lastname = ?");
 //       values.push(lastname);
 //     }
 
-//     // Validar y agregar cambios a la contraseña
 //     if (password) {
 //       if (password !== confirmPassword) {
-//         return new Response(
-//           JSON.stringify({ message: "Las contraseñas no coinciden" }),
-//           { status: 400 }
-//         );
+//         return new Response(JSON.stringify({ message: "Las contraseñas no coinciden" }), { status: 400 });
 //       }
-
 //       const passwordError = validatePassword(password);
-//       if (passwordError) {
-//         return new Response(JSON.stringify({ message: passwordError }), {
-//           status: 400,
-//         });
-//       }
-
+//       if (passwordError) return new Response(JSON.stringify({ message: passwordError }), { status: 400 });
 //       const hashedPassword = await bcrypt.hash(password, 10);
 //       updates.push("password = ?");
 //       values.push(hashedPassword);
 //     }
 
-//     // Verificar si el roleId está presente y es válido
-//     if (roleId) {
-//       // Conectar a la base de datos
-//       connection = await mysql.createConnection({
-//         host: process.env.DB_HOST,
-//         user: process.env.DB_USERNAME,
-//         password: process.env.DB_PASSWORD,
-//         database: process.env.DB_DATABASE,
-//       });
-
-//       // Validar que el roleId exista en la base de datos
+//     if (roleId && !isNaN(roleId)) {
 //       const [roles] = await connection.execute("SELECT id FROM role WHERE id = ?", [roleId]);
-
 //       if (roles.length === 0) {
-//         return new Response(JSON.stringify({ message: "Role no válido" }), {
-//           status: 400,
-//         });
+//         return new Response(JSON.stringify({ message: "Role no válido" }), { status: 400 });
 //       }
-
 //       updates.push("roleId = ?");
 //       values.push(roleId);
 //     }
 
-//     connection= await mysql.createConnection({
-//       host: process.env.DB_HOST,
-//       user: process.env.DB_USERNAME,
-//       password: process.env.DB_PASSWORD,
-//       database: process.env.DB_DATABASE
-//     })
+//     if (avatar && avatar.name) {
+//       const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
+//       const avatarExtension = avatar.name.split(".").pop().toLowerCase();
+//       if (!allowedExtensions.includes(avatarExtension)) {
+//         return new Response(JSON.stringify({ message: "Formato de imagen no permitido" }), { status: 400 });
+//       }
+//       const uploadsPath = path.join(process.cwd(), "public/avatars");
+//       if (!existsSync(uploadsPath)) {
+//         mkdirSync(uploadsPath, { recursive: true });
+//       }
+//       const uniqueFilename = crypto.randomUUID();
+//       const newAvatarFilename = `${uniqueFilename}.${avatarExtension}`;
+//       const avatarUploadPath = path.join(uploadsPath, newAvatarFilename);
+//       const avatarBytes = await avatar.arrayBuffer();
+//       const avatarBuffer = Buffer.from(avatarBytes);
+//       await writeFile(avatarUploadPath, avatarBuffer);
+//       const avatarPath = `/avatars/${newAvatarFilename}`;
+//       updates.push("avatar = ?");
+//       values.push(avatarPath);
+//     }
 
-//     // Asegurar que el usuario existe antes de actualizar
 //     const [existingUser] = await connection.execute("SELECT id FROM User WHERE id = ?", [id]);
 //     if (existingUser.length === 0) {
-//       await connection.end();
-//       return new Response(JSON.stringify({ message: "Usuario no encontrado" }), {
-//         status: 404,
-//       });
+//       return new Response(JSON.stringify({ message: "Usuario no encontrado" }), { status: 404 });
 //     }
 
-//     // Ejecutar la actualización
-//     values.push(id); // Agregar el ID al final para WHERE
-//     await connection.execute(
-//       `UPDATE User SET ${updates.join(", ")} WHERE id = ?`,
-//       values
-//     );
+//     if (updates.length === 0) {
+//       return new Response(JSON.stringify({ message: "No hay cambios para actualizar" }), { status: 400 });
+//     }
 
-//     await connection.end();
+//     values.push(id);
+//     await connection.execute(`UPDATE User SET ${updates.join(", ")} WHERE id = ?`, values);
 
-//     return new Response(
-//       JSON.stringify({ message: "Usuario actualizado exitosamente" }),
-//       { status: 200 }
-//     );
+//     return new Response(JSON.stringify({ message: "Usuario y foto de perfil actualizados exitosamente" }), { status: 200 });
 //   } catch (error) {
-//     console.error("Error al actualizar usuario:", error);
-//     return new Response("Error interno del servidor", { status: 500 });
+//     console.error("Error al actualizar usuario y foto de perfil:", error);
+//     return new Response(JSON.stringify({ message: "Error interno del servidor" }), { status: 500 });
 //   } finally {
-//     if (connection) {
-//       await connection.end(); // Asegurarse de cerrar la conexión al final
-//     }
+//     if (connection) await connection.end();
 //   }
 // }
 

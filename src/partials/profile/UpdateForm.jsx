@@ -34,7 +34,7 @@ export default function UpdateForm() {
   });
 
   const { handleSubmit, setValue, watch } = methods;
-  const { createData, isMutating } = useData("/admin/users", {}, false);
+  const { updateData, isMutating } = useData("/admin/users/", {}, false);
 
   const onSubmit = async (formData) => {
     try {
@@ -69,7 +69,7 @@ export default function UpdateForm() {
       }
 
       // Enviar todo en una sola petición
-      await createData(formDataObj, userId);
+      await updateData(formDataObj, userId);
 
       toast.success("Perfil actualizado exitosamente");
       setTimeout(() => {
