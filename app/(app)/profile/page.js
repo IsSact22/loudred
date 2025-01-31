@@ -13,7 +13,8 @@ import Image from 'next/image'
 export default function ProfilePage() {
   const { data: session } = useSession();
   const [userSongs, setUserSongs] = useState([]);
-  const { data = {}, isLoading, error } = useData("/songs");
+  const username = session?.user?.username || "Artista"; // Obtiene el nombre del usuario
+  const { data: songData = {}, isLoading: loadingSongs, error: errorSongs } = useData("/songs");
 
   const { playSong, setPlaylist } = usePlayerStore();
 
@@ -45,13 +46,13 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
-    if (session?.user?.id && data?.songs) {
-      const userSongs = data.songs.filter((song) => song.userId === session.user.id);
+    if (session?.user?.id && songData?.songs) {
+      const userSongs = songData.songs.filter((song) => song.userId === session.user.id);
       setUserSongs(userSongs);
     }
-  }, [session, data]);
+  }, [session, songData]);
 
-  if (isLoading) {
+  if (loadingSongs) {
     return <div className="m-4">Cargando canciones...</div>;
   }
 
@@ -70,7 +71,7 @@ export default function ProfilePage() {
           </div>
           <div className="flex flex-col items-start">
             <h1 className="text-7xl font-bold">Mi Perfil</h1>
-            <h3 className="font-medium text-xl text-red-400">corta biografía</h3>
+            <h3 className="font-medium text-xl text-red-400">{username}</h3>
           </div>
         </div>
       </header>
