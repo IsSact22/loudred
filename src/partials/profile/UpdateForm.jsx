@@ -17,7 +17,6 @@ import { updateSchema } from "@/src/validations/validationSchema";
 import toast from "react-hot-toast";
 
 export default function UpdateForm() {
-  const router = useRouter();
   const { data: session } = useSession();
   const userId = session?.user?.id;
 
@@ -34,7 +33,7 @@ export default function UpdateForm() {
   });
 
   const { handleSubmit, setValue, watch } = methods;
-  const { updateData, isMutating } = useData("/admin/users/", {}, false);
+  const { createData, isMutating } = useData(`/admin/users/${userId}`, {}, false);
 
   const onSubmit = async (formData) => {
     try {
@@ -58,10 +57,17 @@ export default function UpdateForm() {
         const originalValue = fieldsToCheck[key];
 
         if (currentValue && currentValue !== originalValue) {
-          formDataObj.append(key, currentValue);
+          if (key === "avatar" && currentValue instanceof File) {
+            formDataObj.append(key, currentValue); // Solo si es un archivo
+            
+          } else {
+            formDataObj.append(key, currentValue);
+          }
           hasChanges = true;
         }
       }
+
+      formDataObj.append("avatar", formData.avatar?.[0] || "");
 
       if (!hasChanges) {
         toast.error("No hay cambios que actualizar.");
@@ -69,7 +75,7 @@ export default function UpdateForm() {
       }
 
       // Enviar todo en una sola petición
-      await updateData(formDataObj, userId);
+      await createData(formDataObj, userId);
 
       toast.success("Perfil actualizado exitosamente");
       setTimeout(() => {
