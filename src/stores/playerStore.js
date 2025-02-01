@@ -45,11 +45,12 @@ export const usePlayerStore = create(
 
         toggleShuffle: () => {
           const { isShuffled, originalPlaylist, currentSong } = get();
+          if (!originalPlaylist?.length) return; // Evita el toggle si la playlist está vacía
 
           if (isShuffled) {
             set((state) => {
               state.isShuffled = false;
-              state.currentPlaylist = state.originalPlaylist; // Restauramos la lista original
+              state.currentPlaylist = state.originalPlaylist;
               state.shuffledPlaylist = [];
               state.playedIndices = [];
             });
