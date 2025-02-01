@@ -56,7 +56,7 @@ export default function FavoritesPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-slate-950 text-white p-6">
-        Error al cargar favoritos: {error.message}
+        Error al cargar favoritos: {error.error}
       </div>
     );
   }

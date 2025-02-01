@@ -7,13 +7,15 @@ const UserCard = ({ avatar, username, onClick }) => {
         className="flex flex-col items-center cursor-pointer transition-transform hover:scale-105 py-2"
       >
         {/* Imagen de perfil */}
-        <Image
-          src={avatar}
-          alt={username}
-          width={500}
-          height={500}
-          className="w-lg h-lg rounded-full object-cover border-2 border-gray-700 shadow-lg shadow-indigo-500/50"
-        />
+        <div className="w-[180px] h-[180px] rounded-full overflow-hidden border-2 border-gray-700 shadow-lg shadow-indigo-500/50">
+          <Image
+            src={avatar}
+            alt={username}
+            width={500} // Tamaño fijo para todas las imágenes
+            height={500}
+            className="object-cover w-full h-full"
+          />
+        </div>
   
         {/* Nombre de usuario */}
         <p className="mt-2 text-sm text-white font-semibold truncate">{username}</p>

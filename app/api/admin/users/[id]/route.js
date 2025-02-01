@@ -5,9 +5,9 @@ import path from 'path';
 import bcrypt from "bcryptjs"; // bcryptjs es más compatible con Next.js
 
 function validatePassword(password) {
-  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     if (!password || !strongPasswordRegex.test(password)) {
-      return new Response(JSON.stringify({ message: "Las contraseñas deben tener mayúsculas, minúsculas, números y un caracter especial" }), { status: 400 });
+      return "Las contraseñas deben tener mayúsculas, minúsculas, números y un carácter especial.";
   }
   return null;
 }
@@ -174,13 +174,12 @@ export async function POST(req, context) {
       if (password !== confirmPassword) {
         return new Response(JSON.stringify({ message: "Las contraseñas no coinciden" }), { status: 400 });
       }
-      const passwordError = validatePassword(password);
-      if (passwordError) {
-        return new Response(JSON.stringify({ message: passwordError }), {
-          status: 400,
-        });
-      }
-
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      return new Response(JSON.stringify({ message: passwordError }), {
+        status: 400,
+      });
+    }
       const hashedPassword = await bcrypt.hash(password, 10);
       updates.push("password = ?");
       values.push(hashedPassword);

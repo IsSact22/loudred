@@ -31,11 +31,11 @@ const SongCarousel = ({ songs }) => {
 
   return (
     <Carousel className="flex w-full max-w-6xl mt-4">
-      <CarouselContent className="py-2 -ml-2">
+      <CarouselContent className="flex gap-4 py-2 -ml-2">
         {sortedSongs.map((song, index) => (
           <CarouselItem
             key={`${song.id}-${index}`}
-            className="pl-6 md:basis-1/5 lg:basis-1/6 space-x-4"
+            className=" md:basis-1/5 lg:basis-1/6 flex-1"
           >
             <SongCard
               className={`${

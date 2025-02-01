@@ -84,15 +84,18 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-slate-950 text-white mr-10">
       <header className="p-6 flex flex-col gap-4 items-start">
         <div className="flex items-center gap-3">
-          <div className="text-5xl">
-            <Image
-              width={200}
-              height={200}
+
+
+        <div className="w-[200px] h-[200px] overflow-hidden">            
+          <Image
+              width={500}
+              height={500}
               alt="avatar"
-              className="rounded-full object-cover border-2 border-red-500"
+              className="rounded-full w-full h-full object-cover border-2 border-red-500"
               src={session?.user?.avatar || "/avatars/default-avatar.jpg"}
             />
           </div>
+
           <div className="flex flex-col items-start">
             <h1 className="text-7xl font-bold">Mi Perfil</h1>
             <h3 className="font-medium text-xl text-red-400">{username}</h3>

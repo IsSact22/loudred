@@ -38,6 +38,9 @@ export default function MusicPlayer() {
         <div className="mt-1 text-sm font-medium text-white truncate">
           {currentSong.title}
         </div>
+        <div className="mt-1 text-sm font-medium text-white truncate">
+          {currentSong.artist}
+        </div>
 
         <div className="mt-3">
           <Slider
