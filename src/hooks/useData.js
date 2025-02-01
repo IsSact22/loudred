@@ -18,8 +18,16 @@ export function useData(
   const key = shouldFetch && url ? [url, JSON.stringify(combinedParams)] : null;
 
   // Hook de SWR para el GET (solo funciona si key no es null)
-  const { data, error, isLoading, mutate } = useSWR(key, ([url, params]) =>
-    fetcher(url, JSON.parse(params))
+  const { data, error, isLoading, mutate } = useSWR(
+    key,
+    ([url, params]) => fetcher(url, JSON.parse(params)),
+    {
+      onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+        if (error.status !== 404) return;
+        if (retryCount >= 2) return;
+        setTimeout(() => revalidate({ retryCount }), 2000);
+      },
+    }
   );
 
   // Estados para mutaciones

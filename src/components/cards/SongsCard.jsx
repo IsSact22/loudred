@@ -1,10 +1,10 @@
 import FavButton from "../buttons/FavButton";
 
-const SongCard = ({ image, title, artist, onClick, songId }) => {
+const SongCard = ({ image, title, artist, onClick, songId, className }) => {
   return (
     <div
       onClick={onClick} // Agregar la funcionalidad de clic en toda la tarjeta
-      className="w-40  bg-slate-900 hover:bg-slate-800 rounded-lg overflow-hidden shadow-md cursor-pointer transition-transform hover:scale-105"
+      className={`${className} w-40 bg-slate-900 hover:bg-slate-800 rounded-lg overflow-hidden shadow-md cursor-pointer transition-transform hover:scale-105`}
     >
       {/* Imagen de la canción */}
       <img src={image} alt={title} className="w-full h-40 object-cover" />

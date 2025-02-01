@@ -9,13 +9,6 @@ export function PlaylistCard({ song, onPlay, userId, onRemove }) {
   return (
     <div className="flex items-center p-4 bg-gray-800 rounded-lg shadow-md text-white gap-4">
       {/* Mostrar el botón de eliminar solo en la vista de favoritos */}
-      {userId && (
-        <RemoveFavButton
-          song={song}
-          userId={userId}
-          onRemove={onRemove}
-        />
-      )}
 
       {/* Imagen de la portada */}
       <img
@@ -38,6 +31,9 @@ export function PlaylistCard({ song, onPlay, userId, onRemove }) {
       >
         <Play className="h-5 w-5 text-white" />
       </button>
+      {userId && (
+        <RemoveFavButton song={song} userId={userId} onRemove={onRemove} />
+      )}
     </div>
   );
 }

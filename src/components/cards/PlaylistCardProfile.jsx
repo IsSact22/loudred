@@ -34,17 +34,6 @@ export function PlaylistCard({ song, onPlay, onConfirmDelete, deleteActionLabel,
 
   return (
     <div className="flex items-center p-4 bg-gray-800 rounded-lg shadow-md text-white gap-4">
-      {/* Solo mostrar el botón de basura si es el propietario */}
-      {isOwner && (
-        <button
-          className="flex items-center justify-center p-2 bg-red-600 hover:bg-red-700 rounded-full"
-          onClick={handleDelete}
-          aria-label={deleteActionLabel || `Eliminar ${song.title}`}
-        >
-          <HiTrash className="h-5 w-5 text-white" />
-        </button>
-      )}
-
       {/* Imagen de la portada */}
       <img
         src={song.image || "/placeholder.svg"}
@@ -66,6 +55,17 @@ export function PlaylistCard({ song, onPlay, onConfirmDelete, deleteActionLabel,
       >
         <Play className="h-5 w-5 text-white" />
       </button>
+
+      {/* Solo mostrar el botón de basura si es el propietario */}
+      {isOwner && (
+        <button
+          className="flex items-center justify-center p-2 bg-red-600 hover:bg-red-700 rounded-full"
+          onClick={handleDelete}
+          aria-label={deleteActionLabel || `Eliminar ${song.title}`}
+        >
+          <HiTrash className="h-5 w-5 text-white" />
+        </button>
+      )}
     </div>
   );
 }

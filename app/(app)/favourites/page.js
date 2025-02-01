@@ -5,36 +5,64 @@ import { PlaylistCard } from "@/src/components/cards/PlaylistCardFav";
 import { useSession } from "next-auth/react";
 import { useData } from "@/src/hooks/useData";
 import React, { useEffect, useState } from "react";
-import { usePlayerStore } from "@/src/stores/usePlayerStore";
+import { usePlayerStore, usePlayerActions } from "@/src/stores/playerStore";
 import Link from "next/link";
+import { toast } from "react-hot-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function FavoritesPage() {
   const { data: session } = useSession();
   const userId = session?.user?.id;
-
-  // Asegurarse de que no se haga la petición si userId es undefined
-  const { data = {}, isLoading } = useData(userId ? `/favourite?userId=${userId}` : null);
+  const { data, isLoading, error } = useData(
+    userId ? `/favourite?userId=${userId}` : null
+  );
   const [favoriteSongs, setFavoriteSongs] = useState([]);
-  const { playSong, setPlaylist } = usePlayerStore();
+
+  // Usar acciones del store correctamente
+  const { playSong, setPlaylist } = usePlayerActions();
+  const { currentSong, isPlaying } = usePlayerStore();
 
   useEffect(() => {
     if (data?.songs) {
-      console.log("Canciones favoritas obtenidas:", data.songs);
       setFavoriteSongs(data.songs);
+      // Actualizar la playlist del reproductor si es la misma lista
+      setPlaylist(data.songs);
     }
-  }, [data]);
+  }, [data, setPlaylist]);
 
-  const handleRemoveFromFavorites = (song) => {
-    setFavoriteSongs((prev) => prev.filter((s) => s.id !== song.id));
+  const handleRemoveFromFavorites = async (song) => {
+    try {
+      // Lógica para eliminar de favoritos
+      setFavoriteSongs((prev) => prev.filter((s) => s.id !== song.id));
+      toast.success("Canción eliminada de favoritos");
+    } catch (error) {
+      toast.error("Error al eliminar de favoritos");
+    }
   };
 
   if (isLoading) {
-    return <div className="m-4">Cargando canciones favoritas...</div>;
+    return (
+      <div className="min-h-screen bg-slate-950 text-white mr-10 p-6">
+        <Skeleton className="h-10 w-48 mb-4" />
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <Skeleton key={i} className="h-20 w-full" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white p-6">
+        Error al cargar favoritos: {error.message}
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-slate-950 text-white mr-10">
-      {/* Header */}
       <header className="p-6 flex flex-col gap-4 items-start">
         <div className="flex items-center gap-3">
           <div className="text-5xl">
@@ -53,38 +81,41 @@ export default function FavoritesPage() {
         </div>
       </header>
 
-      {/* Tabla de canciones */}
       <main className="p-6">
         <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 mr-10 pb-2">
           Mis Canciones Favoritas
         </h2>
-        <div>
-          {favoriteSongs.length === 0 ? (
-            <p>No has guardado ninguna canción aún
 
-              <Link href="/" className="text-red-400 ml-1">
-                ¡Agrega una!
-              </Link> 
-
-            </p>
-          ) : (
-            <div className="space-y-4 mr-10">
-              {favoriteSongs.map((song) => (
-                <PlaylistCard
-                  key={song.id}
-                  song={song}
-                  onPlay={() => {
-                    console.log("Reproduciendo canción:", song);
-                    setPlaylist(favoriteSongs);
+        {favoriteSongs.length === 0 ? (
+          <div className="text-gray-400">
+            <p>No has guardado ninguna canción aún</p>
+            <Link
+              href="/"
+              className="text-red-400 hover:text-red-300 mt-2 inline-block"
+            >
+              ¡Descubre música nueva!
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-4 mr-10">
+            {favoriteSongs.map((song) => (
+              <PlaylistCard
+                key={song.id}
+                song={song}
+                isPlaying={currentSong?.id === song.id && isPlaying}
+                onPlay={() => {
+                  try {
                     playSong(song, favoriteSongs);
-                  }}
-                  userId={userId}
-                  onRemove={handleRemoveFromFavorites}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+                  } catch (error) {
+                    toast.error("Error al reproducir la canción");
+                  }
+                }}
+                userId={userId}
+                onRemove={handleRemoveFromFavorites}
+              />
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );

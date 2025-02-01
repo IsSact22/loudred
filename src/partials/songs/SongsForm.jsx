@@ -58,12 +58,16 @@ export default function SongsForm() {
   return (
     <div className="relative z-50 flex flex-col items-center justify-center">
       <div className="bg-gradient-to-br from-purple-200 to-purple-300 p-8 rounded-2xl shadow-md min-h-[600px] min-w-[700px]">
-        <h2 className="text-4xl font-bold text-purple-900 mb-10 ml-1">Añade la información</h2>
-        
+        <h2 className="text-4xl font-bold text-purple-900 mb-10 ml-1">
+          Añade la información
+        </h2>
+
         {/* FORMULARIO DE SUBIR CANCIÓN */}
         <FormProvider {...methods}>
-          <form onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col">
-
+          <form
+            onSubmit={handleSubmit(onSubmit, onError)}
+            className="flex flex-col"
+          >
             {/* Input para el título de la canción */}
             <Input
               name="title"
@@ -110,7 +114,7 @@ export default function SongsForm() {
                 name="cover"
                 label="Portada"
                 labelClass="text-purple-900"
-                accept="image/png/jpg"
+                accept="image/jpeg, image/png"
                 maxSize={10 * 1024 * 1024} // 10MB
                 containerClass="mb-6"
                 className="text-purple-900"

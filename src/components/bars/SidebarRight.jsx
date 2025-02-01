@@ -1,26 +1,35 @@
+// components/SidebarRight.jsx
 "use client";
 import React, { useEffect } from "react";
 import NextSongCard from "../cards/NextSongCard";
 import MusicPlayer from "../MusicPlayer";
-import { usePlayerStore } from "@/src/stores/usePlayerStore";
+import { usePlayerStore } from "@/src/stores/playerStore";
 
 const SidebarRight = () => {
   const { currentPlaylist, currentSong } = usePlayerStore();
-  
-  // Obtener el índice de la canción actual en la playlist
-  const currentIndex = currentPlaylist.findIndex((song) => song.id === currentSong?.id);
 
-  // Filtrar y obtener las siguientes canciones sin afectar la canción actual
-  const nextSongs = currentPlaylist
-    .slice(currentIndex + 1) // Tomar las canciones después de la actual
-    .concat(currentPlaylist.slice(0, currentIndex)) // Para hacer un loop infinito
-    .slice(0, 2); // Solo mostrar las siguientes 2 canciones
+  // Función para normalizar el ID de la canción
+  const getSongId = (song) => song?.songId || song?.id;
 
-  // Asegurarnos de que la cola de canciones se actualice correctamente al cambiar el modo de aleatorio
+  // Obtener el índice usando el identificador normalizado
+  const currentIndex = currentPlaylist.findIndex(
+    (song) => getSongId(song) === getSongId(currentSong)
+  );
+
+  // Generar nextSongs con lógica mejorada
+  const nextSongs = React.useMemo(() => {
+    if (!currentSong || currentIndex === -1) return [];
+
+    return [
+      ...currentPlaylist.slice(currentIndex + 1),
+      ...currentPlaylist.slice(0, currentIndex),
+    ].slice(0, 2);
+  }, [currentPlaylist, currentIndex, currentSong]);
+
+  // Efecto para forzar actualización cuando cambia la canción
   useEffect(() => {
-    // Aquí podrías agregar algo como un efecto de actualización cuando el estado de la lista cambia
-    // Esto es solo un ejemplo de cómo podrías reaccionar a cambios en el estado
-  }, [currentPlaylist, currentSong]);
+    // Lógica adicional si es necesaria
+  }, [currentPlaylist, currentSong, currentIndex]);
 
   return (
     <div className="absolute top-0">
@@ -30,15 +39,13 @@ const SidebarRight = () => {
             Siguiente en reproducción:
           </h2>
 
-          {/* Tarjetas de las siguientes canciones */}
           {nextSongs.length > 0 ? (
             nextSongs.map((song, index) => (
               <NextSongCard
-                key={`${song.id}-${index}`}
-                index={index}
-                image={song.image}
+                key={`${getSongId(song)}-${index}`}
+                image={song.image || "/placeholder-song.jpg"}
                 title={song.title}
-                artist={song.artist}
+                artist={song.artist || "Artista desconocido"}
               />
             ))
           ) : (
@@ -46,7 +53,6 @@ const SidebarRight = () => {
           )}
         </div>
 
-        {/* Reproductor principal */}
         <MusicPlayer />
       </div>
     </div>

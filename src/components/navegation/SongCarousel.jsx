@@ -1,5 +1,4 @@
 // components/carousels/SongCarousel.js
-
 import * as React from "react";
 import {
   Carousel,
@@ -9,13 +8,16 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import SongCard from "../cards/SongsCard";
-import { usePlayerStore } from "@/src/stores/usePlayerStore";
+import { usePlayerActions, usePlayerStore } from "@/src/stores/playerStore"; // Cambiar a usePlayerActions
 
 const SongCarousel = ({ songs }) => {
-  const playSong = usePlayerStore((state) => state.playSong);
+  const { playSong } = usePlayerActions(); // Usar acciones del store
+  const currentSong = usePlayerStore((state) => state.currentSong); // Opcional: para resaltar la canción actual
 
   if (!songs || !songs.length) {
-    return <div>No hay canciones disponibles</div>;
+    return (
+      <div className="text-gray-400 p-4">No hay canciones disponibles</div>
+    );
   }
 
   // Ordenar canciones
@@ -24,30 +26,33 @@ const SongCarousel = ({ songs }) => {
   );
 
   const handlePlay = (song) => {
-    playSong(song, sortedSongs); // Reproducir canción
+    playSong(song, sortedSongs); // Usar la acción del store
   };
 
   return (
     <Carousel className="flex w-full max-w-6xl mt-4">
-      <CarouselContent className="-ml-2">
+      <CarouselContent className="py-2 -ml-2">
         {sortedSongs.map((song, index) => (
           <CarouselItem
             key={`${song.id}-${index}`}
-            className="pl-6  md:basis-1/5 lg:basis-1/6 space-x-4"
+            className="pl-6 md:basis-1/5 lg:basis-1/6 space-x-4"
           >
             <SongCard
-            className="w-lg h-lg"
+              className={`${
+                currentSong?.id === song.id ? "shadow-lg shadow-indigo-500/50" : ""
+              }`}
               image={song.image}
               title={song.title}
               artist={song.artist}
-              songId={song.id} // Pasamos el songId
-              onClick={() => handlePlay(song)} // Reproducir la canción al hacer clic
+              songId={song.id}
+              isPlaying={currentSong?.id === song.id} // Resaltar canción actual
+              onClick={() => handlePlay(song)}
             />
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="bg-slate-50" />
-      <CarouselNext className="bg-slate-50" />
+      <CarouselPrevious className="bg-slate-50 hover:bg-slate-200" />
+      <CarouselNext className="bg-slate-50 hover:bg-slate-200" />
     </Carousel>
   );
 };

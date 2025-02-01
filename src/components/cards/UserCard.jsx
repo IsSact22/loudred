@@ -4,7 +4,7 @@ const UserCard = ({ avatar, username, onClick }) => {
     return (
       <div
         onClick={onClick} // Hace que toda la tarjeta sea clickeable
-        className="flex flex-col items-center cursor-pointer transition-transform hover:scale-105"
+        className="flex flex-col items-center cursor-pointer transition-transform hover:scale-105 py-2"
       >
         {/* Imagen de perfil */}
         <Image
@@ -12,7 +12,7 @@ const UserCard = ({ avatar, username, onClick }) => {
           alt={username}
           width={500}
           height={500}
-          className="w-lg h-lg rounded-full object-cover border-2 border-gray-700"
+          className="w-lg h-lg rounded-full object-cover border-2 border-gray-700 shadow-lg shadow-indigo-500/50"
         />
   
         {/* Nombre de usuario */}

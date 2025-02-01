@@ -3,7 +3,7 @@ import SidebarRight from "@/src/components/bars/SidebarRight";
 import SidebarLeft from "@/src/components/bars/SidebarLeft";
 import { SidebarProvider } from "@/src/contexts/sidebarContext";
 import React, { useState } from "react";
-import { usePlayerStore } from "@/src/stores/usePlayerStore";
+import { usePlayerStore } from "@/src/stores/playerStore";
 
 const AppLayout = ({ children }) => {
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);

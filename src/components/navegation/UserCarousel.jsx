@@ -7,6 +7,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import UserCard from "../cards/UserCard";
+import { useRouter } from "next/navigation";
 
 const UserCarousel = ({ users }) => {
 
@@ -19,6 +20,8 @@ const UserCarousel = ({ users }) => {
     (a, b) => new Date(b.created_at) - new Date(a.created_at)
   );
 
+  const router = useRouter()
+
   return (
     <Carousel className="flex w-full max-w-6xl mt-4">
       <CarouselContent className="-ml-2">
@@ -28,9 +31,9 @@ const UserCarousel = ({ users }) => {
             className="pl-6 md:basis-1/5 lg:basis-1/6 space-x-4"
           >
             <UserCard
-              image={user.avatar}
+              avatar={user.avatar ?? "/avatars/default-avatar.jpg"}
               username={user.username}
-              onClick={() => console.log(`Clicked on ${user.username}`)}
+              onClick={() => router.push(`/profile/${user.id}`) }
             />
           </CarouselItem>
         ))}
