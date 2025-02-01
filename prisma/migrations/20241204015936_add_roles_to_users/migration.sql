@@ -1,2 +1,0 @@
--- AlterTable
--- ALTER TABLE `users` ADD COLUMN `role` ENUM('USER', 'SUPERADMIN') NOT NULL DEFAULT 'USER';
