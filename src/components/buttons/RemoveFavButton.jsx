@@ -1,4 +1,3 @@
-// components/RemoveFavButton.js
 "use client";
 
 import React from "react";
@@ -20,17 +19,42 @@ export function RemoveFavButton({ song, userId, onRemove }) {
 
       console.log("Respuesta del servidor:", response);
       onRemove(song);
-      toast.success("Canción eliminada de favoritos.");
+      // toast.success("Canción eliminada de favoritos.");
     } catch (error) {
       console.error("Error al eliminar la canción:", error.response?.data || error.message);
-      toast.error("No se pudo eliminar la canción.");
+      // toast.error("No se pudo eliminar la canción.");
     }
+  };
+
+  const confirmDelete = () => {
+    toast((t) => (
+      <div className="flex flex-col items-center p-4 bg-white rounded-lg shadow-md text-gray-900">
+        <span className="text-lg mb-3">¿Seguro que deseas eliminar esta canción de favoritos?</span>
+        <div className="flex gap-4">
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              handleDelete(); // Ejecuta la eliminación si el usuario confirma
+            }}
+            className="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600"
+          >
+            Sí
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)} // Solo cierra el toast si el usuario cancela
+            className="bg-gray-500 text-white py-1 px-4 rounded hover:bg-gray-600"
+          >
+            No
+          </button>
+        </div>
+      </div>
+    ));
   };
 
   return (
     <button
-      className="flex items-center justify-center p-2  hover:bg-red-700 rounded-full"
-      onClick={handleDelete}
+      className="flex items-center justify-center p-2 hover:bg-red-700 rounded-full"
+      onClick={confirmDelete} // Llamamos a confirmDelete en lugar de handleDelete directamente
       aria-label={`Eliminar ${song.title}`}
     >
       <HiXCircle className="h-6 w-6 text-white" />
