@@ -53,13 +53,13 @@ export default function FavoritesPage() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-white p-6">
-        Error al cargar favoritos: {error.error}
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="min-h-screen bg-slate-950 text-white p-6">
+  //       Error al cargar favoritos: {error.error}
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-slate-950 text-white mr-10">

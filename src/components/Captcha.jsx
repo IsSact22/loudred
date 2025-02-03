@@ -2,6 +2,7 @@
 "use client";
 import { useState } from "react";
 import { useData } from "@/src/hooks/useData";
+import { Button } from "@/components/ui/button";
 import { toast } from 'react-hot-toast';
 
 export default function Captcha({ onSuccess }) {
@@ -46,8 +47,10 @@ export default function Captcha({ onSuccess }) {
           <div
             key={index}
             onClick={() => handleImageClick(index)}
-            className={`border border-red-600 flex items-center justify-center ${
-              selectedImages.has(index) ? "border-4 border-blue-500" : ""
+            className={`flex items-center justify-center ${
+              selectedImages.has(index)
+                ? "border-4 border-blue-500"
+                : "border border-red-600"
             }`}
           >
             <img
@@ -58,12 +61,12 @@ export default function Captcha({ onSuccess }) {
           </div>
         ))}
       </div>
-      <button
+      <Button
         onClick={handleSubmit}
-        className="mt-4 p-4 bg-green-500 text-white rounded"
+        className="mt-4 p-4 bg-green-500 hover:bg-green-700 text-white rounded"
       >
         Verificar
-      </button>
+      </Button>
     </div>
   );
 }
