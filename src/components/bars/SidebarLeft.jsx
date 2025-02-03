@@ -37,7 +37,7 @@ const SidebarLeft = ({isOpen, setIsOpen}) => {
       ? [
           {
             name: "Administrador",
-            path: "/superAdmin",
+            path: "/admin",
             icon: <HiOutlineViewGridAdd />,
           },
         ]
