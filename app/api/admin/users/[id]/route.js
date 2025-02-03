@@ -251,7 +251,8 @@ export async function POST(req, context) {
 
 //DELETE
 export async function DELETE(req, { params }) {
-  const { id } = params;
+  const { id } = await params;
+  const userId = id;
 
   try {
 
@@ -262,7 +263,7 @@ export async function DELETE(req, { params }) {
       database: process.env.DB_DATABASE,
     });
 
-    const [result] = await connection.execute("DELETE FROM User WHERE id = ?", [id]);
+    const [result] = await connection.execute("DELETE FROM User WHERE id = ?", [userId]);
     await connection.end();
 
     if (result.affectedRows === 0) {
