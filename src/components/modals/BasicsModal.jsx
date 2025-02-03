@@ -41,7 +41,7 @@ export default function BasicsModal2({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="max-w-[480px] space-y-4 rounded-xl bg-indigo-50 px-6 pb-6 pt-4 shadow-xl relative"
+              className="min-w-h-80 max-w-[480px] space-y-4 rounded-xl bg-indigo-50 px-6 pb-6 pt-4 shadow-xl relative"
             >
               {/* Botón de cierre en la esquina superior derecha */}
               <button
