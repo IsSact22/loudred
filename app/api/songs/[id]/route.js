@@ -3,7 +3,8 @@ import mysql from "mysql2/promise";
 
 //actualizar validate de canciones
 export async function PUT(req, {params}) {
-  const {id} = params;
+  const { id } = await params;
+  const songId = id;
   const {validate} = await req.json();
   let connection;
 
@@ -27,7 +28,7 @@ export async function PUT(req, {params}) {
         
       const [song] = await connection.execute(
         "SELECT * FROM songs WHERE id = ?",
-        [id] // Filtrar por el ID de la canción
+        [songId] // Filtrar por el ID de la canción
       );
       
       // Validar que exista la canción
@@ -47,7 +48,7 @@ export async function PUT(req, {params}) {
         }
 
       // Verificar si el valor 'validate' es NULL, en caso de que quieras actualizarlo solo a TRUE
-      const [validates] = await connection.execute("SELECT validate FROM songs WHERE id = ?", [id]);
+      const [validates] = await connection.execute("SELECT validate FROM songs WHERE id = ?", [songId]);
 
       if (validates.length === 0) {
           return new Response(JSON.stringify({ message: "La canción no existe" }), { status: 404 });
@@ -60,7 +61,7 @@ export async function PUT(req, {params}) {
       // Ejecutar la consulta de actualización
       await connection.execute(
           `UPDATE songs SET ${updates.join(",")} WHERE id = ?`,
-          [...values, id]
+          [...values, songId]
       );
 
       await connection.end();
@@ -83,7 +84,8 @@ export async function PUT(req, {params}) {
 
 //borrar canciones
 export async function DELETE(req, { params }) {
-    const { id } = params;
+  const { id } = await params;
+  const songId = id;
   
     try {
   
@@ -94,7 +96,7 @@ export async function DELETE(req, { params }) {
         database: process.env.DB_DATABASE,
       });
   
-      const [result] = await connection.execute("DELETE FROM Songs WHERE id = ?", [id]);
+      const [result] = await connection.execute("DELETE FROM Songs WHERE id = ?", [songId]);
       await connection.end();
   
       if (result.affectedRows === 0) {
@@ -111,9 +113,9 @@ export async function DELETE(req, { params }) {
   }
 
 //get de una sola canción
-  export async function GET(req, context) {
-    const { params } = await context;
-    const songId = params.id;
+  export async function GET(req, {params}) {
+    const { id } = await params;
+    const songId = id;
   
     try {
       // Configuración de conexión a la base de datos
