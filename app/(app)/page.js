@@ -44,9 +44,9 @@ export default function Home() {
       <div className="mt-10 ml-10">
         <p className="text-white text-2xl">Agregados recientemente</p>
         {loadingSongs ? (
-          <p className="m-4">Cargando canciones...</p>
+          <p className="mt-4 text-white">Cargando canciones...</p>
         ) : errorSongs ? (
-          <p>Error al cargar canciones</p>
+          <p className="mt-4 text-white">Error al cargar canciones</p>
         ) : (
           <SongCarousel songs={songs} />
         )}

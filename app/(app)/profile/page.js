@@ -71,15 +71,6 @@ export default function ProfilePage() {
     );
   }
 
-  if (errorSongs) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-white p-6">
-        <p className="text-red-400">Error cargando canciones:</p>
-        <p className="text-gray-400">{errorSongs.message}</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-slate-950 text-white mr-10">
       <header className="p-6 flex flex-col gap-4 items-start">
