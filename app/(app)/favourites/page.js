@@ -53,6 +53,14 @@ export default function FavoritesPage() {
     );
   }
 
+  // if (error) {
+  //   return (
+  //     <div className="min-h-screen bg-slate-950 text-white p-6">
+  //       Error al cargar favoritos: {error.error}
+  //     </div>
+  //   );
+  // }
+
   return (
     <div className="min-h-screen bg-slate-950 text-white mr-10">
       <header className="p-6 flex flex-col gap-4 items-start">
