@@ -21,7 +21,8 @@ function validateNameField(field, fieldName) {
 
 // READ UNO POR UNO CON CANCIONES QUE HAN SUBIDO
 export async function GET(req, { params }) {
-  const userId = params?.id;
+  const { id } = await params;
+  const userId = id;
   const { search } = Object.fromEntries(new URL(req.url).searchParams);
 
   try {
