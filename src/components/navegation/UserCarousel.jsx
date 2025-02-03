@@ -24,7 +24,7 @@ const UserCarousel = ({ users }) => {
 
   return (
     <Carousel className="flex w-full max-w-6xl mt-4">
-      <CarouselContent className="-ml-2">
+      <CarouselContent className="ml-6">
         {sortedUsers.map((user, index) => (
           <CarouselItem
             key={`${user.id}-${index}`}
