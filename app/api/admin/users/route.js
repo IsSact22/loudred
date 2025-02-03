@@ -2,9 +2,9 @@ import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
 
 function validatePassword(password) {
-  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/;
     if (!password || !strongPasswordRegex.test(password)) {
-    return "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.";
+    return "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un caracter especial. ";
   }
   return null;
 }
