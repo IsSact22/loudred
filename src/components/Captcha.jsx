@@ -32,7 +32,7 @@ export default function Captcha({ onSuccess }) {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center text-center w-full min-h-screen bg-black/10">
+      <div className="flex justify-center items-center text-center w-full h-auto bg-black/10">
         <span className="accessLoader"></span>
       </div>
     );

@@ -11,7 +11,7 @@ const AppLayout = ({ children }) => {
   const { showModal } = useCaptchaStore();
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen w-full overflow-hidden">
       <CaptchaModal isOpen={showModal} />
 
       <SidebarProvider>
