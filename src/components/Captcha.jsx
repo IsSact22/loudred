@@ -2,6 +2,7 @@
 "use client";
 import { useState } from "react";
 import { useData } from "@/src/hooks/useData";
+import { Button } from "@/components/ui/button";
 import { toast } from 'react-hot-toast';
 
 export default function Captcha({ onSuccess }) {
@@ -58,12 +59,12 @@ export default function Captcha({ onSuccess }) {
           </div>
         ))}
       </div>
-      <button
+      <Button
         onClick={handleSubmit}
-        className="mt-4 p-4 bg-green-500 text-white rounded"
+        className="mt-4 p-4 bg-green-500 hover:bg-green-700 text-white rounded"
       >
         Verificar
-      </button>
+      </Button>
     </div>
   );
 }
