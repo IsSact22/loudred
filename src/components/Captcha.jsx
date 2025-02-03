@@ -47,8 +47,10 @@ export default function Captcha({ onSuccess }) {
           <div
             key={index}
             onClick={() => handleImageClick(index)}
-            className={`border border-red-600 flex items-center justify-center ${
-              selectedImages.has(index) ? "border-4 border-blue-500" : ""
+            className={`flex items-center justify-center ${
+              selectedImages.has(index)
+                ? "border-4 border-blue-500"
+                : "border border-red-600"
             }`}
           >
             <img
