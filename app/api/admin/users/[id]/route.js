@@ -120,7 +120,7 @@ export async function GET(req, { params }) {
 
 //UPDATE
 export async function POST(req, context) {
-  const { id } = context.params;
+  const { id } = await context.params;
   if (!id) {
     return new Response(JSON.stringify({ message: "ID no proporcionado" }), {
       status: 400,

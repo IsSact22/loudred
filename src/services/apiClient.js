@@ -46,6 +46,8 @@ const handleValidationErrors = (errorMessage, error) => {
   if (data) {
     if (typeof data.error === "string") {
       toast.error(data.error);
+    } else if (typeof data.message === "string") {
+      toast.error(data.message);
     } else {
       const validationErrors = data.message || data.messages || data.error;
       Object.keys(validationErrors).forEach((field) => {
