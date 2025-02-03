@@ -2,12 +2,22 @@
 "use client";
 // Components
 import Navbar from "@/src/layouts/nav/Navbar";
-// Hooks
+// Next
 import { usePathname } from "next/navigation";
+// React
+import { useEffect } from "react";
+// Store
+import { useCaptchaStore } from "@/src/stores/captchaStore";
 
 export default function AuthLayout({ children }) {
   const pathname = usePathname();
   const isRegister = pathname === "/auth/register";
+  const { setShowModal } = useCaptchaStore();
+
+  useEffect(() => {
+    setShowModal(true);
+  }
+  , [setShowModal]);
 
   return (
     <div

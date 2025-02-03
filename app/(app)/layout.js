@@ -1,16 +1,19 @@
 "use client";
 import SidebarRight from "@/src/components/bars/SidebarRight";
 import SidebarLeft from "@/src/components/bars/SidebarLeft";
+import CaptchaModal from "@/src/partials/auth/components/CaptchaModal";
 import { SidebarProvider } from "@/src/contexts/sidebarContext";
+import { useCaptchaStore } from "@/src/stores/captchaStore";
 import React, { useState } from "react";
-import { usePlayerStore } from "@/src/stores/playerStore";
 
 const AppLayout = ({ children }) => {
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
-  const { isPlaying, currentSong, playSong } = usePlayerStore();
+  const { showModal } = useCaptchaStore();
 
   return (
     <div className="flex h-screen overflow-hidden">
+      <CaptchaModal isOpen={showModal} />
+
       <SidebarProvider>
         {/* Sidebar izquierdo siempre visible */}
         <div
@@ -37,7 +40,6 @@ const AppLayout = ({ children }) => {
         <div className="bg-gradient-to-b from-purple-900 to-purple-950 text-white h-screen w-80 fixed right-0 top-0 z-20">
           <SidebarRight />
         </div>
-       
       </SidebarProvider>
     </div>
   );
