@@ -2,7 +2,7 @@ import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { FaRandom } from "react-icons/fa";
-import { useMusicPlayer } from "@/src/hooks/useMusicPlayer"; // Importamos el hook
+import { useMusicPlayer } from "@/src/hooks/useMusicPlayer";
 
 export default function MusicPlayer() {
   const {
@@ -17,11 +17,11 @@ export default function MusicPlayer() {
     handleToggleShuffle,
     formatTime,
     handleSeek,
-    isShuffled
-  } = useMusicPlayer(); // Usamos el hook para obtener la lógica
+    isShuffled,
+  } = useMusicPlayer();
 
   if (!currentSong) {
-    return <div className="m-4">Cargando canción...</div>;
+    return <div className="m-4">Selecciona una canción para comenzar</div>;
   }
 
   return (
@@ -45,7 +45,7 @@ export default function MusicPlayer() {
         <div className="mt-3">
           <Slider
             value={[currentTime]}
-            max={duration}
+            max={duration || 1} // Añadir valor por defecto
             step={1}
             onValueChange={handleSeek}
             className="w-full h-1 bg-red-300"
@@ -60,7 +60,7 @@ export default function MusicPlayer() {
           <Button
             variant="outline"
             size="icon"
-            className="p-1"
+            className="p-1 hover:bg-red-500/20"
             onClick={handleSkipBack}
           >
             <SkipBack className="h-3 w-3" />
@@ -68,7 +68,7 @@ export default function MusicPlayer() {
           <Button
             variant="outline"
             size="icon"
-            className="p-1"
+            className="p-1 hover:bg-red-500/20"
             onClick={togglePlayPause}
           >
             {isPlaying ? (
@@ -80,14 +80,16 @@ export default function MusicPlayer() {
           <Button
             variant="outline"
             size="icon"
-            className="p-1"
+            className="p-1 hover:bg-red-500/20"
             onClick={handleSkipForward}
           >
             <SkipForward className="h-3 w-3" />
           </Button>
           <Button
             size="icon"
-            className={`p-1 ${isShuffled ? "bg-red-500" : "bg-purple-500"}`}
+            className={`p-1 hover:opacity-80 transition-opacity ${
+              isShuffled ? "bg-red-500" : "bg-purple-500"
+            }`}
             onClick={handleToggleShuffle}
           >
             <FaRandom className="h-3 w-3 text-white" />
@@ -95,7 +97,12 @@ export default function MusicPlayer() {
         </div>
       </div>
 
-      <audio ref={audioRef} src={currentSong.music} />
+      {/* Elemento audio optimizado */}
+      <audio
+        ref={audioRef}
+        key={currentSong.id} // Fuerza recarga al cambiar canción
+        hidden
+      />
     </div>
   );
 }
