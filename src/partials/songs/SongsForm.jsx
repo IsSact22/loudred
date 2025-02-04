@@ -50,7 +50,10 @@ export default function SongsForm() {
         toast.success("Canción subida con éxito");
       }
 
-      toast.success("Su cancion se aprobará en las próximas 24 horas");
+      if (role === 1) {
+        toast.success("Su cancion se aprobará en las próximas 24 horas");
+      }
+      
       router.push("/"); // Redirigir al home
     } catch (error) {
       console.error(error);
