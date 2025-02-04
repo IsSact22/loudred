@@ -30,7 +30,8 @@ export default function ProfilePage() {
         (song) => song.userId === session.user.id
       );
       setUserSongs(filteredSongs);
-      setPlaylist(filteredSongs); // Actualizar playlist en el store
+      // NOTA: No se setea la playlist acá para forzar el cambio solo al hacer click
+      // setPlaylist(filteredSongs);
     }
   }, [session, songData, setPlaylist]);
 
@@ -60,7 +61,7 @@ export default function ProfilePage() {
 
   if (loadingSongs) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white mr-10 p-6">
+      <div className="min-h-screen bg-slate-950 text-white p-6">
         <Skeleton className="h-10 w-48 mb-4" />
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
@@ -72,13 +73,11 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white mr-10">
+    <div className="min-h-screen bg-slate-950 text-white">
       <header className="p-6 flex flex-col gap-4 items-start">
         <div className="flex items-center gap-3">
-
-
-        <div className="w-[200px] h-[200px] overflow-hidden">            
-          <Image
+          <div className="w-[200px] h-[200px] overflow-hidden">
+            <Image
               width={500}
               height={500}
               alt="avatar"
@@ -95,7 +94,7 @@ export default function ProfilePage() {
       </header>
 
       <main className="p-6">
-        <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 mr-10 pb-2">
+        <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 pb-2">
           Mis Canciones ({userSongs.length})
         </h2>
 
@@ -110,7 +109,7 @@ export default function ProfilePage() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-4 mr-10">
+          <div className="space-y-4">
             {userSongs.map((song) => (
               <PlaylistCard
                 key={song.id}
@@ -118,6 +117,9 @@ export default function ProfilePage() {
                 isPlaying={currentSong?.id === song.id && isPlaying}
                 onPlay={() => {
                   try {
+                    // Actualiza la playlist del store a la lista de canciones del perfil
+                    setPlaylist(userSongs);
+                    // Reproduce la canción usando la playlist actualizada
                     playSong(song, userSongs);
                   } catch (error) {
                     toast.error("Error al reproducir: " + error.message);

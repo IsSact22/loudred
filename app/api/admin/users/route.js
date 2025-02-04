@@ -55,23 +55,25 @@ export async function GET(req) {
 export async function POST(req) {
   let client;
   try {
-    const { name, lastname, username, password, confirmPassword } = await req.json();
+    const { name, lastname, username, password, confirmPassword } =
+      await req.json();
 
-    //  **Validaciones**
-    const missingFields = [];
-    if (!name) missingFields.push("Nombre");
-    if (!lastname) missingFields.push("Apellido");
-    if (!username) missingFields.push("Usuario");
-    if (!password) missingFields.push("Contraseña");
-    if (!confirmPassword) missingFields.push("Confirmar contraseña");
+// Validacion
+const missingFields = [];
 
-    if (missingFields.length > 0) {
-      return createErrorResponse(
-        missingFields.length === 5
-          ? "Todos los campos son requeridos"
-          : `Los siguientes campos son requeridos: ${missingFields.join(", ")}`
-      );
-    }
+if (!name) missingFields.push("Nombre");
+if (!lastname) missingFields.push("Apellido");
+if (!username) missingFields.push("Usuario");
+if (!password) missingFields.push("Contraseña");
+if (!confirmPassword) missingFields.push("Confirmar contraseña");
+
+if (missingFields.length > 0) {
+  const errorMessage =
+    missingFields.length === 5
+      ? "Todos los campos son requeridos"
+      : `Los siguientes campos son requeridos: ${missingFields.join(", ")}`;
+  return createErrorResponse(errorMessage);
+}
 
     //  Validar nombre y apellido
     const nameError = validateNameField(name, "Nombre");
@@ -112,19 +114,23 @@ export async function POST(req) {
     //  **Hash de la contraseña**
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    //  **Determinar el roleId (SUPERADMIN o USER)**
-    const usersCount = await client.query("SELECT COUNT(*) AS count FROM users");
-    const roleId = usersCount.rows[0].count < 4 ? 2 : 1; // 2 = SUPERADMIN, 1 = USER
+    // Obtener el número total de usuarios para determinar si es SUPERADMIN o USER
+    const [usersCount] = await connection.execute("SELECT COUNT(*) AS count FROM User");
 
-    //  **Verificar si el rol existe**
-    const role = await client.query("SELECT id FROM role WHERE id = $1", [roleId]);
-    if (role.rows.length === 0) {
+    // Determinar el roleId según el número de usuarios existentes
+    const roleId = usersCount[0].count < 4 ? 2 : 1; // 2 es para SUPERADMIN, 1 es para USER
+
+    // Obtener el roleId de la tabla `role`
+    const [role] = await connection.execute("SELECT id FROM role WHERE id = ?", [roleId]);
+
+    // Si no se encuentra un role válido, devolver error
+    if (!role || role.length === 0) {
       return createErrorResponse("Role no válido", 400);
     }
 
-    //  **Insertar nuevo usuario**
-    await client.query(
-      "INSERT INTO users (name, lastname, username, password, roleId, avatar) VALUES ($1, $2, $3, $4, $5, $6)",
+    // Insertar nuevo usuario con el roleId correspondiente y asignar avatar
+    await connection.execute(
+      "INSERT INTO User (name, lastname, username, password, roleId, avatar) VALUES (?, ?, ?, ?, ?, ?)",
       [name, lastname, username, hashedPassword, roleId, "/avatars/default-avatar.jpg"]
     );
 

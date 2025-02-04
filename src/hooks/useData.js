@@ -35,11 +35,12 @@ export function useData(
   const [mutationError, setMutationError] = useState(null);
 
   // Función para crear datos (POST)
-  const createData = async (newData) => {
+  const createData = async (newData, idOverride = null) => {
     setIsMutating(true);
     setMutationError(null);
     try {
-      const response = await fetcher.post(url, newData);
+      const postUrl = idOverride ? `${endpoint}/${idOverride}` : url;
+      const response = await fetcher.post(postUrl, newData);
       mutate(); // Revalidar datos después de la mutación
       return response;
     } catch (error) {

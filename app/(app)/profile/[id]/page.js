@@ -10,12 +10,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
 
 export default function ProfileUserPage({ params }) {
-  const { id } = React.use(params);
+  const { id } = React.use(params); // Asumiendo que params ya tiene la propiedad id
   const { data: session } = useSession();
   const [user, setUser] = useState(null);
   const [userSongs, setUserSongs] = useState([]);
 
-  // Usar acciones del store
+  // Acciones del store
   const { playSong, setPlaylist } = usePlayerActions();
   const { currentSong, isPlaying } = usePlayerStore();
 
@@ -29,7 +29,8 @@ export default function ProfileUserPage({ params }) {
     if (userData) {
       setUser(userData);
       setUserSongs(userData.songs || []);
-      setPlaylist(userData.songs || []); // Actualizar playlist en el store
+      // No se setea la playlist aquí para forzar el cambio solo al hacer click
+      // setPlaylist(userData.songs || []);
     }
   }, [userData, setPlaylist]);
 
@@ -59,7 +60,7 @@ export default function ProfileUserPage({ params }) {
 
   if (userLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white mr-10 p-6">
+      <div className="min-h-screen bg-slate-950 text-white p-6">
         <div className="flex items-center gap-3">
           <Skeleton className="w-40 h-40 rounded-full" />
           <div className="space-y-4">
@@ -92,10 +93,9 @@ export default function ProfileUserPage({ params }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white mr-10">
+    <div className="min-h-screen bg-slate-950 text-white">
       <header className="p-6 flex flex-col gap-4 items-start">
         <div className="flex items-center gap-3">
-
           <div className="w-[200px] h-[200px] overflow-hidden">
             <Image
               width={200}
@@ -121,7 +121,7 @@ export default function ProfileUserPage({ params }) {
       </header>
 
       <main className="p-6">
-        <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 mr-10 pb-2">
+        <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 pb-2">
           Canciones de {user.username} ({userSongs.length})
         </h2>
 
@@ -130,30 +130,39 @@ export default function ProfileUserPage({ params }) {
             <p>Este usuario aún no ha subido canciones</p>
           </div>
         ) : (
-          <div className="space-y-4 mr-10">
-            {userSongs.map((song) => (
-              <PlaylistCard
-                key={song.songId}
-                song={{
-                  ...song,
-                  id: song.songId, // Normalizar el identificador
-                }}
-                onPlay={() => {
-                  const normalizedSongs = userSongs.map((s) => ({
-                    ...s,
-                    id: s.songId,
-                  }));
-                  setPlaylist(normalizedSongs);
-                  playSong({ ...song, id: song.songId }, normalizedSongs);
-                }}
-                onConfirmDelete={
-                  session?.user?.isAdmin ? handleRemoveSong : null
-                }
-                deleteActionLabel="Eliminar canción (Admin)"
-                deleteConfirmationMessage="¿Estás seguro de eliminar esta canción? Esta acción es irreversible."
-                showDelete={session?.user?.isAdmin}
-              />
-            ))}
+          <div className="space-y-4">
+            {userSongs.map((song) => {
+              // Normalizamos la canción y la lista de canciones
+              const normalizedSong = { ...song, id: song.songId };
+              const normalizedSongs = userSongs.map((s) => ({
+                ...s,
+                id: s.songId,
+              }));
+
+              return (
+                <PlaylistCard
+                  key={song.songId}
+                  song={normalizedSong}
+                  isPlaying={currentSong?.id === normalizedSong.id && isPlaying}
+                  onPlay={() => {
+                    try {
+                      // Al hacer click, se actualiza la playlist del store
+                      setPlaylist(normalizedSongs);
+                      // Se reproduce la canción usando la playlist normalizada
+                      playSong(normalizedSong, normalizedSongs);
+                    } catch (error) {
+                      toast.error("Error al reproducir: " + error.message);
+                    }
+                  }}
+                  onConfirmDelete={
+                    session?.user?.isAdmin ? handleRemoveSong : null
+                  }
+                  deleteActionLabel="Eliminar canción (Admin)"
+                  deleteConfirmationMessage="¿Estás seguro de eliminar esta canción? Esta acción es irreversible."
+                  showDelete={session?.user?.isAdmin}
+                />
+              );
+            })}
           </div>
         )}
       </main>

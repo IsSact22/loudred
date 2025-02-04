@@ -3,24 +3,45 @@ import { persist } from "zustand/middleware";
 import Cookies from "js-cookie";
 import { immer } from "zustand/middleware/immer";
 
+// Helper functions para la lógica de shuffle
+const shuffleLogic = {
+  generateShuffledPlaylist: (currentSong, originalPlaylist) => {
+    const others = originalPlaylist.filter(
+      (song) => song.id !== currentSong?.id
+    );
+    return [currentSong, ...others.sort(() => Math.random() - 0.5)];
+  },
+
+  getNextIndex: (playedIndices, playlist) => {
+    if (playedIndices.length >= playlist.length) return 0;
+    return (playedIndices[playedIndices.length - 1] + 1) % playlist.length;
+  },
+
+  getPrevIndex: (playedIndices) => {
+    return playedIndices.length > 1
+      ? playedIndices[playedIndices.length - 2]
+      : 0;
+  },
+};
+
 export const usePlayerStore = create(
   persist(
     immer((set, get) => ({
-      isPlaying: false, // Ahora no persistente
+      isPlaying: false,
       currentSong: null,
       currentPlaylist: [],
       originalPlaylist: [],
       isShuffled: false,
-      shuffledPlaylist: [], // Nueva propiedad para mejor control del shuffle
-      playedIndices: [], // Rastrea índices reproducidos en modo shuffle
+      shuffledPlaylist: [],
+      playedIndices: [],
 
-      // Separamos las acciones en un objeto para mejor organización
       actions: {
         setPlayingState: (value) => set({ isPlaying: value }),
+
         setPlaylist: (playlist) =>
           set((state) => {
-            state.currentPlaylist = playlist;
             state.originalPlaylist = playlist;
+            state.currentPlaylist = playlist;
             state.shuffledPlaylist = [];
             state.playedIndices = [];
           }),
@@ -28,94 +49,169 @@ export const usePlayerStore = create(
         setCurrentSong: (song) =>
           set((state) => {
             state.currentSong = song;
-            state.isPlaying = false; // Reset play state al cambiar canción manualmente
+            state.isPlaying = false;
           }),
 
         playSong: (song, playlist) =>
           set((state) => {
+            const isNewPlaylist = !state.originalPlaylist.some(
+              (s) => s.id === song.id
+            );
+
             state.currentSong = song;
-            state.currentPlaylist = playlist;
             state.isPlaying = true;
-            // Reset shuffle tracking si es nueva playlist
-            if (!state.currentPlaylist.includes(song)) {
-              state.shuffledPlaylist = [];
-              state.playedIndices = [];
+            state.originalPlaylist = playlist;
+
+            if (isNewPlaylist) {
+              state.shuffledPlaylist = shuffleLogic.generateShuffledPlaylist(
+                song,
+                playlist
+              );
+              state.playedIndices = [0];
+              state.currentPlaylist = state.isShuffled
+                ? state.shuffledPlaylist
+                : playlist;
             }
           }),
 
-        toggleShuffle: () => {
-          const { isShuffled, originalPlaylist, currentSong } = get();
-          if (!originalPlaylist?.length) return; // Evita el toggle si la playlist está vacía
+        toggleShuffle: () =>
+          set((state) => {
+            if (!state.originalPlaylist?.length) return;
 
-          if (isShuffled) {
-            set((state) => {
-              state.isShuffled = false;
-              state.currentPlaylist = state.originalPlaylist;
-              state.shuffledPlaylist = [];
-              state.playedIndices = [];
-            });
-          } else {
-            const remainingSongs = originalPlaylist.filter(
-              (s) => s.id !== currentSong?.id
-            );
-            const shuffled = [
-              currentSong,
-              ...remainingSongs.sort(() => Math.random() - 0.5),
-            ];
+            state.isShuffled = !state.isShuffled;
 
-            set((state) => {
-              state.isShuffled = true;
-              state.shuffledPlaylist = shuffled;
+            if (state.isShuffled) {
+              state.shuffledPlaylist = shuffleLogic.generateShuffledPlaylist(
+                state.currentSong,
+                state.originalPlaylist
+              );
               state.playedIndices = [0];
-              state.currentPlaylist = shuffled; // Solo cambiamos la lista actual
-            });
-          }
-        },
+              state.currentPlaylist = state.shuffledPlaylist;
+            } else {
+              state.currentPlaylist = state.originalPlaylist;
+            }
+          }),
 
-        handleSongEnd: () => {
-          const { isShuffled, shuffledPlaylist, playedIndices, actions } =
-            get();
+        handleSongEnd: () =>
+          set((state) => {
+            const {
+              isShuffled,
+              shuffledPlaylist,
+              originalPlaylist,
+              playedIndices,
+            } = state;
+            const currentPlaylist = isShuffled
+              ? shuffledPlaylist
+              : originalPlaylist;
 
-          if (isShuffled && shuffledPlaylist.length > 0) {
-            const nextIndex =
-              (playedIndices[playedIndices.length - 1] + 1) %
-              shuffledPlaylist.length;
+            const nextIndex = shuffleLogic.getNextIndex(
+              playedIndices,
+              currentPlaylist
+            );
+            const newSong = currentPlaylist[nextIndex];
 
-            if (nextIndex === 0) {
-              // Regenerar shuffle excluyendo la canción actual
-              const newShuffled = shuffledPlaylist
-                .slice(1)
-                .sort(() => Math.random() - 0.5);
-              set((state) => {
-                state.shuffledPlaylist = [state.currentSong, ...newShuffled];
+            if (isShuffled) {
+              if (nextIndex === 0) {
+                state.shuffledPlaylist = shuffleLogic.generateShuffledPlaylist(
+                  newSong,
+                  originalPlaylist
+                );
                 state.playedIndices = [0];
-              });
+              } else {
+                state.playedIndices.push(nextIndex);
+              }
             }
 
-            set((state) => {
+            state.currentSong = newSong;
+            state.isPlaying = true;
+          }),
+
+        handleSkipForward: () =>
+          set((state) => {
+            const {
+              isShuffled,
+              shuffledPlaylist,
+              originalPlaylist,
+              playedIndices,
+            } = state;
+            const currentPlaylist = isShuffled
+              ? shuffledPlaylist
+              : originalPlaylist;
+            if (!currentPlaylist.length) return;
+
+            // Obtener el índice actual. Si no hay, se asume 0.
+            const currentIndex =
+              playedIndices.length > 0
+                ? playedIndices[playedIndices.length - 1]
+                : 0;
+            // Calcular el siguiente índice (cíclico)
+            const nextIndex = (currentIndex + 1) % currentPlaylist.length;
+
+            // Si el índice actual es el último, se completó un ciclo: se reinicia el historial.
+            if (currentIndex === currentPlaylist.length - 1) {
+              state.playedIndices = [nextIndex]; // nextIndex será 0
+            } else {
               state.playedIndices.push(nextIndex);
-              state.currentSong = state.shuffledPlaylist[nextIndex];
-              state.isPlaying = true;
-            });
-          } else {
-            const currentIndex = get().currentPlaylist.findIndex(
-              (s) => s.id === get().currentSong?.id
-            );
-            const nextIndex = (currentIndex + 1) % get().currentPlaylist.length;
-            set((state) => {
-              state.currentSong = state.currentPlaylist[nextIndex];
-              state.isPlaying = true;
-            });
-          }
-        },
+            }
+
+            state.currentSong = currentPlaylist[nextIndex];
+
+            // En modo shuffle, si se reinició el ciclo, se regenera la lista aleatoria.
+            if (isShuffled && nextIndex === 0) {
+              state.shuffledPlaylist = shuffleLogic.generateShuffledPlaylist(
+                state.currentSong,
+                originalPlaylist
+              );
+            }
+          }),
+
+        handleSkipBack: () =>
+          set((state) => {
+            const {
+              isShuffled,
+              shuffledPlaylist,
+              originalPlaylist,
+              playedIndices,
+              currentSong,
+            } = state;
+            // Selecciona el playlist activo
+            const currentPlaylist = isShuffled
+              ? shuffledPlaylist
+              : originalPlaylist;
+            if (!currentPlaylist.length) return;
+
+            // Determinar el índice actual:
+            // Si existe historial, se toma el último; si no, se busca el índice de currentSong en el playlist.
+            const currentIndex =
+              playedIndices.length > 0
+                ? playedIndices[playedIndices.length - 1]
+                : currentPlaylist.findIndex(
+                    (song) => song.id === currentSong?.id
+                  ) || 0;
+
+            // Calcular el índice anterior de forma cíclica
+            const prevIndex =
+              (currentIndex - 1 + currentPlaylist.length) %
+              currentPlaylist.length;
+
+            // Actualizar el historial:
+            // Si hay más de un elemento en playedIndices, se elimina el último para retroceder.
+            // En caso contrario (historial "vacío" o con un solo elemento) se establece el nuevo índice.
+            if (playedIndices.length > 1) {
+              playedIndices.pop();
+            } else {
+              state.playedIndices = [prevIndex];
+            }
+
+            // Actualizar la canción actual con el índice calculado
+            state.currentSong = currentPlaylist[prevIndex];
+          }),
       },
     })),
     {
       name: "player-store",
       partialize: (state) => ({
-        // Excluimos isPlaying y acciones de la persistencia
         currentSong: state.currentSong,
-        currentPlaylist: state.currentPlaylist,
         originalPlaylist: state.originalPlaylist,
         isShuffled: state.isShuffled,
         shuffledPlaylist: state.shuffledPlaylist,
@@ -130,5 +226,4 @@ export const usePlayerStore = create(
   )
 );
 
-// Exportamos las acciones por separado para mejor consumo en componentes
 export const usePlayerActions = () => usePlayerStore((state) => state.actions);

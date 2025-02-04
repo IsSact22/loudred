@@ -17,7 +17,7 @@ const AppLayout = ({ children }) => {
       <SidebarProvider>
         {/* Sidebar izquierdo siempre visible */}
         <div
-          className={`bg-slate-950 fixed left-0 top-0 bottom-0 z-10 transition-all duration-300 ${
+          className={`relative left-0 top-0 bottom-0 z-20 h-screen transition-all duration-300 ${
             isLeftSidebarOpen ? "w-64" : "w-16"
           }`}
         >
@@ -29,15 +29,13 @@ const AppLayout = ({ children }) => {
 
         {/* Contenido principal */}
         <div
-          className={`flex-1 ${
-            isLeftSidebarOpen ? "ml-64" : "ml-16"
-          } mr-64 relative overflow-y-auto transition-all duration-300 z-0`}
+          className={`flex-1 relative overflow-y-auto transition-all duration-300 z-0`}
         >
           {children}
         </div>
 
         {/* Sidebar derecho siempre visible */}
-        <div className="bg-gradient-to-b from-purple-900 to-purple-950 text-white h-screen w-80 fixed right-0 top-0 z-20">
+        <div className="h-screen w-80 relative right-0 top-0 z-20 bg-gradient-to-b from-purple-900 to-purple-950 text-white ">
           <SidebarRight />
         </div>
       </SidebarProvider>

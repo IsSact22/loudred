@@ -56,9 +56,9 @@ export default function Home() {
       <div className="mt-20 ml-10">
         <p className="text-white text-2xl">Nuevos usuarios</p>
         {loadingUsers ? (
-          <p className="m-4">Cargando usuarios...</p>
+          <p className="mt-4 text-white">Cargando usuarios...</p>
         ) : errorUsers ? (
-          <p>Error al cargar usuarios</p>
+          <p className="mt-4 text-white">Error al cargar usuarios</p>
         ) : (
           <>
             <UserCarousel users={users} />

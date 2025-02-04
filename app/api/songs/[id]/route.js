@@ -1,37 +1,69 @@
 import { Pool } from "pg";
 
-// Configurar pool de conexiones global
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-  port: process.env.DB_PORT,
-});
-
-// Actualizar el campo `validate` de una canción
-export async function PUT(req, { params }) {
-  const { id } = params; // Corrección: no necesitas `await`
-  const { validate } = await req.json();
-
-  if (typeof validate !== "boolean") {
-    return new Response(JSON.stringify({ message: "El valor debe ser booleano" }), {
-      status: 400,
-    });
-  }
+//actualizar validate de canciones
+export async function PUT(req, {params}) {
+  const { id } = await params;
+  const songId = id;
+  const {validate} = await req.json();
+  let connection;
 
   try {
-    const { rowCount } = await pool.query(
-      "UPDATE songs SET validate = $1 WHERE id = $2 RETURNING *",
-      [validate, id]
-    );
+      // Validar que el valor de validate sea booleano
+      if (typeof validate !== "boolean") {
+          return new Response(JSON.stringify({ message: "El valor debe ser booleano" }), {
+              status: 400,
+          });
+      }
 
-    if (rowCount === 0) {
-      return new Response(
-        JSON.stringify({ error: "No existe canción por actualizar!" }),
-        { status: 404 }
+      let updates = [];
+      let values = [];
+
+      connection = await mysql.createConnection({
+          host: process.env.DB_HOST,
+          user: process.env.DB_USERNAME,
+          password: process.env.DB_PASSWORD,
+          database: process.env.DB_DATABASE,
+      });
+        
+      const [song] = await connection.execute(
+        "SELECT * FROM songs WHERE id = ?",
+        [songId] // Filtrar por el ID de la canción
       );
-    }
+      
+      // Validar que exista la canción
+      if (song.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "No existe canción por actualizar!" }),
+          { status: 404, headers: { "Content-Type": "application/json" } }
+        );
+      }
+      
+  
+        // Validar que el valor de validate sea booleano
+        if (typeof validate !== "boolean") {
+            return new Response(JSON.stringify({ message: "El valor debe ser booleano" }), {
+                status: 400,
+            });
+        }
+
+      // Verificar si el valor 'validate' es NULL, en caso de que quieras actualizarlo solo a TRUE
+      const [validates] = await connection.execute("SELECT validate FROM songs WHERE id = ?", [songId]);
+
+      if (validates.length === 0) {
+          return new Response(JSON.stringify({ message: "La canción no existe" }), { status: 404 });
+      }
+
+      // Si la canción tiene el campo `validate` como NULL, actualizar a TRUE
+      updates.push("validate = ?");
+      values.push(validate);
+
+      // Ejecutar la consulta de actualización
+      await connection.execute(
+          `UPDATE songs SET ${updates.join(",")} WHERE id = ?`,
+          [...values, songId]
+      );
+
+      await connection.end();
 
     return new Response(
       JSON.stringify({ message: "Canción actualizada exitosamente" }),
@@ -43,7 +75,8 @@ export async function PUT(req, { params }) {
   }
 }
 
-// Eliminar una canción
+
+//borrar canciones
 export async function DELETE(req, { params }) {
   const { id } = params;
 

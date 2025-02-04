@@ -24,11 +24,11 @@ const UserCarousel = ({ users }) => {
 
   return (
     <Carousel className="flex w-full max-w-6xl mt-4">
-      <CarouselContent className="ml-6">
+      <CarouselContent>
         {sortedUsers.map((user, index) => (
           <CarouselItem
             key={`${user.id}-${index}`}
-            className="pl-6 md:basis-1/5 lg:basis-1/6 flex-2"
+            className="px-8 md:basis-1/5 flex-2"
           >
             <UserCard
               avatar={user.avatar ?? "/avatars/default-avatar.jpg"}

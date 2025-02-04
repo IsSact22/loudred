@@ -18,15 +18,15 @@ export default function FavoritesPage() {
   );
   const [favoriteSongs, setFavoriteSongs] = useState([]);
 
-  // Usar acciones del store correctamente
+  // Acciones del store
   const { playSong, setPlaylist } = usePlayerActions();
   const { currentSong, isPlaying } = usePlayerStore();
 
   useEffect(() => {
     if (data?.songs) {
       setFavoriteSongs(data.songs);
-      // Actualizar la playlist del reproductor si es la misma lista
-      setPlaylist(data.songs);
+      // Si se desea, se puede establecer la playlist de favoritos al cargar la página:
+      // setPlaylist(data.songs);
     }
   }, [data, setPlaylist]);
 
@@ -42,7 +42,7 @@ export default function FavoritesPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white mr-10 p-6">
+      <div className="min-h-screen bg-slate-950 text-white p-6">
         <Skeleton className="h-10 w-48 mb-4" />
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
@@ -53,16 +53,8 @@ export default function FavoritesPage() {
     );
   }
 
-  // if (error) {
-  //   return (
-  //     <div className="min-h-screen bg-slate-950 text-white p-6">
-  //       Error al cargar favoritos: {error.error}
-  //     </div>
-  //   );
-  // }
-
   return (
-    <div className="min-h-screen bg-slate-950 text-white mr-10">
+    <div className="min-h-screen bg-slate-950 text-white">
       <header className="p-6 flex flex-col gap-4 items-start">
         <div className="flex items-center gap-3">
           <div className="text-5xl">
@@ -82,7 +74,7 @@ export default function FavoritesPage() {
       </header>
 
       <main className="p-6">
-        <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 mr-10 pb-2">
+        <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 pb-2">
           Mis Canciones Favoritas
         </h2>
 
@@ -97,7 +89,7 @@ export default function FavoritesPage() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-4 mr-10">
+          <div className="space-y-4">
             {favoriteSongs.map((song) => (
               <PlaylistCard
                 key={song.id}
@@ -105,6 +97,9 @@ export default function FavoritesPage() {
                 isPlaying={currentSong?.id === song.id && isPlaying}
                 onPlay={() => {
                   try {
+                    // Si la playlist actual es diferente, se actualiza a la de favoritos
+                    setPlaylist(favoriteSongs);
+                    // Luego se reproduce la canción haciendo que la playlist sea la de favoritos
                     playSong(song, favoriteSongs);
                   } catch (error) {
                     toast.error("Error al reproducir la canción");

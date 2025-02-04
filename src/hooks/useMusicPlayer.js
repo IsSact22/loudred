@@ -4,141 +4,91 @@ import { toast } from "react-hot-toast";
 
 export function useMusicPlayer() {
   // Estados del store
-  const {
-    currentSong,
-    isPlaying,
-    currentPlaylist,
-    isShuffled,
-    shuffledPlaylist,
-    playedIndices,
-  } = usePlayerStore();
-
-  // Acciones del store
-  const { playSong, toggleShuffle, handleSongEnd, setPlayingState } =
+  const { currentSong, isPlaying, isShuffled } = usePlayerStore();
+  const { handleSkipForward, handleSkipBack, toggleShuffle, setPlayingState } =
     usePlayerActions();
 
-  // Estados locales del componente
+  // Estados locales
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef(null);
 
-  // Manejador optimizado de actualización de tiempo
+  // Manejador optimizado de tiempo
   const handleTimeUpdate = useCallback(() => {
     const newTime = audioRef.current?.currentTime || 0;
-    if (Math.abs(newTime - currentTime) >= 0.1) {
-      setCurrentTime(newTime);
-    }
-  }, [currentTime]);
+    setCurrentTime((prev) =>
+      Math.abs(newTime - prev) >= 0.1 ? newTime : prev
+    );
+  }, []);
 
-  // Manejador del fin de canción
-  const handleSongEndCallback = useCallback(() => {
-    handleSongEnd();
-    setCurrentTime(0);
-  }, [handleSongEnd]);
-
-  // Efectos para control del audio
+  // Efecto principal de control de audio
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || !currentSong) return;
 
-    const handleLoadedMetadata = () => setDuration(audio.duration);
+    const handleLoadedData = () => {
+      setDuration(audio.duration);
+      if (isPlaying) audio.play().catch(console.error);
+    };
 
+    audio.addEventListener("loadeddata", handleLoadedData);
     audio.addEventListener("timeupdate", handleTimeUpdate);
-    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-    audio.addEventListener("ended", handleSongEndCallback);
+    audio.addEventListener("ended", () => {
+      setCurrentTime(0);
+      handleSkipForward();
+    });
+
+    // Cargar nueva fuente
+    audio.src = currentSong.music;
+    audio.load();
 
     return () => {
+      audio.removeEventListener("loadeddata", handleLoadedData);
       audio.removeEventListener("timeupdate", handleTimeUpdate);
-      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      audio.removeEventListener("ended", handleSongEndCallback);
     };
-  }, [handleTimeUpdate, handleSongEndCallback]);
+  }, [currentSong?.id, handleTimeUpdate, handleSkipForward]); // Eliminado isPlaying
 
-  useEffect(() => {
-    if (currentSong && isPlaying && audioRef.current) {
-      audioRef.current.play().catch((error) => {
-        console.error("Error al reproducir:", error);
-        setPlayingState(false);
-      });
-    }
-  }, [currentSong, isPlaying, setPlayingState]);
-
-  // Control play/pause
+  // Control de reproducción
   const togglePlayPause = async () => {
-    if (!audioRef.current) return;
-
     try {
       if (isPlaying) {
-        await audioRef.current.pause();
-        setPlayingState(false); // Usamos la acción del store
+        await audioRef.current?.pause();
+        setPlayingState(false);
       } else {
-        await audioRef.current.play();
-        setPlayingState(true); // Usamos la acción del store
+        await audioRef.current?.play();
+        setPlayingState(true);
       }
     } catch (error) {
-      console.error("Error al reproducir:", error);
       toast.error("Error al controlar la reproducción");
-      setPlayingState(false); // Aseguramos resetear el estado
+      setPlayingState(false);
     }
   };
 
-  // Navegación entre canciones
-  const handleSkipForward = () => {
-    if (isShuffled && shuffledPlaylist.length > 0) {
-      const nextIndex =
-        (playedIndices[playedIndices.length - 1] + 1) % shuffledPlaylist.length;
-      const newSong = shuffledPlaylist[nextIndex];
-      playSong(newSong, shuffledPlaylist); // Usamos shuffledPlaylist para obtener la siguiente canción
-    } else {
-      const nextIndex =
-        (currentPlaylist.indexOf(currentSong) + 1) % currentPlaylist.length;
-      const newSong = currentPlaylist[nextIndex];
-      playSong(newSong, currentPlaylist);
-    }
-    setCurrentTime(0);
-  };
-
-  const handleSkipBack = () => {
-    if (isShuffled && shuffledPlaylist.length > 0) {
-      const prevIndex =
-        playedIndices.length > 1 ? playedIndices[playedIndices.length - 2] : 0;
-      const newSong = shuffledPlaylist[prevIndex];
-      playSong(newSong, shuffledPlaylist);
-    } else {
-      const prevIndex = currentPlaylist.indexOf(currentSong);
-      const newIndex =
-        prevIndex === 0 ? currentPlaylist.length - 1 : prevIndex - 1;
-      const newSong = currentPlaylist[newIndex];
-      playSong(newSong, currentPlaylist);
-    }
-    setCurrentTime(0);
-  };
-
-
-  // Control de shuffle
+  // Control de shuffle con feedback
   const handleToggleShuffle = () => {
     toggleShuffle();
-    setTimeout(() => {
-      toast.success(
-        isShuffled
-          ? "Reproducción en orden activada"
-          : "Reproducción aleatoria activada"
-      );
-    }, 0);
+    toast.success(
+      isShuffled
+        ? "Reproducción en orden activada"
+        : "Reproducción aleatoria activada",
+      { position: "bottom-center" }
+    );
   };
 
   // Formateo de tiempo
-  const formatTime = (time) => {
+  const formatTime = useCallback((time) => {
     const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-  };
+    const seconds = Math.floor(time % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  }, []);
 
   // Control de la barra de progreso
-  const handleSeek = (value) => {
+  const handleSeek = (values) => {
     if (audioRef.current) {
-      audioRef.current.currentTime = value[0];
-      setCurrentTime(value[0]);
+      audioRef.current.currentTime = values[0];
+      setCurrentTime(values[0]);
     }
   };
 
@@ -154,6 +104,6 @@ export function useMusicPlayer() {
     handleToggleShuffle,
     formatTime,
     handleSeek,
-    isShuffled
+    isShuffled,
   };
 }
