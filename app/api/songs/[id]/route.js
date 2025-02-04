@@ -2,7 +2,7 @@
 import mysql from "mysql2/promise";
 
 //actualizar validate de canciones
-export async function PUT(req, {params}) {
+export async function PATCH(req, {params}) {
   const { id } = await params;
   const songId = id;
   const {validate} = await req.json();
