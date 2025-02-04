@@ -68,7 +68,7 @@ export default function RegisterForm() {
 
   return (
     <div className="flex flex-col items-center justify-center ">
-      <div className="flex flex-col mt-14 bg-gradient-to-br from-white to-purple-100 p-8 rounded-2xl mt-10 shadow-md min-h-[600px] min-w-[600px]">
+      <div className="flex flex-col mt-10 p-8 bg-gradient-to-br from-white to-purple-100 rounded-2xl shadow-md min-h-[600px] min-w-[600px]">
         <h2 className="text-4xl font-bold text-red-500 mb-12 ml-1">Bienvenido</h2>
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col">

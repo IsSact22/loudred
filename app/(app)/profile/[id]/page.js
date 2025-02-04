@@ -59,7 +59,7 @@ export default function ProfileUserPage({ params }) {
 
   if (userLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white mr-10 p-6">
+      <div className="min-h-screen bg-slate-950 text-white p-6">
         <div className="flex items-center gap-3">
           <Skeleton className="w-40 h-40 rounded-full" />
           <div className="space-y-4">
@@ -92,7 +92,7 @@ export default function ProfileUserPage({ params }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white mr-10">
+    <div className="min-h-screen bg-slate-950 text-white">
       <header className="p-6 flex flex-col gap-4 items-start">
         <div className="flex items-center gap-3">
 
@@ -121,7 +121,7 @@ export default function ProfileUserPage({ params }) {
       </header>
 
       <main className="p-6">
-        <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 mr-10 pb-2">
+        <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 pb-2">
           Canciones de {user.username} ({userSongs.length})
         </h2>
 
@@ -130,7 +130,7 @@ export default function ProfileUserPage({ params }) {
             <p>Este usuario aún no ha subido canciones</p>
           </div>
         ) : (
-          <div className="space-y-4 mr-10">
+          <div className="space-y-4">
             {userSongs.map((song) => (
               <PlaylistCard
                 key={song.songId}
