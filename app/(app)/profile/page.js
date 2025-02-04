@@ -30,7 +30,7 @@ export default function ProfilePage() {
         (song) => song.userId === session.user.id
       );
       setUserSongs(filteredSongs);
-      setPlaylist(filteredSongs); // Actualizar playlist en el store
+      // setPlaylist(filteredSongs); // Actualizar playlist en el store
     }
   }, [session, songData, setPlaylist]);
 

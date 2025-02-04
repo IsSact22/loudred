@@ -25,8 +25,8 @@ export default function FavoritesPage() {
   useEffect(() => {
     if (data?.songs) {
       setFavoriteSongs(data.songs);
-      // Actualizar la playlist del reproductor si es la misma lista
-      setPlaylist(data.songs);
+      // // Actualizar la playlist del reproductor si es la misma lista
+      // setPlaylist(data.songs);
     }
   }, [data, setPlaylist]);
 

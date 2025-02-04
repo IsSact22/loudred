@@ -29,7 +29,7 @@ export default function ProfileUserPage({ params }) {
     if (userData) {
       setUser(userData);
       setUserSongs(userData.songs || []);
-      setPlaylist(userData.songs || []); // Actualizar playlist en el store
+      // setPlaylist(userData.songs || []); // Actualizar playlist en el store
     }
   }, [userData, setPlaylist]);
 
