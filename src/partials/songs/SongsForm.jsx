@@ -17,7 +17,7 @@ import toast from "react-hot-toast";
 
 export default function SongsForm() {
   const { data: session } = useSession();
-  const role = session?.user?.role.id;
+  const role = session?.user?.role?.id;
   const router = useRouter(); // Hook de Next.js para redirección
 
   const methods = useForm({
