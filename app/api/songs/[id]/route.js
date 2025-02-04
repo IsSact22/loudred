@@ -2,14 +2,22 @@
 import mysql from "mysql2/promise";
 
 //actualizar validate de canciones
-export async function PATCH(req, {params}) {
+// Se cambia la lectura del body de JSON a FormData para procesar el envío desde FormData
+export async function PATCH(req, { params }) {
   const { id } = await params;
   const songId = id;
-  const {validate} = await req.json();
+
+  // Obtener FormData en lugar de JSON
+  const formData = await req.formData();
+  let validate = formData.get("validate");
+
+  // Convertir el valor a booleano
+  validate = validate === "true";
+
   let connection;
 
   try {
-      // Validar que el valor de validate sea booleano
+      // Validar que el valor de validate sea booleano (ya es booleano tras la conversión)
       if (typeof validate !== "boolean") {
           return new Response(JSON.stringify({ message: "El valor debe ser booleano" }), {
               status: 400,
@@ -28,7 +36,7 @@ export async function PATCH(req, {params}) {
         
       const [song] = await connection.execute(
         "SELECT * FROM songs WHERE id = ?",
-        [songId] // Filtrar por el ID de la canción
+        [songId]
       );
       
       // Validar que exista la canción
@@ -38,14 +46,6 @@ export async function PATCH(req, {params}) {
           { status: 404, headers: { "Content-Type": "application/json" } }
         );
       }
-      
-  
-        // Validar que el valor de validate sea booleano
-        if (typeof validate !== "boolean") {
-            return new Response(JSON.stringify({ message: "El valor debe ser booleano" }), {
-                status: 400,
-            });
-        }
 
       // Verificar si el valor 'validate' es NULL, en caso de que quieras actualizarlo solo a TRUE
       const [validates] = await connection.execute("SELECT validate FROM songs WHERE id = ?", [songId]);
@@ -54,7 +54,6 @@ export async function PATCH(req, {params}) {
           return new Response(JSON.stringify({ message: "La canción no existe" }), { status: 404 });
       }
 
-      // Si la canción tiene el campo `validate` como NULL, actualizar a TRUE
       updates.push("validate = ?");
       values.push(validate);
 
@@ -80,7 +79,6 @@ export async function PATCH(req, {params}) {
       }
   }
 }
-
 
 //borrar canciones
 export async function DELETE(req, { params }) {

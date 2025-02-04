@@ -220,7 +220,7 @@ export async function POST(req) {
     await connection.end();
 
     return new Response(
-      JSON.stringify({ success: true, message: "Canción y archivos guardados correctamente", song: newSong }),
+      JSON.stringify({ success: true, message: "Canción y archivos guardados correctamente", song: newSong, id: newSong.id }),
       { status: 201, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
@@ -232,9 +232,7 @@ export async function POST(req) {
   }
 }
 
-
 //función read para las canciones
-
 export async function GET(req) {
   try {
     // Conexión a la base de datos
@@ -255,11 +253,13 @@ export async function GET(req) {
         Songs.categoryId,
         categories.name AS categoryName,
         Image.fileName AS imageFileName,
-        Music.fileName AS musicFileName
+        Music.fileName AS musicFileName,
+        user.username AS username
       FROM Songs
       LEFT JOIN categories ON Songs.categoryId = categories.id
       LEFT JOIN Image ON Songs.id = Image.songId
       LEFT JOIN Music ON Songs.id = Music.songId
+      LEFT JOIN user ON Songs.userId = user.id
     `);
 
     await connection.end();
@@ -277,6 +277,7 @@ export async function GET(req) {
       validate: song.validate,
       createdAt: song.createdAt,
       userId: song.userId,
+      username: song.username || null,
       categoryId: song.categoryId,
       categoryName: song.categoryName || null,
       image: song.imageFileName ? `${song.imageFileName}` : null,

@@ -4,13 +4,13 @@ import { useForm, FormProvider } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import { useData } from "@/src/hooks/useData"
 import { registerSchema } from "@/src/validations/validationSchema"
+import { updateSchema } from "@/src/validations/validationSchema"
 import { DataTable } from "@/components/ui/data-table"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Modal } from "@/components/ui/modal"
 import { toast } from "react-hot-toast"
 import { useState, useEffect } from "react"
+import UserForm from "@/src/partials/admin/components/UserForm"
+import EditUserModal from "@/src/partials/admin/components/EditUserModal"
 
 export default function UsersPage() {
   const {
@@ -46,7 +46,7 @@ export default function UsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const editMethods = useForm({
-    resolver: yupResolver(registerSchema),
+    resolver: yupResolver(updateSchema),
     mode: "onChange",
     defaultValues: {
       name: "",
@@ -77,15 +77,21 @@ export default function UsersPage() {
     setIsModalOpen(true);
   };
 
-  // Llamado al actualizar usuario (patch)
+  // Llamado al actualizar usuario (post que emula patch usando FormData y sin enviar campos vacíos)
   const onSubmitEdit = async (data) => {
-    // Enviar solo los cambios; si los campos de contraseña están vacíos, no se envían
-    const payload = { ...editingUser, ...data };
-    if (!data.password && !data.confirmPassword) {
-      delete payload.password;
-      delete payload.confirmPassword;
+    // Combinar editingUser y data en un objeto
+    const merged = { ...editingUser, ...data };
+  
+    // Crear un objeto FormData y agregar solo valores no vacíos
+    const formData = new FormData();
+    for (const key in merged) {
+      if (merged[key] === "" || merged[key] === null || merged[key] === undefined) {
+        continue;
+      }
+      formData.append(key, merged[key]);
     }
-    await updateData(payload, editingUser.id);
+  
+    await createData(formData, editingUser.id);
     toast.success("Usuario actualizado exitosamente");
     setIsModalOpen(false);
     setEditingUser(null);
@@ -119,120 +125,26 @@ export default function UsersPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Gestión de Usuarios</h1>
+      <div className="grid grid-cols-2 gap-10">
+        <FormProvider {...methods}>
+          <UserForm
+            register={register}
+            handleSubmit={handleSubmit}
+            onSubmit={onSubmit}
+            onError={onError}
+          />
+        </FormProvider>
+        <div className="mt-3">
+          <DataTable data={users} columns={columns} actions={actions} />
+        </div>
+      </div>
 
-      <FormProvider {...methods}>
-        <form
-          onSubmit={handleSubmit(onSubmit, onError)}
-          className="mb-8 space-y-4"
-        >
-          <div>
-            <Label htmlFor="name">Nombre</Label>
-            <Input id="name" {...register("name")} required />
-          </div>
-          <div>
-            <Label htmlFor="lastname">Apellido</Label>
-            <Input id="lastname" {...register("lastname")} required />
-          </div>
-          <div>
-            <Label htmlFor="username">Usuario</Label>
-            <Input id="username" {...register("username")} required />
-          </div>
-          <div>
-            <Label htmlFor="password">Contraseña</Label>
-            <Input
-              id="password"
-              type="password"
-              {...register("password")}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              {...register("confirmPassword")}
-              required
-            />
-          </div>
-          <Button type="submit">Crear Usuario</Button>
-        </form>
-      </FormProvider>
-
-      <DataTable data={users} columns={columns} actions={actions} />
-
-      <Modal
+      <EditUserModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Editar Usuario"
-      >
-        {editingUser && (
-          <FormProvider {...editMethods}>
-            <form
-              onSubmit={handleSubmitEdit(onSubmitEdit)}
-              className="space-y-4"
-            >
-              <div>
-                <Label htmlFor="edit-name">Nombre</Label>
-                <Input
-                  id="edit-name"
-                  {...editMethods.register("name")}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-lastname">Apellido</Label>
-                <Input
-                  id="edit-lastname"
-                  {...editMethods.register("lastname")}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-username">Usuario</Label>
-                <Input
-                  id="edit-username"
-                  {...editMethods.register("username")}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-password">Contraseña</Label>
-                <Input
-                  id="edit-password"
-                  type="password"
-                  {...editMethods.register("password")}
-                  placeholder="Dejar en blanco para no cambiar"
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-confirmPassword">
-                  Confirmar Contraseña
-                </Label>
-                <Input
-                  id="edit-confirmPassword"
-                  type="password"
-                  {...editMethods.register("confirmPassword")}
-                  placeholder="Dejar en blanco para no cambiar"
-                />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button
-                  className="mt-2"
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  Cancelar
-                </Button>
-                <Button className="mt-2" type="submit">
-                  Guardar Cambios
-                </Button>
-              </div>
-            </form>
-          </FormProvider>
-        )}
-      </Modal>
+        editMethods={editMethods}
+        onSubmitEdit={onSubmitEdit}
+      />
     </div>
   );
 }

@@ -30,7 +30,7 @@ export default function VerificationPage() {
     Object.entries(payload).forEach(([key, value]) => {
       formData.append(key, value);
     });
-    await updateData(formData);
+    await updateData(formData, song.id);
     toast.success("Canción aprobada exitosamente");
   };
 
@@ -43,8 +43,8 @@ export default function VerificationPage() {
   const columns = [
     { header: "ID", accessor: "id" },
     { header: "Título", accessor: "title" },
-    { header: "Categoría", accessor: "category" },
-    { header: "Artista", accessor: "artist" },
+    { header: "Categoría", accessor: "categoryName" },
+    { header: "Artista", accessor: "username" },
   ];
 
   const actions = (song) => (
