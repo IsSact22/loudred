@@ -1,22 +1,25 @@
-import mysql from "mysql2/promise";
+import { Pool } from "pg";
 import bcrypt from "bcrypt";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-const getDatabaseConnection = async () => {
-  try {
-    return await mysql.createConnection({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
-    });
-  } catch (error) {
-    console.error("Error al conectar con la base de datos:", error);
-    throw new Error("Error de conexión a la base de datos");
-  }
-};
+// Configurar conexión a PostgreSQL
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  port: process.env.DB_PORT, // Asegúrate de definir este valor en .env (5432 por defecto)
+});
 
+// const getDatabaseConnection = async () => {
+//   try {
+//     return await pool.query(); // Devuelve una conexión al pool
+//   } catch (error) {
+//     console.error("Error conectando a PostgreSQL:", error);
+//     throw new Error("No se pudo conectar a la base de datos");
+//   }
+// };
 export const authOptions = {
   providers: [
     CredentialsProvider({
@@ -26,25 +29,24 @@ export const authOptions = {
         password: { label: "Contraseña", type: "password" },
       },
       authorize: async (credentials) => {
-        let connection;
         try {
-          connection = await getDatabaseConnection();
 
-          const [rows] = await connection.execute(
-            `SELECT 
-               User.id, 
-               User.name, 
-               User.lastname, 
-               User.avatar, 
-               User.username, 
-               User.password, 
-               role.id AS roleId, 
-               role.name AS roleName
-             FROM User
-             JOIN role ON User.roleId = role.id
-             WHERE User.username = ?`,
+          const { rows } = await pool.query(
+              `SELECT 
+               "User".id, 
+               "User".name, 
+               "User".lastname, 
+               "User".avatar, 
+               "User".username, 
+               "User".password, 
+               "role".id AS roleId, 
+               "role".name AS roleName
+             FROM "User"
+             JOIN "role" ON "User"."roleId" = "role".id
+             WHERE "User"."username" = $1`,
             [credentials.username]
           );
+          
 
           const user = rows[0];
           if (!user) {
@@ -79,15 +81,7 @@ export const authOptions = {
         } catch (error) {
           console.error("Error durante la autenticación:", error.message);
           throw new Error(error.message || "Error de autenticación");
-        } finally {
-          if (connection) {
-            try {
-              await connection.end();
-            } catch (endError) {
-              console.error("Error al cerrar la conexión:", endError);
-            }
-          }
-        }
+        } 
       },
     }),
   ],
@@ -107,25 +101,24 @@ export const authOptions = {
 
     // AQUÍ vuelve a leerse la DB para tener datos frescos
     async session({ session, token }) {
-      let connection;
       try {
-        connection = await getDatabaseConnection();
         // Consulta la DB para obtener el usuario más reciente
-        const [rows] = await connection.execute(
+        const result = await pool.query(
           `SELECT 
-             User.id, 
-             User.name, 
-             User.avatar,
-             User.lastname, 
-             User.username, 
-             role.id AS roleId, 
-             role.name AS roleName
-           FROM User
-           JOIN role ON User.roleId = role.id
-           WHERE User.id = ?`,
+             "User".id, 
+             "User".name, 
+             "User".avatar,
+             "User".lastname, 
+             "User".username, 
+             "role".id AS roleId, 
+             "role".name AS roleName
+           FROM "User"
+           JOIN "role" ON "User"."roleId" = "role".id
+           WHERE "User".id = $1`,
           [token.id] // id que guardamos en el JWT
         );
-
+        
+ const rows = result.rows; 
         const dbUser = rows[0];
         if (!dbUser) {
           // Si no se encuentra, podría ser que el usuario haya sido borrado.
@@ -149,9 +142,7 @@ export const authOptions = {
       } catch (error) {
         console.error("Error al refrescar la sesión:", error);
       } finally {
-        if (connection) {
-          await connection.end();
-        }
+        
       }
 
       return session;

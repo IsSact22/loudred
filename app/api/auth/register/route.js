@@ -1,4 +1,4 @@
-import mysql from "mysql2/promise";
+import { Pool } from "pg";
 import bcrypt from "bcryptjs";
 
 
@@ -48,19 +48,18 @@ export async function POST(req) {
       );
     }
 
-    // Crear una conexión a la base de datos
-    const connection = await mysql.createConnection({
+    const pool = new Pool({
       host: process.env.DB_HOST,
       user: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
+      port: process.env.DB_PORT,
     });
-
-    // Verificar si el usuario ya existe
-    const [existingUser] = await connection.execute(
-      "SELECT * FROM User WHERE username = ?",
+    const {rows: existingUser} = await pool.query(
+      'SELECT * FROM "User" WHERE "username" = $1',
       [username]
     );
+    
     if (existingUser.length > 0) {
       await connection.end(); // Cerrar conexión
       return new Response(
@@ -70,8 +69,8 @@ export async function POST(req) {
     }
 
     // Obtener el roleId para el rol "USER"
-    const [role] = await connection.execute(
-      "SELECT id FROM role WHERE name = ?",
+    const {rows: role} = await pool.query(
+      "SELECT id FROM role WHERE name = $1",
       ["USER"]
     );
     if (role.length === 0) {
@@ -85,13 +84,13 @@ export async function POST(req) {
 
     // Crear el usuario con contraseña encriptada
     const hashedPassword = await bcrypt.hash(password, 10);
-    await connection.execute(
-      "INSERT INTO User (name, lastname, username, password, roleId) VALUES (?, ?, ?, ?, ?)",
+    await pool.query(
+      'INSERT INTO "User" ("name", "lastname", "username", "password", "roleId") VALUES ($1, $2, $3, $4, $5)',
       [name, lastname, username, hashedPassword, roleId]
     );
 
     // Cerrar la conexión
-    await connection.end();
+    await pool.end();
 
     return new Response(
       JSON.stringify({ message: "Usuario registrado exitosamente" }),

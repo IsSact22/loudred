@@ -3,22 +3,22 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model role {
   id   Int    @id @default(autoincrement())
-  name String @db.VarChar(100) @unique
+  name String  @unique
   User User[] // Relación uno a muchos
 }
 
 model User {
   id         Int       @id @default(autoincrement())
-  name       String    @db.VarChar(100)
-  lastname   String    @db.VarChar(100)
-  username   String    @unique(map: "user") @db.VarChar(255)
-  password   String    @db.VarChar(255)
+  name       String    
+  lastname   String    
+  username   String    @unique(map: "user") 
+  password   String    
   roleId     Int
   avatar     String?   @default("/avatars/default-avatar.jpg") // Establecer valor predeterminado
   role       role      @relation(fields: [roleId], references: [id])
@@ -52,7 +52,7 @@ model categories {
 
 model Image {
   id       Int      @id @default(autoincrement())
-  fileName String   @db.VarChar(255)
+  fileName String   
   songId   Int
   userId   Int
   song     Songs    @relation(fields: [songId], references: [id], onDelete: Cascade)
@@ -61,7 +61,7 @@ model Image {
 
 model Music {
   id       Int      @id @default(autoincrement()) 
-  fileName String   @db.VarChar(255)
+  fileName String   
   songId   Int
   userId   Int
   song     Songs    @relation(fields: [songId], references: [id], onDelete: Cascade)
@@ -70,7 +70,7 @@ model Music {
 
 model Playlist {
   id      Int      @id @default(autoincrement())
-  name    String   @db.VarChar(255)
+  name    String   
   userId  Int      // Clave foránea hacia el modelo User
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   Songs   Songs[]  @relation("PlaylistSongs")

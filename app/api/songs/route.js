@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import mysql from "mysql2/promise";
+import { Pool } from "pg";
 // import { v4 as uuidv4 } from "uuid";
 // import { writeFile } from "fs/promises";
 // import path from "path";
@@ -7,7 +7,14 @@ import mysql from "mysql2/promise";
 // import { buffer } from "stream/consumers";
 
 const prisma = new PrismaClient();
-
+// Configurar pool de conexiones global
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  port: process.env.DB_PORT,
+});
 // Subir canciones, imágenes y audios (música)
 export async function POST(req) {
   try {
@@ -48,23 +55,15 @@ export async function POST(req) {
       );
     }
 
-    // Conexión a la base de datos MySQL
-    const connection = await mysql.createConnection({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
-    });
-
+  
     // Validar canción duplicada
-    const [existingSong] = await connection.execute(
-      "SELECT * FROM Songs WHERE title = ?",
+    const [existingSong] = await pool.query(
+      "SELECT * FROM \"Songs\" WHERE title = $1",
       [title]
     );
     console.log("Canción existente:", existingSong);
 
     if (existingSong.length > 0) {
-      await connection.end();
       return new Response(
         JSON.stringify({ message: "La canción ya existe." }),
         { status: 409, headers: { "Content-Type": "application/json" } }
@@ -237,32 +236,27 @@ export async function POST(req) {
 
 export async function GET(req) {
   try {
-    // Conexión a la base de datos
-    const connection = await mysql.createConnection({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
-    });
+    
 
-    const [songs] = await connection.execute(`
+    const [songs] = await pool.query(`
       SELECT 
-        Songs.id AS songId,
-        Songs.title,
-        Songs.validate,
-        Songs.createdAt,
-        Songs.userId,
-        Songs.categoryId,
+        "Songs".id AS songId,
+        "Songs".title,
+        "Songs".validate,
+        "Songs"."createdAt",
+        "Songs"."userId",
+        "Songs"."categoryId",
         categories.name AS categoryName,
-        Image.fileName AS imageFileName,
-        Music.fileName AS musicFileName
-      FROM Songs
-      LEFT JOIN categories ON Songs.categoryId = categories.id
-      LEFT JOIN Image ON Songs.id = Image.songId
-      LEFT JOIN Music ON Songs.id = Music.songId
+        Image.filename AS ImageFileName,
+        Music.filename AS MusicFileName
+      FROM "Songs"
+      LEFT JOIN categories ON "Songs"."categoryId" = categories.id
+      LEFT JOIN "Image" ON "Songs".id = "Image"."songId"
+      LEFT JOIN Music ON "Songs".id = Music."songId"
     `);
+    
 
-    await connection.end();
+    await pool.end();
 
     if (songs.length === 0) {
       return new Response(
