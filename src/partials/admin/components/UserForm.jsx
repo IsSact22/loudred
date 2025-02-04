@@ -13,6 +13,12 @@ export default function UserForm({ register, onSubmit, onError, handleSubmit, is
         <Label htmlFor="lastname">Apellido</Label>
         <Input id="lastname" {...register("lastname")} required />
       </div>
+      {!isEditing && (
+        <div>
+          <Label htmlFor="username">Usuario</Label>
+          <Input id="username" {...register("username")} required />
+        </div>
+      )}
       <div>
         <Label htmlFor="password">Contraseña</Label>
         <Input

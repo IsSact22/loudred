@@ -18,14 +18,14 @@ export default function FavoritesPage() {
   );
   const [favoriteSongs, setFavoriteSongs] = useState([]);
 
-  // Usar acciones del store correctamente
+  // Acciones del store
   const { playSong, setPlaylist } = usePlayerActions();
   const { currentSong, isPlaying } = usePlayerStore();
 
   useEffect(() => {
     if (data?.songs) {
       setFavoriteSongs(data.songs);
-      // // Actualizar la playlist del reproductor si es la misma lista
+      // Si se desea, se puede establecer la playlist de favoritos al cargar la página:
       // setPlaylist(data.songs);
     }
   }, [data, setPlaylist]);
@@ -97,6 +97,9 @@ export default function FavoritesPage() {
                 isPlaying={currentSong?.id === song.id && isPlaying}
                 onPlay={() => {
                   try {
+                    // Si la playlist actual es diferente, se actualiza a la de favoritos
+                    setPlaylist(favoriteSongs);
+                    // Luego se reproduce la canción haciendo que la playlist sea la de favoritos
                     playSong(song, favoriteSongs);
                   } catch (error) {
                     toast.error("Error al reproducir la canción");
