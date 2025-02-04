@@ -51,8 +51,8 @@ const SongCarousel = ({ songs }) => {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="bg-slate-50 hover:bg-slate-200" />
-      <CarouselNext className="bg-slate-50 hover:bg-slate-200" />
+      <CarouselPrevious className="bg-slate-50" />
+      <CarouselNext className="bg-slate-50" />
     </Carousel>
   );
 };
