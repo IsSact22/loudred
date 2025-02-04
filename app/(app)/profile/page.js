@@ -110,7 +110,7 @@ export default function ProfilePage() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-4 mr-10">
+          <div className="space-y-4">
             {userSongs.map((song) => (
               <PlaylistCard
                 key={song.id}
