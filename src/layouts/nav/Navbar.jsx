@@ -16,11 +16,17 @@ export default function Navbar({ color, color2, shadow, shadow2, imageSrc }) {
     return () => clearTimeout(timeout);
   }, [imageSrc]);
 
+  // Función para manejar el clic en la imagen
+  const handleClick = () => {
+    router.push("/auth/login"); // Redirige a la ruta /auth/login
+  };
+
   return (
     <nav
       className={`absolute w-full flex justify-between items-center p-2 ${color} shadow-lg ${shadow} transition-colors ease-in-out duration-500`}
     >
       <div className="flex items-center p-2">
+      <Link href="/auth/login">
         <Image
           src={currentSrc}
           alt="Logo"
@@ -30,6 +36,7 @@ export default function Navbar({ color, color2, shadow, shadow2, imageSrc }) {
             fade ? "opacity-0" : "opacity-100"
           }`}
         />
+    </Link>
       </div>
       <ul className="flex space-x-6 list-none">
         <motion.li
@@ -38,7 +45,7 @@ export default function Navbar({ color, color2, shadow, shadow2, imageSrc }) {
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >
           <Link
-            href="/auth/register"
+            href="/auth/about"
             className={`p-1.5 ${color2} text-white rounded-xl shadow-lg ${shadow2} transition-colors ease-in-out duration-500`}
           >
             Sobre nosotros

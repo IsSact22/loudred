@@ -138,7 +138,8 @@ export async function DELETE(req, { params }) {
         SELECT 
           s.id, 
           s.title, 
-          s.userId, 
+          s.userId,
+          u.username AS username, 
           s.categoryId, 
           c.name AS categoryName, 
           s.validate, 
@@ -149,6 +150,7 @@ export async function DELETE(req, { params }) {
         LEFT JOIN categories c ON s.categoryId = c.id
         LEFT JOIN Image i ON s.id = i.songId
         LEFT JOIN Music m ON s.id = m.songId
+        LEFT JOIN \`user\` u ON s.userId = u.id
         WHERE s.id = ?
         `,
         [songId]
@@ -171,8 +173,9 @@ export async function DELETE(req, { params }) {
         id: song.id,
         title: song.title,
         userId: song.userId,
+        username: song.username,
         categoryId: song.categoryId,
-        categoryName: song.categoryName || null,
+        categoryName: song.categoryName,
         validate: song.validate,
         createdAt: song.createdAt,        
         image: song.imageFileName ? `${song.imageFileName}` : null,

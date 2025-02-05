@@ -12,7 +12,7 @@ const SongCard = ({ image, title, artist, onClick, songId, className }) => {
       {/* Contenido del card */}
       <div className="p-2 text-white">
         <h3 className="text-sm font-semibold truncate">{title}</h3>
-        <p className="text-xs text-purple-300 truncate">{artist}</p>
+        <p className="text-xs text-purple-300 mt-1 truncate">{artist}</p>
 
         {/* Ícono de "agregar a favoritos" */}
         <div className="flex justify-end mt-2">

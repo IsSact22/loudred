@@ -46,7 +46,7 @@ const SongCarousel = ({ songs }) => {
               }
               image={song.image}
               title={song.title}
-              artist={song.artist}
+              artist={song.username}
               songId={song.id}
               isActive={currentSong?.id === song.id}
               onClick={() => handlePlay(song)}

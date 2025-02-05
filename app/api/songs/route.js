@@ -220,7 +220,7 @@ export async function POST(req) {
     await connection.end();
 
     return new Response(
-      JSON.stringify({ success: true, message: "Canción y archivos guardados correctamente", song: newSong, id: newSong.id }),
+      JSON.stringify({ success: true, message: "Canción y archivos guardados correctamente", song: newSong }),
       { status: 201, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
@@ -232,9 +232,14 @@ export async function POST(req) {
   }
 }
 
+
 //función read para las canciones
+
 export async function GET(req) {
   try {
+    const url = new URL(req.url);
+    const validateParam = url.searchParams.get("validate");
+
     // Conexión a la base de datos
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
@@ -243,7 +248,7 @@ export async function GET(req) {
       database: process.env.DB_DATABASE,
     });
 
-    const [songs] = await connection.execute(`
+    let query = `
       SELECT 
         Songs.id AS songId,
         Songs.title,
@@ -260,7 +265,16 @@ export async function GET(req) {
       LEFT JOIN Image ON Songs.id = Image.songId
       LEFT JOIN Music ON Songs.id = Music.songId
       LEFT JOIN user ON Songs.userId = user.id
-    `);
+    `;
+
+    const queryParams = [];
+
+    if (validateParam !== null) {
+      query += ` WHERE Songs.validate = ?`;
+      queryParams.push(validateParam === "1" ? 1 : 0);
+    }
+
+    const [songs] = await connection.execute(query, queryParams);
 
     await connection.end();
 
@@ -277,9 +291,9 @@ export async function GET(req) {
       validate: song.validate,
       createdAt: song.createdAt,
       userId: song.userId,
-      username: song.username || null,
+      username: song.username,
       categoryId: song.categoryId,
-      categoryName: song.categoryName || null,
+      categoryName: song.categoryName,
       image: song.imageFileName ? `${song.imageFileName}` : null,
       music: song.musicFileName ? `${song.musicFileName}` : null,
     }));
