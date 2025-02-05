@@ -17,7 +17,7 @@ import toast from "react-hot-toast";
 
 export default function SongsForm() {
   const { data: session } = useSession();
-  const role = session?.user?.role.id;
+  const role = session?.user?.role?.id;
   const router = useRouter(); // Hook de Next.js para redirección
 
   const methods = useForm({
@@ -50,7 +50,10 @@ export default function SongsForm() {
         toast.success("Canción subida con éxito");
       }
 
-      toast.success("Su cancion se aprobará en las próximas 24 horas");
+      if (role === 1) {
+        toast.success("Su cancion se aprobará en las próximas 24 horas");
+      }
+      
       router.push("/"); // Redirigir al home
     } catch (error) {
       console.error(error);
