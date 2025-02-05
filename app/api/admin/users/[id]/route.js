@@ -48,7 +48,7 @@ export async function GET(req, { params }) {
 
         // Buscar el usuario por ID
         const result = await pool.query(
-          `SELECT id, name, "lastname", "username", "roleId", "avatar", "created_at"  FROM "User" WHERE "id" = $1`,
+          `SELECT "id", "name", "lastname", "username", "roleId", "avatar", "created_at"  FROM "User" WHERE "id" = $1`,
           [userId]
         );
               // Verificar si se encontró el usuario
