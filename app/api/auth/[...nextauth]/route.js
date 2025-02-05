@@ -42,7 +42,7 @@ export const authOptions = {
                "role".id AS roleId, 
                "role".name AS roleName
              FROM "User"
-             JOIN "role" ON "User"."roleId" = "role".id
+             JOIN "role" ON "User"."roleId" = "role"."id"
              WHERE "User"."username" = $1`,
             [credentials.username]
           );
@@ -113,8 +113,8 @@ export const authOptions = {
              "role".id AS roleId, 
              "role".name AS roleName
            FROM "User"
-           JOIN "role" ON "User"."roleId" = "role".id
-           WHERE "User".id = $1`,
+           JOIN "role" ON "User"."roleId" = "role"."id"
+           WHERE "User"."id" = $1`,
           [token.id] // id que guardamos en el JWT
         );
         

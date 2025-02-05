@@ -94,7 +94,7 @@ if (missingFields.length > 0) {
 
     //  **Verificar si el usuario ya existe**
     const existingUser = await client.query(
-      `SELECT id FROM "user" WHERE username = $1`,
+      `SELECT id FROM "User" WHERE username = $1`,
       [username]
     );
 
@@ -115,13 +115,13 @@ if (missingFields.length > 0) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Obtener el número total de usuarios para determinar si es SUPERADMIN o USER
-    const [usersCount] = await connection.execute("SELECT COUNT(*) AS count FROM User");
+    const [usersCount] = await pool.query(`SELECT COUNT(*) AS count FROM "User"`);
 
     // Determinar el roleId según el número de usuarios existentes
     const roleId = usersCount[0].count < 4 ? 2 : 1; // 2 es para SUPERADMIN, 1 es para USER
 
     // Obtener el roleId de la tabla `role`
-    const [role] = await connection.execute("SELECT id FROM role WHERE id = ?", [roleId]);
+    const [role] = await pool.query(`SELECT id FROM "role" WHERE "id" = $1`, [roleId]);
 
     // Si no se encuentra un role válido, devolver error
     if (!role || role.length === 0) {
@@ -129,8 +129,8 @@ if (missingFields.length > 0) {
     }
 
     // Insertar nuevo usuario con el roleId correspondiente y asignar avatar
-    await connection.execute(
-      "INSERT INTO User (name, lastname, username, password, roleId, avatar) VALUES (?, ?, ?, ?, ?, ?)",
+    await pool.query(
+      `INSERT INTO "User" (name, lastname, username, password, roleId, avatar) VALUES ($1, $2 ,$3 , $4, $5, $6)`,
       [name, lastname, username, hashedPassword, roleId, "/avatars/default-avatar.jpg"]
     );
 

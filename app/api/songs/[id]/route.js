@@ -1,11 +1,18 @@
 import { Pool } from "pg";
 
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  port: process.env.DB_PORT,
+});
 //actualizar validate de canciones
 export async function PUT(req, {params}) {
   const { id } = await params;
   const songId = id;
   const {validate} = await req.json();
-  let connection;
+ 
 
   try {
       // Validar que el valor de validate sea booleano
@@ -18,15 +25,15 @@ export async function PUT(req, {params}) {
       let updates = [];
       let values = [];
 
-      connection = await mysql.createConnection({
-          host: process.env.DB_HOST,
-          user: process.env.DB_USERNAME,
-          password: process.env.DB_PASSWORD,
-          database: process.env.DB_DATABASE,
+      const pool = new Pool({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USERNAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_DATABASE,
+        port: process.env.DB_PORT,
       });
-        
-      const [song] = await connection.execute(
-        "SELECT * FROM songs WHERE id = ?",
+      const [song] = await pool.query(
+        `SELECT * FROM "Songs" WHERE id = $1`,
         [songId] // Filtrar por el ID de la canción
       );
       
@@ -47,23 +54,23 @@ export async function PUT(req, {params}) {
         }
 
       // Verificar si el valor 'validate' es NULL, en caso de que quieras actualizarlo solo a TRUE
-      const [validates] = await connection.execute("SELECT validate FROM songs WHERE id = ?", [songId]);
+      const [validates] = await pool.query(`SELECT validate FROM "Songs" WHERE id = $1`, [songId]);
 
       if (validates.length === 0) {
           return new Response(JSON.stringify({ message: "La canción no existe" }), { status: 404 });
       }
 
       // Si la canción tiene el campo `validate` como NULL, actualizar a TRUE
-      updates.push("validate = ?");
+      updates.push("validate = $1");
       values.push(validate);
 
       // Ejecutar la consulta de actualización
-      await connection.execute(
-          `UPDATE songs SET ${updates.join(",")} WHERE id = ?`,
+      await pool.query(
+          `UPDATE "songs" SET ${updates.join(",")} WHERE id = $1`,
           [...values, songId]
       );
 
-      await connection.end();
+      await pool.end();
 
     return new Response(
       JSON.stringify({ message: "Canción actualizada exitosamente" }),
@@ -81,7 +88,7 @@ export async function DELETE(req, { params }) {
   const { id } = params;
 
   try {
-    const { rowCount } = await pool.query("DELETE FROM songs WHERE id = $1", [id]);
+    const { rowCount } = await pool.query(`DELETE FROM "songs" WHERE id = $1`, [id]);
 
     if (rowCount === 0) {
       return new Response("Canción no encontrada", { status: 404 });
@@ -118,10 +125,10 @@ export async function GET(req, { params }) {
         s.createdAt,
         i.fileName AS imageFileName,
         m.fileName AS musicFileName
-      FROM songs s
+      FROM Songs s
       LEFT JOIN categories c ON s.categoryId = c.id
-      LEFT JOIN images i ON s.id = i.songId
-      LEFT JOIN music m ON s.id = m.songId
+      LEFT JOIN Images i ON s.id = i.songId
+      LEFT JOIN Music m ON s.id = m.songId
       WHERE s.id = $1`,
       [id]
     );

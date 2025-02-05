@@ -31,7 +31,7 @@ function validateNameField(field, fieldName) {
 
 // READ UNO POR UNO CON CANCIONES QUE HAN SUBIDO
 export async function GET(req, { params }) {
-  const { id } = params;
+  const { id } = await params;
   const userId = id;
   const { search } = Object.fromEntries(new URL(req.url).searchParams);
 
@@ -48,7 +48,7 @@ export async function GET(req, { params }) {
 
         // Buscar el usuario por ID
         const result = await pool.query(
-          `SELECT "id", "name", "lastname", "username", "roleId", "avatar", "created_at"  FROM "User" WHERE "id" = $1`,
+          `SELECT id, name, "lastname", "username", "roleId", "avatar", "created_at"  FROM "User" WHERE "id" = $1`,
           [userId]
         );
               // Verificar si se encontró el usuario
@@ -62,26 +62,26 @@ export async function GET(req, { params }) {
 
         const user = result.rows[0];
         // Consultar canciones con imagen y música
-        const {rows: songs} = await pool.query(
+        const { rows: songs } = await pool.query(
           `
           SELECT 
-            Songs.id AS songId,
-            Songs.title,
-            Songs.validate,
-            Songs.createdAt,
-            Songs.categoryId,
-            categories.name AS categoryName,
-            Image.fileName AS imageFileName,
-            Music.fileName AS musicFileName
-          FROM Songs
-          LEFT JOIN categories ON Songs.categoryId = categories.id
-          LEFT JOIN Image ON Songs.id = Image.songId
-          LEFT JOIN Music ON Songs.id = Music.songId
-          WHERE Songs.userId = $1 AND Songs.title ILIKE $2
+            "Songs"."id" AS songId,
+            "Songs"."title",
+            "Songs"."validate",
+            "Songs"."createdAt",
+            "Songs"."categoryId",
+            "categories"."name" AS categoryName,
+            "Image"."fileName" AS ImageFileName,
+            "Music"."fileName" AS MusicFileName
+          FROM "Songs"
+          LEFT JOIN "categories" ON "Songs"."categoryId" = "categories"."id"
+          LEFT JOIN "Image" ON "Songs"."id" = "Image"."songId"
+          LEFT JOIN "Music" ON "Songs"."id" = "Music"."songId"
+          WHERE "Songs"."userId" = $1 AND "Songs"."title" ILIKE $2
           `,
           [userId, `%${search || ""}%`]
         );
-
+        
         const formattedSongs = songs.map((song) => ({
           songId: song.songId,
           title: song.title,
@@ -249,7 +249,7 @@ export async function POST(req, context) {
 
 //DELETE
 export async function DELETE(req, { params }) {
-  const { id } = params;
+  const { id } = await params;
   const userId = id;
 
   try {

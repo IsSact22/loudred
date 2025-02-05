@@ -57,8 +57,8 @@ export async function POST(req) {
 
   
     // Validar canción duplicada
-    const [existingSong] = await pool.query(
-      "SELECT * FROM \"Songs\" WHERE title = $1",
+    const {rows:existingSong} = await pool.query(
+      `SELECT * FROM "Songs" WHERE title = $1`,
       [title]
     );
     console.log("Canción existente:", existingSong);
@@ -216,8 +216,7 @@ export async function POST(req) {
     }
 
     // Finalizar la conexión MySQL
-    await connection.end();
-
+ 
     return new Response(
       JSON.stringify({ success: true, message: "Canción y archivos guardados correctamente", song: newSong, id: newSong.id }),
       { status: 201, headers: { "Content-Type": "application/json" } }
@@ -236,8 +235,8 @@ export async function GET(req) {
   try {
     
 
-    const [songs] = await pool.query(`
-      SELECT 
+    const {rows: songs} = await pool.query(
+      `SELECT 
         "Songs".id AS songId,
         "Songs".title,
         "Songs".validate,
@@ -245,18 +244,15 @@ export async function GET(req) {
         "Songs"."userId",
         "Songs"."categoryId",
         categories.name AS categoryName,
-        Image.fileName AS imageFileName,
-        Music.fileName AS musicFileName
-        user.username AS username
-      FROM Songs
-      LEFT JOIN categories ON Songs.categoryId = categories.id
-      LEFT JOIN Image ON Songs.id = Image.songId
-      LEFT JOIN Music ON Songs.id = Music.songId
-      LEFT JOIN user ON Songs.userId = user.id
-    `);
-    
-
-    await pool.end();
+        "Image"."fileName" AS imageFileName,
+        "Music"."fileName" AS musicFileName,
+        "User".username AS username
+      FROM "Songs"
+      LEFT JOIN categories ON "Songs"."categoryId" = categories.id
+      LEFT JOIN "Image" ON "Songs".id = "Image"."songId"
+      LEFT JOIN "Music" ON "Songs".id = "Music"."songId"
+      LEFT JOIN "User" ON "Songs"."userId" = "User".id`
+    );
 
     if (songs.length === 0) {
       return new Response(

@@ -18,7 +18,7 @@ export async function POST(req) {
           missingFields.length === 2
             ? "Todos los campos son requeridos"
             : `Los siguientes campos son requeridos: ${missingFields.join(", ")}`;
-        return createErrorResponse(errorMessage);
+        return new Response(errorMessage);
       }
   
       // Verificar si el usuario y la canción existen
@@ -47,15 +47,15 @@ export async function POST(req) {
         });
       }
   
-      // Agregar la canción a la playlist de Favoritos
       await prisma.playlist.update({
         where: { id: playlist.id },
         data: {
           Songs: {
-            connect: { id: songId },
+            connect: [{ id: songId }],
           },
         },
       });
+      
   
       return new Response(
         JSON.stringify({ message: "Canción agregada a Favoritos." }),
@@ -78,7 +78,8 @@ export async function POST(req) {
 // Obtener canciones de favoritos
 export async function GET(req) {
   try {
-      const userId = req.nextUrl.searchParams.get('userId');
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get('userId');
 
       if (!userId) {
           return new Response(
