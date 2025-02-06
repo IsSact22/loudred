@@ -149,9 +149,6 @@ export async function POST(req) {
       }
     }
 
-
-
-
     // let imagePath = null;
     // if (image) {
     //   const newImageFilename = `${uuidv4()}.${image.name.split(".").pop()}`;
@@ -220,7 +217,7 @@ export async function POST(req) {
     await connection.end();
 
     return new Response(
-      JSON.stringify({ success: true, message: "Canción y archivos guardados correctamente", song: newSong }),
+      JSON.stringify({ success: true, message: "Canción y archivos guardados correctamente", song: newSong, id: newSong.id }),
       { status: 201, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {

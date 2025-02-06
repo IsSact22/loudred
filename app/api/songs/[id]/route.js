@@ -3,80 +3,67 @@ import mysql from "mysql2/promise";
 
 //actualizar validate de canciones
 // Se cambia la lectura del body de JSON a FormData para procesar el envío desde FormData
-export async function PATCH(req, { params }) {
-  const { id } = await params;
-  const songId = id;
 
-  // Obtener FormData en lugar de JSON
+export async function POST(req, { params }) {
+  // Extraer el id sin await, ya que params ya es un objeto:
+  const { id: songId } = await params;
+
+  // Obtener el FormData de la solicitud
   const formData = await req.formData();
-  let validate = formData.get("validate");
-
-  // Convertir el valor a booleano
-  validate = validate === "true";
+  const validateValue = formData.get("validate");
+  // Convertir el valor a booleano (si no es "true", será false)
+  const validate = validateValue === "true";
 
   let connection;
 
   try {
-      // Validar que el valor de validate sea booleano (ya es booleano tras la conversión)
-      if (typeof validate !== "boolean") {
-          return new Response(JSON.stringify({ message: "El valor debe ser booleano" }), {
-              status: 400,
-          });
-      }
+    // Conectar a la base de datos
+    connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+    });
 
-      let updates = [];
-      let values = [];
-
-      connection = await mysql.createConnection({
-          host: process.env.DB_HOST,
-          user: process.env.DB_USERNAME,
-          password: process.env.DB_PASSWORD,
-          database: process.env.DB_DATABASE,
-      });
-        
-      const [song] = await connection.execute(
-        "SELECT * FROM songs WHERE id = ?",
-        [songId]
-      );
-      
-      // Validar que exista la canción
-      if (song.length === 0) {
-        return new Response(
-          JSON.stringify({ error: "No existe canción por actualizar!" }),
-          { status: 404, headers: { "Content-Type": "application/json" } }
-        );
-      }
-
-      // Verificar si el valor 'validate' es NULL, en caso de que quieras actualizarlo solo a TRUE
-      const [validates] = await connection.execute("SELECT validate FROM songs WHERE id = ?", [songId]);
-
-      if (validates.length === 0) {
-          return new Response(JSON.stringify({ message: "La canción no existe" }), { status: 404 });
-      }
-
-      updates.push("validate = ?");
-      values.push(validate);
-
-      // Ejecutar la consulta de actualización
-      await connection.execute(
-          `UPDATE songs SET ${updates.join(",")} WHERE id = ?`,
-          [...values, songId]
-      );
-
-      await connection.end();
-
+    // Verificar que la canción existe
+    const [song] = await connection.execute(
+      "SELECT * FROM songs WHERE id = ?",
+      [songId]
+    );
+    if (song.length === 0) {
       return new Response(
-          JSON.stringify({ message: "Canción actualizada exitosamente" }),
-          { status: 200 }
+        JSON.stringify({ error: "No existe canción por actualizar!" }),
+        {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        }
       );
+    }
 
-  } catch (error) {
-      console.error("Error al actualizar la canción:", error);
-      return new Response("Error interno del servidor", { status: 500 });
-  } finally {
-      if (connection) {
-          await connection.end(); // Asegurarse de cerrar la conexión al final
+    // Actualizar la canción (solo la columna "validate")
+    await connection.execute("UPDATE songs SET validate = ? WHERE id = ?", [
+      validate,
+      songId,
+    ]);
+
+    return new Response(
+      JSON.stringify({ message: "Canción actualizada exitosamente" }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
       }
+    );
+  } catch (error) {
+    console.error("Error al actualizar la canción:", error);
+    return new Response(
+      JSON.stringify({ error: "Error interno del servidor" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } finally {
+    if (connection) await connection.end();
   }
 }
 

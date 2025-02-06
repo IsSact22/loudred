@@ -39,3 +39,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 app/api/auth/Ajustes/route.js
+/public/uploads
