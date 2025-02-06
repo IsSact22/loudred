@@ -54,7 +54,7 @@ export async function PUT(req, {params}) {
         }
 
       // Verificar si el valor 'validate' es NULL, en caso de que quieras actualizarlo solo a TRUE
-      const [validates] = await pool.query(`SELECT validate FROM "Songs" WHERE id = $1`, [songId]);
+      const [validates] = await pool.query(`SELECT "validate" FROM "Songs" WHERE id = $1`, [songId]);
 
       if (validates.length === 0) {
           return new Response(JSON.stringify({ message: "La canción no existe" }), { status: 404 });
@@ -116,20 +116,22 @@ export async function GET(req, { params }) {
   try {
     const { rows } = await pool.query(
       `SELECT 
-        s.id, 
-        s.title, 
-        s.userId, 
-        s.categoryId, 
-        c.name AS categoryName, 
-        s.validate, 
-        s.createdAt,
-        i.fileName AS imageFileName,
-        m.fileName AS musicFileName
-      FROM Songs s
-      LEFT JOIN categories c ON s.categoryId = c.id
-      LEFT JOIN Images i ON s.id = i.songId
-      LEFT JOIN Music m ON s.id = m.songId
-      WHERE s.id = $1`,
+        "Songs".id, 
+        "Songs".title, 
+        "Songs".userId, 
+        "Songs".categoryId, 
+        categories.name AS categoryName, 
+        "Songs".validate, 
+        "Songs".createdAt,
+        "Image"."fileName" AS "ImageFileName",
+        "Music"."fileName" AS "MusicFileName"
+         "User"."username" AS "username" 
+      FROM "Songs" 
+      LEFT JOIN categories  ON "Songs".categoryId = categories.id
+      LEFT JOIN "Images"  ON "Songs".id = "Image"."songId"
+      LEFT JOIN "Music"  ON "Songs".id = "Music"."songId"
+      LEFT JOIN "User" ON "Songs"."userId" = "User".id
+      WHERE "Songs".id = $1`,
       [id]
     );
 

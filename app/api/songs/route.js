@@ -43,7 +43,7 @@ export async function POST(req) {
         missingFields.length===5
           ? "Todos los campos son requeridos"
           : `Los siguientes campos son requeridos: ${missingFields.join(", ")}`;
-      return createErrorResponse(errorMessage);
+      return new Response(errorMessage);
 
     }
 
@@ -237,16 +237,16 @@ export async function GET(req) {
 
     const {rows: songs} = await pool.query(
       `SELECT 
-        "Songs".id AS songId,
+        "Songs".id AS "songId",
         "Songs".title,
         "Songs".validate,
         "Songs"."createdAt",
         "Songs"."userId",
         "Songs"."categoryId",
-        categories.name AS categoryName,
-        "Image"."fileName" AS imageFileName,
-        "Music"."fileName" AS musicFileName,
-        "User".username AS username
+        categories.name AS "categoryName",
+        "Image"."fileName" AS "imageFileName",
+        "Music"."fileName" AS "musicFileName",
+        "User"."username" AS "username"
       FROM "Songs"
       LEFT JOIN categories ON "Songs"."categoryId" = categories.id
       LEFT JOIN "Image" ON "Songs".id = "Image"."songId"

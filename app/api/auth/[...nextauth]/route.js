@@ -34,12 +34,12 @@ export const authOptions = {
           const { rows } = await pool.query(
               `SELECT 
                "User".id, 
-               "User".name, 
+               "User"."name", 
                "User".lastname, 
                "User".avatar, 
-               "User".username, 
+               "User"."username", 
                "User".password, 
-               "role".id AS roleId, 
+               "role".id AS "roleId", 
                "role".name AS roleName
              FROM "User"
              JOIN "role" ON "User"."roleId" = "role"."id"
@@ -109,9 +109,9 @@ export const authOptions = {
              "User".name, 
              "User".avatar,
              "User".lastname, 
-             "User".username, 
-             "role".id AS roleId, 
-             "role".name AS roleName
+             "User"."username", 
+             "role".id AS "roleId", 
+             "role".name AS "roleName"
            FROM "User"
            JOIN "role" ON "User"."roleId" = "role"."id"
            WHERE "User"."id" = $1`,

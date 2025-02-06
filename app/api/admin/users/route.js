@@ -94,7 +94,7 @@ if (missingFields.length > 0) {
 
     //  **Verificar si el usuario ya existe**
     const existingUser = await client.query(
-      `SELECT id FROM "User" WHERE username = $1`,
+      `SELECT id FROM "User" WHERE "username" = $1`,
       [username]
     );
 

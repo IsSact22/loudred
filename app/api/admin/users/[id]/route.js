@@ -31,8 +31,7 @@ function validateNameField(field, fieldName) {
 
 // READ UNO POR UNO CON CANCIONES QUE HAN SUBIDO
 export async function GET(req, { params }) {
-  const { id } = await params;
-  const userId = id;
+  const { id: userId } = await params;
   const { search } = Object.fromEntries(new URL(req.url).searchParams);
 
   try {
@@ -47,12 +46,14 @@ export async function GET(req, { params }) {
         }
 
         // Buscar el usuario por ID
-        const result = await pool.query(
-          `SELECT "id", "name", "lastname", "username", "roleId", "avatar", "created_at"  FROM "User" WHERE "id" = $1`,
+        const userResult = await pool.query(
+          `SELECT "id", "name", "lastname", "username", "roleId", "avatar", "created_at"  
+          FROM "User" 
+          WHERE "id" = $1`,
           [userId]
         );
               // Verificar si se encontró el usuario
-        if (result.rows.length === 0) {
+        if (userResult.rows.length === 0) {
           // Si no se encuentra el usuario, retornar un error 404
           return new Response(
             JSON.stringify({ error: "Usuario no encontrado" }),
@@ -60,24 +61,25 @@ export async function GET(req, { params }) {
           );
         }
 
-        const user = result.rows[0];
+        const user = userResult.rows[0];
         // Consultar canciones con imagen y música
         const { rows: songs } = await pool.query(
           `
           SELECT 
-            "Songs"."id" AS songId,
+            "Songs"."id" AS "songId",
             "Songs"."title",
             "Songs"."validate",
             "Songs"."createdAt",
             "Songs"."categoryId",
-            "categories"."name" AS categoryName,
-            "Image"."fileName" AS ImageFileName,
-            "Music"."fileName" AS MusicFileName
+            "categories"."name" AS "categoryName",
+            "Image"."fileName" AS "ImageFileName",
+            "Music"."fileName" AS "MusicFileName"
           FROM "Songs"
           LEFT JOIN "categories" ON "Songs"."categoryId" = "categories"."id"
           LEFT JOIN "Image" ON "Songs"."id" = "Image"."songId"
           LEFT JOIN "Music" ON "Songs"."id" = "Music"."songId"
-          WHERE "Songs"."userId" = $1 AND "Songs"."title" ILIKE $2
+          WHERE "Songs"."userId" = $1 
+          AND "Songs"."title" ILIKE $2
           `,
           [userId, `%${search || ""}%`]
         );
@@ -100,7 +102,7 @@ export async function GET(req, { params }) {
           : undefined;
 
         const response = {
-          ...user[0],
+          ...user,
           songs: formattedSongs,
           message,
         };
@@ -225,7 +227,7 @@ export async function POST(req, context) {
       }
     }
 
-    const result = await pool.query('SELECT id FROM "User" WHERE id = $1', [id]);
+    const result = await pool.query('SELECT "id" FROM "User" WHERE id = $1', [id]);
     if (result.rows.length === 0) {
       return new Response(JSON.stringify({ message: "Usuario no encontrado" }), { status: 404 });
     }
@@ -235,7 +237,7 @@ export async function POST(req, context) {
     }
 
     values.push(id);
-    const updateQuery = `UPDATE "User" SET ${updates.join(", ")} WHERE id = $2${values.length}`;
+    const updateQuery = `UPDATE User SET ${updates.join(", ")} WHERE id = $1${values.length}`;
     await pool.query(updateQuery, values);
 
     return new Response(JSON.stringify({ message: "Usuario y foto de perfil actualizados exitosamente" }), { status: 200 });
