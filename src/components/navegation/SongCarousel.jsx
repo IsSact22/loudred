@@ -32,7 +32,7 @@ const SongCarousel = ({ songs }) => {
 
   return (
     <Carousel className="flex w-full max-w-6xl mt-4">
-      <CarouselContent className="flex gap-4 py-2 -ml-2">
+      <CarouselContent className="flex gap-4 py-2 ml-2">
         {sortedSongs.map((song) => (
           <CarouselItem
             key={song.id} // Mejor usar solo el ID único
@@ -46,7 +46,7 @@ const SongCarousel = ({ songs }) => {
               }
               image={song.image}
               title={song.title}
-              artist={song.artist}
+              artist={song.username}
               songId={song.id}
               isActive={currentSong?.id === song.id}
               onClick={() => handlePlay(song)}

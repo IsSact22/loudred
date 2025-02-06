@@ -33,7 +33,11 @@ export default function FavoritesPage() {
   const handleRemoveFromFavorites = async (song) => {
     try {
       // Lógica para eliminar de favoritos
-      setFavoriteSongs((prev) => prev.filter((s) => s.id !== song.id));
+      setFavoriteSongs((prev) => {
+        const updatedFavorites = prev.filter((s) => s.id !== song.id);
+        setPlaylist(updatedFavorites); // Actualizar la playlist con las canciones restantes
+        return updatedFavorites;
+      });
       toast.success("Canción eliminada de favoritos");
     } catch (error) {
       toast.error("Error al eliminar de favoritos");

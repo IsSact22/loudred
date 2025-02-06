@@ -28,7 +28,7 @@ export default function SongsForm() {
     },
   });
   const { handleSubmit } = methods;
-  const { createData, isMutating: isLoading, updateData } = useData("/songs", {}, true);
+  const { createData, isMutating: isLoading } = useData("/songs", {}, true);
 
   const onSubmit = async (data) => {
     try {
@@ -46,7 +46,7 @@ export default function SongsForm() {
       if (role === 2) {
         const updateFormData = new FormData();
         updateFormData.append("validate", "true");
-        await updateData(updateFormData, response.id);
+        await createData(updateFormData, response.id);
         toast.success("Canción subida con éxito");
       }
 

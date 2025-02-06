@@ -2,6 +2,7 @@ import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { FaRandom } from "react-icons/fa";
+import Link from "next/link";
 import { useMusicPlayer } from "@/src/hooks/useMusicPlayer";
 
 export default function MusicPlayer() {
@@ -35,11 +36,16 @@ export default function MusicPlayer() {
         <div className="uppercase tracking-wide text-xs text-red-500 font-semibold">
           {currentSong.categoryName ?? "Desconocido"}
         </div>
-        <div className="mt-1 text-sm font-medium text-white truncate">
+        <div className="mt-1 text-lg font-medium text-white truncate">
           {currentSong.title}
         </div>
         <div className="mt-1 text-sm font-medium text-white truncate">
-          {currentSong.artist}
+          <Link
+            href={`/profile/${currentSong.userId}`}
+            className="text-red-400 hover:text-red-300 mt-2 inline-block"
+          >
+            {currentSong.username}
+          </Link>
         </div>
 
         <div className="mt-3">

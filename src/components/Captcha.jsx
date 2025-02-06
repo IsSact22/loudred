@@ -41,7 +41,7 @@ export default function Captcha({ onSuccess }) {
 
   return (
     <div className="captcha">
-      <h2>Selecciona los perritos :3</h2>
+      <h2 className="font-semibold mb-2 justify-center items-center text-center">Selecciona solo los perritos</h2>
       <div className="captcha-images grid grid-cols-3 gap-2">
         {images?.map((image, index) => (
           <div
@@ -63,7 +63,7 @@ export default function Captcha({ onSuccess }) {
       </div>
       <Button
         onClick={handleSubmit}
-        className="mt-4 p-4 bg-green-500 hover:bg-green-700 text-white rounded"
+        className="mt-4 p-4  justify-items-center flex bg-green-500 hover:bg-green-700 text-white rounded"
       >
         Verificar
       </Button>

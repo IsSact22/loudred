@@ -33,7 +33,7 @@ export default function UpdateForm() {
   const { handleSubmit } = methods;
   // Cambiamos el tercer parámetro a true para enviar como multipart
   const { createData, isMutating } = useData(
-    `/admin/users/${userId}`,
+    `/admin/users`,
     {},
     false
   );

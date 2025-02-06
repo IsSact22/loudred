@@ -5,6 +5,7 @@ import React from "react";
 import { Play } from "lucide-react";
 import { HiTrash } from "react-icons/hi";
 import { toast } from "react-hot-toast";
+import FavButton from "../buttons/FavButton";
 
 export function PlaylistCard({ song, onPlay, onConfirmDelete, deleteActionLabel, deleteConfirmationMessage, isOwner }) {
   const handleDelete = () => {
@@ -46,6 +47,8 @@ export function PlaylistCard({ song, onPlay, onConfirmDelete, deleteActionLabel,
         <h2 className="text-lg font-bold">{song.title}</h2>
         <p className="text-sm text-gray-400">{song.artist}</p>
       </div>
+      {/* Solo mostrar el botón de favoritos si no es el propietario */}
+      {!isOwner && <FavButton songId={song.id} />}
 
       {/* Botón para reproducir */}
       <button
