@@ -39,7 +39,7 @@ export default function ProfileUserPage({ params }) {
       toast.error("No tienes permisos para esta acción");
       return;
     }
-
+  
     try {
       const response = await fetch(`/api/songs/${song.songId}`, {
         method: "DELETE",
@@ -47,10 +47,15 @@ export default function ProfileUserPage({ params }) {
           Authorization: `Bearer ${session?.accessToken}`,
         },
       });
-
-      if (!response.ok) throw new Error(await response.text());
-
-      setUserSongs((prev) => prev.filter((s) => s.songId !== song.songId));
+  
+      if (!response.ok) throw new Error("Error en la respuesta del servidor");
+  
+      setUserSongs((prev) => {
+        const updatedSongs = prev.filter((s) => s.songId !== song.songId);
+        setPlaylist(updatedSongs); // Actualizar la playlist con las canciones restantes
+        return updatedSongs;
+      });
+  
       toast.success("Canción eliminada correctamente");
     } catch (error) {
       console.error("Error eliminando canción:", error);

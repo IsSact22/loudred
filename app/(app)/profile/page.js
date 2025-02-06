@@ -40,7 +40,7 @@ export default function ProfilePage() {
       toast.error("Error de autenticación o canción no válida");
       return;
     }
-
+  
     try {
       const response = await fetch(`/api/songs/${song.id}`, {
         method: "DELETE",
@@ -48,16 +48,23 @@ export default function ProfilePage() {
           Authorization: `Bearer ${session.accessToken}`,
         },
       });
-
+  
       if (!response.ok) throw new Error("Error en la respuesta del servidor");
-
+  
       setUserSongs((prev) => prev.filter((s) => s.id !== song.id));
-      toast.success("Canción eliminada correctamente");
+      
+      toast.success("Canción eliminada de la playlist");
     } catch (error) {
       console.error("Error eliminando canción:", error);
       toast.error(error.message || "Error al eliminar la canción");
     }
   };
+  
+  // ✅ Llamamos `setPlaylist` después de que `userSongs` cambie
+  useEffect(() => {
+    setPlaylist(userSongs);
+  }, [userSongs, setPlaylist]);
+  
 
   if (loadingSongs) {
     return (
