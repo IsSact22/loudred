@@ -14,10 +14,7 @@ export function RemoveFavButton({ song, userId, onRemove }) {
     }
 
     try {
-      console.log(`Intentando eliminar canción con userId: ${userId}, songId: ${song.id}`);
       const response = await fetcher.delete(`/favourite`, { userId, songId: song.id });
-
-      console.log("Respuesta del servidor:", response);
       onRemove(song);
       // toast.success("Canción eliminada de favoritos.");
     } catch (error) {
