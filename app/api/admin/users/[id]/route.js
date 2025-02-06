@@ -214,7 +214,6 @@ export async function POST(req, context) {
       try{
         await writeFile(avatarUploadPath, avatarBuffer);
         avatarPath = `/avatars/${newAvatarFilename}`;
-        console.log("Avatar guardado: ", newAvatarFilename)
       }catch(error){
         console.error("Error al guardar el avatar: ", error)
         return new Response(
