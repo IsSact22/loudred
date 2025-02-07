@@ -7,7 +7,6 @@ export async function POST(req) {
     try {
       const data = await req.json(); // Obtener datos del cuerpo de la solicitud
       const { userId, songId } = data;
-      console.log("Datos recibidos:", data);
       const missingFields = [];
   
       if (!userId) missingFields.push("userId");
@@ -149,7 +148,6 @@ export async function DELETE(req) {
     }
 
     const { userId, songId } = data;
-    console.log("Datos recibidos:", data);
 
     if (!userId || !songId) {
       return new Response(

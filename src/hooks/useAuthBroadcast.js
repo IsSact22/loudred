@@ -11,7 +11,6 @@ export const useAuthBroadcast = () => {
   // Función para restaurar la pestaña a la última ruta
   const restoreTabs = () => {
     const lastRoute = sessionStorage.getItem("lastRoute") || "/";
-    console.log("Restoring to lastRoute:", lastRoute);
     setTimeout(() => {
       router.replace(lastRoute);
     }, 800);

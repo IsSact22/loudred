@@ -30,8 +30,6 @@ export async function POST(req) {
     const userId = parseInt(data.get("userId"));
     const categoryId = parseInt(data.get("categoryId"));
 
-    console.log("Datos recibidos:", { title, validate, userId, categoryId });
-
     // Validación
     const missingFields=[];
     if(!title) missingFields.push("Titulo");
@@ -61,7 +59,6 @@ export async function POST(req) {
       `SELECT * FROM "Songs" WHERE title = $1`,
       [title]
     );
-    console.log("Canción existente:", existingSong);
 
     if (existingSong.length > 0) {
       return new Response(
@@ -79,7 +76,6 @@ export async function POST(req) {
         categoryId,  // Usar categoryId como número
       },
     });
-    console.log("Canción creada:", newSong);
     
     //crear directorio donde se alojará la multimedia en caso de no tenerlo
     const fs = require('fs');
@@ -90,19 +86,6 @@ export async function POST(req) {
     const uploadsPath = path.join(process.cwd(), 'public/uploads');
     const imagesPath = path.join(uploadsPath, 'images');
     const musicsPath = path.join(uploadsPath, 'music');
-
-    const ensureDirectoryExists= (dirPath)=> {
-      if (!fs.existsSync(dirPath)){
-        fs.mkdirSync(dirPath, {recursive:true});
-        console.log(`Directorio creado correctamente: ${dirPath}`)
-      }else{
-        console.log(`El directorio ya existe: ${dirPath}`)
-      }
-    }
-
-    //Asegurar de que existen los directorios
-    ensureDirectoryExists(imagesPath);
-    ensureDirectoryExists(musicsPath);
 
     //Generar un nombre único para ambos archivos
     const uniqueFilename= uuidv4();
@@ -117,7 +100,6 @@ export async function POST(req) {
       try{
         await writeFile(imageUploadPath, imageBuffer);
         imagePath= `/uploads/images/${newImageFilename}`;
-        console.log("Imagen guardada: ", newImageFilename)
       }catch (error){
         console.error("Error al guardar la imagen: ", error)
         return new Response(
@@ -138,7 +120,6 @@ export async function POST(req) {
       try{
         await writeFile(musicUploadPath, MusicBuffer);
         musicPath=`/uploads/music/${newMusicFilename}`;
-        console.log("Audio guardado: ", newMusicFilename)
       }catch (error){
         console.error("Error al guardar el audio: ", error)
         return new Response(
@@ -162,7 +143,6 @@ export async function POST(req) {
     //   try {
     //     await writeFile(imageUploadPath, imageBuffer);
     //     imagePath = `/uploads/images/${newImageFilename}`;
-    //     console.log("Imagen guardada:", newImageFilename);
     //   } catch (error) {
     //     console.error("Error al guardar la imagen:", error);
     //     return new Response(
@@ -184,7 +164,6 @@ export async function POST(req) {
     //   try {
     //     await writeFile(musicUploadPath, audioBuffer);
     //     musicPath = `/uploads/music/${newMusicFilename}`;
-    //     console.log("Canción guardada:", newMusicFilename);
     //   } catch (error) {
     //     console.error("Error al guardar la canción:", error);
     //     return new Response(

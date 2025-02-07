@@ -215,11 +215,10 @@ export async function POST(req, context) {
 
       try {
         await writeFile(avatarUploadPath, avatarBuffer);
-        const avatarPath = `/avatars/${newAvatarFilename}`;
-        updates.push("avatar = $5");
-        values.push(avatarPath);
-      } catch (error) {
-        console.error("Error al guardar el avatar: ", error);
+        avatarPath = `/avatars/${newAvatarFilename}`;
+        console.log("Avatar guardado: ", newAvatarFilename)
+      }catch(error){
+        console.error("Error al guardar el avatar: ", error)
         return new Response(
           JSON.stringify({ success: false, message: "Error al guardar el avatar" }),
           { status: 500 }
