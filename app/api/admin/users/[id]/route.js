@@ -154,7 +154,7 @@ export async function POST(req, context) {
     let updates = [];
     let values = [];
 
-    //cambio de nombre
+    // Validar y actualizar nombre
     if (name) {
       const nameError = validateNameField(name, "Nombre");
       if (nameError) return new Response(JSON.stringify({ message: nameError }), { status: 400 });
@@ -162,7 +162,7 @@ export async function POST(req, context) {
       values.push(name);
     }
 
-    //cambio de apellido
+    // Validar y actualizar apellido
     if (lastname) {
       const lastnameError = validateNameField(lastname, "Apellido");
       if (lastnameError) return new Response(JSON.stringify({ message: lastnameError }), { status: 400 });
@@ -170,7 +170,7 @@ export async function POST(req, context) {
       values.push(lastname);
     }
 
-    //cambio de contraseña
+    // Validar y actualizar contraseña
     if (password) {
       if (password !== confirmPassword) {
         return new Response(JSON.stringify({ message: "Las contraseñas no coinciden" }), { status: 400 });
@@ -184,7 +184,7 @@ export async function POST(req, context) {
       values.push(hashedPassword);
     }
 
-    //cambio de rol
+    // Validar y actualizar rol
     if (roleId && !isNaN(roleId)) {
       const result = await pool.query('SELECT id FROM "role" WHERE id = $1', [roleId]);
       if (result.rows.length === 0) {
@@ -194,7 +194,8 @@ export async function POST(req, context) {
       values.push(roleId);
     }
 
-    //cambio de avatar
+    // Subir y actualizar avatar
+    let avatarPath = null;
     if (avatar && avatar.name) {
       const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
       const avatarExtension = avatar.name.split(".").pop().toLowerCase();
@@ -212,13 +213,12 @@ export async function POST(req, context) {
       const avatarUploadPath = path.join(uploadsPath, newAvatarFilename);
       const avatarBytes = await avatar.arrayBuffer();
       const avatarBuffer = Buffer.from(avatarBytes);
-
       try {
         await writeFile(avatarUploadPath, avatarBuffer);
         avatarPath = `/avatars/${newAvatarFilename}`;
-        console.log("Avatar guardado: ", newAvatarFilename)
-      }catch(error){
-        console.error("Error al guardar el avatar: ", error)
+        console.log("Avatar guardado: ", newAvatarFilename);
+      } catch (error) {
+        console.error("Error al guardar el avatar: ", error);
         return new Response(
           JSON.stringify({ success: false, message: "Error al guardar el avatar" }),
           { status: 500 }
@@ -226,16 +226,21 @@ export async function POST(req, context) {
       }
     }
 
-    const result = await pool.query('SELECT "id" FROM "User" WHERE id = $1', [id]);
+    // Verificar si el usuario existe
+    const result = await pool.query('SELECT "id" FROM "User" WHERE "id" = $1', [id]);
     if (result.rows.length === 0) {
       return new Response(JSON.stringify({ message: "Usuario no encontrado" }), { status: 404 });
     }
 
+    // Verificar si hay cambios
     if (updates.length === 0) {
       return new Response(JSON.stringify({ message: "No hay cambios para actualizar" }), { status: 400 });
     }
 
-    values.push(id);
+    // Actualizar datos
+    values.push(id);  // El id debe ser el último parámetro
+
+    // Construir la consulta UPDATE
     const updateQuery = `UPDATE "User" SET ${updates.join(", ")} WHERE "id" = $${values.length}`;
     await pool.query(updateQuery, values);
 
@@ -255,7 +260,7 @@ export async function DELETE(req, { params }) {
 
   try {
 
-    const [result] = await pool.query(`DELETE FROM "User" WHERE id = $1`, [userId]);
+    const [result] = await pool.query(`DELETE FROM "User" WHERE "id" = $1`, [userId]);
     
     if (result.affectedRows === 0) {
       return new Response("Usuario no encontrado", { status: 404 });
