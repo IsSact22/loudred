@@ -17,7 +17,7 @@ const AppLayout = ({ children }) => {
 
   useEffect(() => {
     setFadeIn(false); // Oculta el contenido al cambiar de página
-    const timeout = setTimeout(() => setFadeIn(true), 10); // Activa la animación después de un breve retraso
+    const timeout = setTimeout(() => setFadeIn(true), 50); // Activa la animación después de un breve retraso
 
     return () => clearTimeout(timeout);
   }, [pathname]); // Se ejecuta en cada cambio de ruta
@@ -39,16 +39,18 @@ const AppLayout = ({ children }) => {
           />
         </div>
 
-        {/* Contenido principal con transición ultra suave */}
+        {/* Contenido principal con transición */}
         <div
-          key={pathname}
-          className={`flex-1 relative overflow-y-auto transition-all duration-700 ease-out transform ${
-            fadeIn
-              ? "opacity-100 translate-y-0 blur-0"
-              : "opacity-0 translate-y-4 blur-sm"
-          }`}
+          key={pathname} // Asegura que el contenido se re-renderice al cambiar la ruta
+          className={`flex-1 relative overflow-hidden transition-all duration-700 ease-in-out`}
         >
-          {children}
+          <div
+            className={`absolute w-full h-full transition-all duration-700 ease-in-out transform ${
+              fadeIn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            }`}
+          >
+            {children}
+          </div>
         </div>
 
         {/* Sidebar derecho */}

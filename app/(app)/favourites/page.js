@@ -9,6 +9,7 @@ import { usePlayerStore, usePlayerActions } from "@/src/stores/playerStore";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 
 export default function FavoritesPage() {
   const { data: session } = useSession();
@@ -79,7 +80,9 @@ export default function FavoritesPage() {
       <header className="p-6 flex flex-col gap-4 items-start">
         <div className="flex items-center gap-3">
           <div className="text-5xl">
-            <img
+            <Image
+              width={500}
+              height={500}
               className="object-cover w-40 h-40"
               src="/assets/4ec6d19b856fe4557baf4385e90b6cf7-removebg-preview.png"
               alt="Mis favoritos"

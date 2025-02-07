@@ -98,16 +98,17 @@ export default function UpdateForm() {
             className="flex flex-col"
           >
             {/* Nuevo input para avatar */}
-            <div className="flex gap-4 mb-4">
-              <UploadInput
+            <div className="flex flex-col justify-center items-center gap-4 mb-4">
+            <UploadInput
                 name="avatar"
                 label="Avatar"
                 labelClass="text-purple-900"
                 accept="image/jpeg, image/png"
                 maxSize={10 * 1024 * 1024} // 10MB
-                containerClass="mb-6"
+                containerClass="mb-2"
                 className="text-purple-900"
               />
+              <h2 className="text-red-400 font-semibold">Puedes cambiar aquí tu foto de perfil</h2>
             </div>
 
             <div className="flex gap-4 mb-4">
@@ -158,7 +159,8 @@ export default function UpdateForm() {
                 type="submit"
                 isLoading={isMutating}
                 disabled={isMutating}
-                padding="p-8"
+                className="w-48 p-4"  // Asegura que el botón ocupe todo el ancho disponible
+
               />
             </div>
           </form>

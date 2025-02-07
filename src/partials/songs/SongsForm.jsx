@@ -140,7 +140,7 @@ export default function SongsForm() {
                 type="submit"
                 isLoading={isLoading}
                 disabled={isLoading}
-                padding="p-4"
+                className="w-64 p-4"  // Asegura que el botón ocupe todo el ancho disponible
               />
             </div>
           </form>
