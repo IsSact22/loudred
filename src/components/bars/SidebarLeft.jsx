@@ -18,20 +18,16 @@ import {
   HiOutlineViewGridAdd,
 } from "react-icons/hi";
 
-const SidebarLeft = ({isOpen, setIsOpen}) => {
+const SidebarLeft = ({ isOpen, setIsOpen }) => {
   const pathname = usePathname(); // Detecta la ruta actual
   const { data: session } = useSession();
   const userRoleId = session?.user?.role?.id;
 
-  //const [isOpen, setIsOpen] = useState(true);
-
-  // Opciones del menú
   const menuItems = [
     { name: "Inicio", path: "/", icon: <HiHome /> },
     { name: "Perfil", path: "/profile", icon: <HiUser /> },
     { name: "Favoritos", path: "/favourites", icon: <HiOutlineHeart /> },
     { name: "Subir", path: "/upload", icon: <HiOutlineCloudUpload /> },
-    // Importante: la barra inicial
     { name: "Ajustes", path: "/settings", icon: <HiOutlineCog /> },
     ...(userRoleId === 2
       ? [
@@ -72,7 +68,6 @@ const SidebarLeft = ({isOpen, setIsOpen}) => {
 
   return (
     <div className="absolute top-0">
-      {/* Sidebar */}
       <div
         className={`bg-gradient-to-b from-purple-900 to-purple-950 text-white h-screen transition-all duration-300 ${
           isOpen ? "w-64" : "w-16"
@@ -107,7 +102,7 @@ const SidebarLeft = ({isOpen, setIsOpen}) => {
                     <button
                       key={item.key}
                       onClick={handleLogout}
-                      className="flex items-center px-4 py-2 w-full text-lg transition-all rounded relative hover:bg-purple-800"
+                      className="flex items-center px-4 py-2 w-full text-lg transition-all duration-300 ease-in-out transform rounded hover:bg-purple-800 hover:scale-105"
                     >
                       <span className="text-xl">{item.icon}</span>
                       <span className="ml-4">{item.name}</span>
@@ -119,8 +114,8 @@ const SidebarLeft = ({isOpen, setIsOpen}) => {
                   <Link
                     key={item.path}
                     href={item.path}
-                    className={`flex items-center px-4 py-2 text-lg transition-all rounded hover:bg-purple-800 ${
-                      pathname === item.path ? "bg-red-500 text-white" : ""
+                    className={`flex items-center px-4 py-2 text-lg transition-all duration-300 ease-in-out transform rounded hover:bg-purple-800 hover:scale-105 ${
+                      pathname === item.path ? "bg-red-500 text-white scale-105 shadow-lg" : ""
                     }`}
                   >
                     <span className="text-xl">{item.icon}</span>
@@ -132,7 +127,6 @@ const SidebarLeft = ({isOpen, setIsOpen}) => {
           </div>
         )}
       </div>
-      
     </div>
   );
 };

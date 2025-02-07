@@ -9,6 +9,7 @@ import { usePlayerStore, usePlayerActions } from "@/src/stores/playerStore";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 
 export default function FavoritesPage() {
   const { data: session } = useSession();
@@ -25,17 +26,19 @@ export default function FavoritesPage() {
   useEffect(() => {
     if (data?.songs) {
       setFavoriteSongs(data.songs);
-      // Si se desea, se puede establecer la playlist de favoritos al cargar la página:
-      // setPlaylist(data.songs);
     }
-  }, [data, setPlaylist]);
+  }, [data]);
+
+  // Usamos useEffect para actualizar la playlist solo cuando favoriteSongs cambia
+  useEffect(() => {
+    setPlaylist(favoriteSongs);
+  }, [favoriteSongs, setPlaylist]);
 
   const handleRemoveFromFavorites = async (song) => {
     try {
       // Lógica para eliminar de favoritos
       setFavoriteSongs((prev) => {
         const updatedFavorites = prev.filter((s) => s.id !== song.id);
-        setPlaylist(updatedFavorites); // Actualizar la playlist con las canciones restantes
         return updatedFavorites;
       });
       toast.success("Canción eliminada de favoritos");
@@ -57,12 +60,29 @@ export default function FavoritesPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white p-6">
+        <div className="text-red-400 text-xl mb-4">Error cargando favoritos</div>
+        <button
+          className="text-red-300 hover:text-red-400"
+          onClick={() => window.location.reload()}
+        >
+          Intentar nuevamente
+        </button>
+      </div>
+    );
+  }
+
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <header className="p-6 flex flex-col gap-4 items-start">
         <div className="flex items-center gap-3">
           <div className="text-5xl">
-            <img
+            <Image
+              width={500}
+              height={500}
               className="object-cover w-40 h-40"
               src="/assets/4ec6d19b856fe4557baf4385e90b6cf7-removebg-preview.png"
               alt="Mis favoritos"

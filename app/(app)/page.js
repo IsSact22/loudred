@@ -5,8 +5,10 @@ import SongCarousel from "@/src/components/navegation/SongCarousel";
 import UserCarousel from "@/src/components/navegation/UserCarousel";
 // React
 import React from "react";
+import { useEffect } from "react";
 // Hooks
 import { useData } from "@/src/hooks/useData";
+import { usePlayerActions } from "@/src/stores/playerStore";
 
 export default function Home() {
   //const { data: session } = useSession();
@@ -15,7 +17,7 @@ export default function Home() {
     data: songData = {},
     isLoading: loadingSongs,
     error: errorSongs,
-  } = useData("/songs");
+  } = useData("/songs?validate=1");
   const songs = songData.songs ?? [];
 
   //Obtener los usuarios desde la api
@@ -30,6 +32,17 @@ export default function Home() {
   const handleSearch = (query) => {
     console.log("Buscando:", query);
   };
+
+    // Acciones del store
+    const { setPlaylist } = usePlayerActions();
+
+    useEffect(() => {
+      // Establecer la playlist en el store cuando las canciones cargan
+      if (songs.length > 0) {
+        setPlaylist(songs);
+      }
+    }, [songs, setPlaylist]);
+  
 
   return (
     <div className="flex h-screen bg-slate-950 flex-1 flex-col  justify-start p-6">

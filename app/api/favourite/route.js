@@ -136,18 +136,10 @@ export async function GET(req) {
 
 export async function DELETE(req) {
   try {
-    let data;
-    try {
-      data = await req.json(); // Intentar parsear el JSON
-    } catch (error) {
-      console.error("Error al parsear JSON:", error);
-      return new Response(
-        JSON.stringify({ error: "Formato de solicitud inválido" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
+    const url = new URL(req.url);
+    const userId = Number(url.searchParams.get("userId"));
+    const songId = Number(url.searchParams.get("songId"));
 
-    const { userId, songId } = data;
 
     if (!userId || !songId) {
       return new Response(
@@ -155,7 +147,6 @@ export async function DELETE(req) {
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
-
     // Verificar si el usuario y la canción existen
     const user = await prisma.user.findUnique({ where: { id: userId } });
     const song = await prisma.songs.findUnique({ where: { id: songId } });
@@ -205,7 +196,7 @@ export async function DELETE(req) {
     );
 
   } catch (error) {
-    console.error("Error interno del servidor:", error);
+    console.error("Error en la operación de Prisma:", error);
     return new Response(
       JSON.stringify({ error: "Error interno del servidor." }),
       { status: 500, headers: { "Content-Type": "application/json" } }

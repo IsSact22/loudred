@@ -7,7 +7,7 @@ import { useData } from "@/src/hooks/useData";
 import { useState, useEffect } from "react";
 
 export default function VerificationPage() {
-  const { data = [], updateData, deleteData } = useData("/songs");
+  const { data = [], createData, deleteData } = useData("/songs");
 
   const songs = data.songs || [];
 
@@ -30,7 +30,7 @@ export default function VerificationPage() {
     Object.entries(payload).forEach(([key, value]) => {
       formData.append(key, value);
     });
-    await updateData(formData, song.id);
+    await createData(formData, song.id);
     toast.success("Canción aprobada exitosamente");
   };
 

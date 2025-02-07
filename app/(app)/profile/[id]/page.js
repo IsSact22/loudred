@@ -30,8 +30,8 @@ export default function ProfileUserPage({ params }) {
     if (userData) {
       setUser(userData);
       setUserSongs(userData.songs || []);
-      // No se setea la playlist aquí para forzar el cambio solo al hacer click
-      // setPlaylist(userData.songs || []);
+      // Actualizar la playlist en el store con las canciones del usuario
+      setPlaylist(userData.songs || []);
     }
   }, [userData, setPlaylist]);
 
@@ -40,7 +40,7 @@ export default function ProfileUserPage({ params }) {
       toast.error("No tienes permisos para esta acción");
       return;
     }
-  
+
     try {
       const response = await fetch(`/api/songs/${song.songId}`, {
         method: "DELETE",
@@ -48,15 +48,16 @@ export default function ProfileUserPage({ params }) {
           Authorization: `Bearer ${session?.accessToken}`,
         },
       });
-  
+
       if (!response.ok) throw new Error("Error en la respuesta del servidor");
-  
+
+      // Eliminar la canción de la lista de canciones del usuario
       setUserSongs((prev) => {
         const updatedSongs = prev.filter((s) => s.songId !== song.songId);
         setPlaylist(updatedSongs); // Actualizar la playlist con las canciones restantes
         return updatedSongs;
       });
-  
+
       toast.success("Canción eliminada correctamente");
     } catch (error) {
       console.error("Error eliminando canción:", error);
@@ -127,10 +128,10 @@ export default function ProfileUserPage({ params }) {
       </header>
 
       <main className="p-6">
-        <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 pb-2">
-          Canciones de {user.username} ({userSongs.length})
-        </h2>
-
+      <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 pb-2 flex items-center">
+        Canciones de {user.username}:
+        <p className="text-red-400 ml-2">{userSongs.length}</p>
+      </h2>
         {userSongs.length === 0 ? (
           <div className="text-gray-400">
             <p>Este usuario aún no ha subido canciones</p>
