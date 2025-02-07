@@ -3,7 +3,7 @@ import { existsSync, mkdirSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import path from 'path';
 import bcrypt from "bcryptjs"; // bcryptjs es más compatible con Next.js
-
+import crypto from 'crypto';
 
 // Configurar conexión a PostgreSQL
 const pool = new Pool({
@@ -72,8 +72,8 @@ export async function GET(req, { params }) {
             "Songs"."createdAt",
             "Songs"."categoryId",
             "categories"."name" AS "categoryName",
-            "Image"."fileName" AS "ImageFileName",
-            "Music"."fileName" AS "MusicFileName"
+            "Image"."fileName" AS "imageFileName",
+            "Music"."fileName" AS "musicFileName"
           FROM "Songs"
           LEFT JOIN "categories" ON "Songs"."categoryId" = "categories"."id"
           LEFT JOIN "Image" ON "Songs"."id" = "Image"."songId"
@@ -236,7 +236,7 @@ export async function POST(req, context) {
     }
 
     values.push(id);
-    const updateQuery = `UPDATE User SET ${updates.join(", ")} WHERE id = $1${values.length}`;
+    const updateQuery = `UPDATE "User" SET ${updates.join(", ")} WHERE "id" = $${values.length}`;
     await pool.query(updateQuery, values);
 
     return new Response(JSON.stringify({ message: "Usuario y foto de perfil actualizados exitosamente" }), { status: 200 });

@@ -66,7 +66,7 @@ export async function PUT(req, {params}) {
 
       // Ejecutar la consulta de actualización
       await pool.query(
-          `UPDATE "songs" SET ${updates.join(",")} WHERE id = $1`,
+          `UPDATE "Songs" SET ${updates.join(",")} WHERE id = $1`,
           [...values, songId]
       );
 
@@ -85,10 +85,10 @@ export async function PUT(req, {params}) {
 
 //borrar canciones
 export async function DELETE(req, { params }) {
-  const { id } = params;
+  const { id } =await params;
 
   try {
-    const { rowCount } = await pool.query(`DELETE FROM "songs" WHERE id = $1`, [id]);
+    const { rowCount } = await pool.query(`DELETE FROM "Songs" WHERE "id" = $1`, [id]);
 
     if (rowCount === 0) {
       return new Response("Canción no encontrada", { status: 404 });

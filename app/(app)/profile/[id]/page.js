@@ -10,7 +10,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
 
 export default function ProfileUserPage({ params }) {
-  const { id } = React.use(params); // Asumiendo que params ya tiene la propiedad id
+ 
+  const { id } = React.use(params);// Asumiendo que params ya tiene la propiedad id
   const { data: session } = useSession();
   const [user, setUser] = useState(null);
   const [userSongs, setUserSongs] = useState([]);
