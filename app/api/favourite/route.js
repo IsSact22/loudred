@@ -135,18 +135,10 @@ export async function GET(req) {
 
 export async function DELETE(req) {
   try {
-    let data;
-    try {
-      data = await req.json(); // Intentar parsear el JSON
-    } catch (error) {
-      console.error("Error al parsear JSON:", error);
-      return new Response(
-        JSON.stringify({ error: "Formato de solicitud inválido" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    const { userId, songId } = data;
+    // Extraer los parámetros desde la URL
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+    const songId = searchParams.get("songId");
 
     if (!userId || !songId) {
       return new Response(
@@ -155,7 +147,7 @@ export async function DELETE(req) {
       );
     }
 
-    // Verificar si el usuario y la canción existen
+    // Verificar si el usuario y la canción existen en la base de datos
     const user = await prisma.user.findUnique({ where: { id: userId } });
     const song = await prisma.songs.findUnique({ where: { id: songId } });
 
@@ -166,7 +158,7 @@ export async function DELETE(req) {
       );
     }
 
-    // Buscar la playlist de Favoritos
+    // Buscar la playlist de Favoritos del usuario
     let playlist = await prisma.playlist.findFirst({
       where: { userId, name: "Favoritos" },
       include: { Songs: true },
@@ -183,7 +175,9 @@ export async function DELETE(req) {
     const songInPlaylist = playlist.Songs.some((song) => song.id === songId);
     if (!songInPlaylist) {
       return new Response(
-        JSON.stringify({ error: "La canción no está en la lista de Favoritos." }),
+        JSON.stringify({
+          error: "La canción no está en la lista de Favoritos.",
+        }),
         { status: 404, headers: { "Content-Type": "application/json" } }
       );
     }
@@ -202,7 +196,6 @@ export async function DELETE(req) {
       JSON.stringify({ message: "Canción eliminada de Favoritos." }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
-
   } catch (error) {
     console.error("Error interno del servidor:", error);
     return new Response(
@@ -211,3 +204,4 @@ export async function DELETE(req) {
     );
   }
 }
+
