@@ -25,17 +25,19 @@ export default function FavoritesPage() {
   useEffect(() => {
     if (data?.songs) {
       setFavoriteSongs(data.songs);
-      // Si se desea, se puede establecer la playlist de favoritos al cargar la página:
-      // setPlaylist(data.songs);
     }
-  }, [data, setPlaylist]);
+  }, [data]);
+
+  // Usamos useEffect para actualizar la playlist solo cuando favoriteSongs cambia
+  useEffect(() => {
+    setPlaylist(favoriteSongs);
+  }, [favoriteSongs, setPlaylist]);
 
   const handleRemoveFromFavorites = async (song) => {
     try {
       // Lógica para eliminar de favoritos
       setFavoriteSongs((prev) => {
         const updatedFavorites = prev.filter((s) => s.id !== song.id);
-        setPlaylist(updatedFavorites); // Actualizar la playlist con las canciones restantes
         return updatedFavorites;
       });
       toast.success("Canción eliminada de favoritos");
@@ -56,6 +58,21 @@ export default function FavoritesPage() {
       </div>
     );
   }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white p-6">
+        <div className="text-red-400 text-xl mb-4">Error cargando favoritos</div>
+        <button
+          className="text-red-300 hover:text-red-400"
+          onClick={() => window.location.reload()}
+        >
+          Intentar nuevamente
+        </button>
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">

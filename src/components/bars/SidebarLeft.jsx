@@ -107,7 +107,7 @@ const SidebarLeft = ({isOpen, setIsOpen}) => {
                     <button
                       key={item.key}
                       onClick={handleLogout}
-                      className="flex items-center px-4 py-2 w-full text-lg transition-all rounded relative hover:bg-purple-800"
+                      className="flex items-center px-4 py-2 w-full text-lg transition-all duration-300 ease-in-out transform rounded hover:bg-purple-800 hover:scale-105"
                     >
                       <span className="text-xl">{item.icon}</span>
                       <span className="ml-4">{item.name}</span>
@@ -119,8 +119,8 @@ const SidebarLeft = ({isOpen, setIsOpen}) => {
                   <Link
                     key={item.path}
                     href={item.path}
-                    className={`flex items-center px-4 py-2 text-lg transition-all rounded hover:bg-purple-800 ${
-                      pathname === item.path ? "bg-red-500 text-white" : ""
+                    className={`flex items-center px-4 py-2 text-lg transition-all duration-300 ease-in-out transform rounded hover:bg-purple-800 hover:scale-105 ${
+                      pathname === item.path ? "bg-red-500 text-white scale-105 shadow-lg" : ""
                     }`}
                   >
                     <span className="text-xl">{item.icon}</span>

@@ -60,7 +60,7 @@ export default function ProfilePage() {
     }
   };
   
-  // ✅ Llamamos `setPlaylist` después de que `userSongs` cambie
+  // Llamamos `setPlaylist` después de que `userSongs` cambie
   useEffect(() => {
     setPlaylist(userSongs);
   }, [userSongs, setPlaylist]);
@@ -101,8 +101,9 @@ export default function ProfilePage() {
       </header>
 
       <main className="p-6">
-        <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 pb-2">
-          Mis Canciones ({userSongs.length})
+      <h2 className="text-xl font-semibold mb-4 border-b border-purple-500 pb-2 flex items-center">
+          Mis canciones
+          <p className="text-red-400 ml-2">{userSongs.length}</p>
         </h2>
 
         {userSongs.length === 0 ? (

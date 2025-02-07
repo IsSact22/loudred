@@ -45,7 +45,7 @@ const SidebarRight = () => {
                 key={`${getSongId(song)}-${index}`}
                 image={song.image || "/placeholder-song.jpg"}
                 title={song.title}
-                artist={song.artist || "Artista desconocido"}
+                artist={song.username || "Artista desconocido"}
               />
             ))
           ) : (
