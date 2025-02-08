@@ -18,7 +18,7 @@ export default function ProfilePage() {
     data: songData = {},
     isLoading: loadingSongs,
     error: errorSongs,
-  } = useData("/songs");
+  } = useData("/songs?validate=1");
 
   // Usar acciones del store
   const { playSong, setPlaylist } = usePlayerActions();

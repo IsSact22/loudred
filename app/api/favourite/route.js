@@ -195,7 +195,7 @@ export async function DELETE(req) {
     );
 
   } catch (error) {
-    console.error("Error en la operación de Prisma:", error);
+    console.error("Error interno del servidor:", error);
     return new Response(
       JSON.stringify({ error: "Error interno del servidor." }),
       { status: 500, headers: { "Content-Type": "application/json" } }

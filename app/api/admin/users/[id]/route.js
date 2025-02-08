@@ -72,7 +72,7 @@ export async function GET(req, { params }) {
           LEFT JOIN categories ON Songs.categoryId = categories.id
           LEFT JOIN Image ON Songs.id = Image.songId
           LEFT JOIN Music ON Songs.id = Music.songId
-          WHERE Songs.userId = ? AND Songs.title LIKE ?
+          WHERE Songs.userId = ? AND Songs.validate = 1 AND Songs.title LIKE ?
           `,
           [userId, `%${search || ""}%`]
         );
