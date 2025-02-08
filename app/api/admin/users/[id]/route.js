@@ -78,8 +78,7 @@ export async function GET(req, { params }) {
           LEFT JOIN "categories" ON "Songs"."categoryId" = "categories"."id"
           LEFT JOIN "Image" ON "Songs"."id" = "Image"."songId"
           LEFT JOIN "Music" ON "Songs"."id" = "Music"."songId"
-          WHERE "Songs"."userId" = $1 
-          AND "Songs"."title" ILIKE $2
+          WHERE "Songs"."userId" = $1 AND "Songs"."title" ILIKE $2
           `,
           [userId, `%${search || ""}%`]
         );
