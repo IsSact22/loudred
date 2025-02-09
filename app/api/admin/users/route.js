@@ -115,13 +115,13 @@ if (missingFields.length > 0) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Obtener el número total de usuarios para determinar si es SUPERADMIN o USER
-    const [usersCount] = await pool.query(`SELECT COUNT(*) AS count FROM "User"`);
+    const {rows:usersCount} = await pool.query(`SELECT COUNT(*) AS count FROM "User"`);
 
     // Determinar el roleId según el número de usuarios existentes
     const roleId = usersCount[0].count < 4 ? 2 : 1; // 2 es para SUPERADMIN, 1 es para USER
 
     // Obtener el roleId de la tabla `role`
-    const [role] = await pool.query(`SELECT id FROM "role" WHERE "id" = $1`, [roleId]);
+    const {rows:role} = await pool.query(`SELECT id FROM "role" WHERE "id" = $1`, [roleId]);
 
     // Si no se encuentra un role válido, devolver error
     if (!role || role.length === 0) {

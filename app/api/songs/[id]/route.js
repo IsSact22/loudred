@@ -32,7 +32,7 @@ export async function PUT(req, {params}) {
         database: process.env.DB_DATABASE,
         port: process.env.DB_PORT,
       });
-      const [song] = await pool.query(
+      const {rows:song} = await pool.query(
         `SELECT * FROM "Songs" WHERE id = $1`,
         [songId] // Filtrar por el ID de la canción
       );
@@ -46,22 +46,17 @@ export async function PUT(req, {params}) {
       }
       
   
-        // Validar que el valor de validate sea booleano
-        if (typeof validate !== "boolean") {
-            return new Response(JSON.stringify({ message: "El valor debe ser booleano" }), {
-                status: 400,
-            });
-        }
+      
 
       // Verificar si el valor 'validate' es NULL, en caso de que quieras actualizarlo solo a TRUE
-      const [validates] = await pool.query(`SELECT "validate" FROM "Songs" WHERE id = $1`, [songId]);
+      const {rows:validate} = await pool.query(`SELECT "validate" FROM "Songs" WHERE id = $1`, [songId]);
 
-      if (validates.length === 0) {
+      if (validate.length === 0) {
           return new Response(JSON.stringify({ message: "La canción no existe" }), { status: 404 });
       }
 
       // Si la canción tiene el campo `validate` como NULL, actualizar a TRUE
-      updates.push("validate = $1");
+      updates.push("validate = true");
       values.push(validate);
 
       // Ejecutar la consulta de actualización

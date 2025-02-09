@@ -48,7 +48,7 @@ export async function GET(req, { params }) {
         // Buscar el usuario por ID
         const userResult = await pool.query(
           `SELECT "id", "name", "lastname", "username", "roleId", "avatar", "created_at"  
-          FROM "User" 
+          FROM "User"
           WHERE "id" = $1`,
           [userId]
         );
@@ -62,6 +62,7 @@ export async function GET(req, { params }) {
         }
 
         const user = userResult.rows[0];
+
         // Consultar canciones con imagen y música
         const { rows: songs } = await pool.query(
           `
@@ -78,7 +79,9 @@ export async function GET(req, { params }) {
           LEFT JOIN "categories" ON "Songs"."categoryId" = "categories"."id"
           LEFT JOIN "Image" ON "Songs"."id" = "Image"."songId"
           LEFT JOIN "Music" ON "Songs"."id" = "Music"."songId"
-          WHERE "Songs"."userId" = $1  AND Songs.validate = 1 AND "Songs"."title" ILIKE $2
+          WHERE "Songs"."userId" = $1  
+          AND "Songs".validate = true
+          AND "Songs"."title" ILIKE $2
           `,
           [userId, `%${search || ""}%`]
         );
@@ -185,7 +188,7 @@ export async function POST(req, context) {
 
     // Validar y actualizar rol
     if (roleId && !isNaN(roleId)) {
-      const result = await pool.query('SELECT id FROM "role" WHERE id = $1', [roleId]);
+      const result = await pool.query('SELECT "id" FROM "role" WHERE id = $1', [roleId]);
       if (result.rows.length === 0) {
         return new Response(JSON.stringify({ message: "Role no válido" }), { status: 400 });
       }
@@ -223,6 +226,10 @@ export async function POST(req, context) {
           { status: 500 }
         );
       }
+    }
+    if (avatarPath) {
+      updates.push(`avatar = $${updates.length + 1}`);
+      values.push(avatarPath);
     }
 
     // Verificar si el usuario existe

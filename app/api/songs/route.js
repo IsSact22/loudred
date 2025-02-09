@@ -218,7 +218,7 @@ export async function GET(req) {
       `SELECT 
         "Songs".id AS "songId",
         "Songs".title,
-        "Songs".validate,
+        "Songs"."validate",
         "Songs"."createdAt",
         "Songs"."userId",
         "Songs"."categoryId",
