@@ -1,4 +1,5 @@
 import FavButton from "../buttons/FavButton";
+import Image from "next/image";
 
 const SongCard = ({ image, title, artist, onClick, songId, className }) => {
   return (
@@ -7,7 +8,12 @@ const SongCard = ({ image, title, artist, onClick, songId, className }) => {
       className={`${className} w-40 bg-slate-900 hover:bg-slate-800 rounded-lg overflow-hidden shadow-md cursor-pointer transition-transform hover:scale-105`}
     >
       {/* Imagen de la canción */}
-      <img src={image} alt={title} className="w-full h-40 object-cover" />
+      <Image
+       width={500}
+       height={500}
+       src={image}
+       alt={title} 
+       className="w-full h-40 object-cover" />
 
       {/* Contenido del card */}
       <div className="p-2 text-white">
@@ -16,7 +22,7 @@ const SongCard = ({ image, title, artist, onClick, songId, className }) => {
 
         {/* Ícono de "agregar a favoritos" */}
         <div className="flex justify-end mt-2">
-          <FavButton songId={songId} /> {/* Usamos el nuevo componente aquí */}
+          <FavButton songId={songId} />
         </div>
       </div>
     </div>

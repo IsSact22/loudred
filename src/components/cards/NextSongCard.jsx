@@ -1,11 +1,14 @@
 import React from "react";
+import Image from "next/image";
 
 export default function NextSongCard({ image, title, username}) {
   return (
     <div className="flex items-center p-4 bg-gradient-to-r from-purple-600 to-pink-500 rounded-lg shadow-lg shadow-blue-500/50">
       {/* Imagen de la canción */}
       <div className="flex-shrink-0">
-        <img
+        <Image
+          width={500}
+          height={500}
           src={image}
           alt={title}
           className="w-16 h-16 rounded-full object-cover shadow-md"

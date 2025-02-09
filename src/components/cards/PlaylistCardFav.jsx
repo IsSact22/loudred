@@ -4,6 +4,7 @@
 import React from "react";
 import { Play } from "lucide-react";
 import { RemoveFavButton } from "../buttons/RemoveFavButton";
+import Image from "next/image";
 
 export function PlaylistCard({ song, onPlay, userId, onRemove }) {
   return (
@@ -11,7 +12,9 @@ export function PlaylistCard({ song, onPlay, userId, onRemove }) {
       {/* Mostrar el botón de eliminar solo en la vista de favoritos */}
 
       {/* Imagen de la portada */}
-      <img
+      <Image
+        width={500}
+        height={500}
         src={song.image || "/placeholder.svg"}
         alt={`Portada de ${song.title}`}
         className="w-16 h-16 rounded object-cover"

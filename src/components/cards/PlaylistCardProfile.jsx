@@ -6,6 +6,7 @@ import { Play } from "lucide-react";
 import { HiTrash } from "react-icons/hi";
 import { toast } from "react-hot-toast";
 import FavButton from "../buttons/FavButton";
+import Image from "next/image";
 
 export function PlaylistCard({ song, onPlay, onConfirmDelete, deleteActionLabel, deleteConfirmationMessage, isOwner }) {
   const handleDelete = () => {
@@ -36,7 +37,9 @@ export function PlaylistCard({ song, onPlay, onConfirmDelete, deleteActionLabel,
   return (
     <div className="flex items-center p-4 bg-gray-800 rounded-lg shadow-md text-white gap-4">
       {/* Imagen de la portada */}
-      <img
+      <Image
+        width={500}
+        height={500}
         src={song.image || "/placeholder.svg"}
         alt={`Portada de ${song.title}`}
         className="w-16 h-16 rounded object-cover"

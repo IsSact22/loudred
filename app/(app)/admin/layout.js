@@ -4,7 +4,7 @@ import { TbPasswordUser } from "react-icons/tb";
 
 export default function AdminLayout({ children }) {
   return (
-    <div className="dark bg-gray-900 text-white min-h-screen bg-slate-100">
+    <div className="darkMode bg-gray-900 text-white min-h-screen">
       <nav className="bg-gray-800 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-12">
