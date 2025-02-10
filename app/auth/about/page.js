@@ -22,15 +22,23 @@ const AboutPage = () => {
           
         {/* Texto */}
         <div className="w-full md:w-1/2 mt-6 md:mt-0 md:ml-8 text-center md:text-left">
-            <h1 className="text-5xl font-bold text-pink-600 flex items-center">
-              HOLA <span className="ml-2 text-yellow-500">🔘</span>
+            <h1 className="text-7xl font-bold text-pink-600 flex items-center">
+              HOLA 
             </h1>
-            <h2 className="text-2xl font-semibold text-purple-800 mt-4">
-              ¡Somos el equipo tirapeos!
+            <h2 className="text-2xl flex font-semibold text-purple-800 mt-4">
+              ¡Somos el equipo <h2 className="ml-2 mr-2 text-pink-600">C A L I</h2> !
             </h2>
-            <p className="text-gray-700 mt-3">
-              Somos un equipo de desarrollo de la Universidad Marítima del Caribe, que con cada proyecto la partimos más.
-            </p>
+            <div className="text-slate-900 mt-3 text-justify">
+              <p className="mt-1">
+                Somos un equipo de desarrolladores de la Universidad Marítima del Caribe, que venimos trabajando juntos desde que entramos a carrera.
+              </p>
+              <p className="mt-2">
+                Este vendría siendo nuestro segundo proyecto juntos, y en cada uno de nuestros proyectos nos dedicamos a aprender nuevas tecnologías para expandir nuestros conocimientos, siempre apoyándonos entre nosotros y manteniendo una dinámica de trabajo muy amena.
+              </p>
+              <p className="mt-2">
+                Podrá este ser nuestro último proyecto a nivel académico, pero sin duda seguiremos trabajando juntos, ya que a estas alturas, somos un equipo increíble.
+              </p>
+            </div>
           </div>
         </div>
       </div>
