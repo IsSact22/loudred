@@ -15,9 +15,7 @@ const SongCarousel = ({ songs }) => {
   const currentPlaylist = usePlayerStore((state) => state.currentPlaylist);
 
   if (!songs?.length) {
-    return (
-      <div className="text-gray-400 p-4">No hay canciones disponibles</div>
-    );
+    return <div className="text-gray-400 p-4">No hay canciones disponibles</div>;
   }
 
   const sortedSongs = [...songs].sort(
@@ -25,25 +23,20 @@ const SongCarousel = ({ songs }) => {
   );
 
   const handlePlay = (song) => {
-    // Si la playlist actual es diferente, usar sortedSongs como nueva playlist
     const isDifferentPlaylist = !currentPlaylist.some((s) => s.id === song.id);
     playSong(song, isDifferentPlaylist ? sortedSongs : currentPlaylist);
   };
 
   return (
-    <Carousel className="flex w-full max-w-6xl mt-4">
-      <CarouselContent className="flex gap-1 py-2 ml-1">
+    <Carousel className="w-full max-w-6xl mt-4">
+      <CarouselContent className="py-2">
         {sortedSongs.map((song) => (
           <CarouselItem
-            key={song.id} // Mejor usar solo el ID único
-            className="w-full sm:w-1/2 md:basis-1/5 lg:basis-1/6 "
+            key={song.id}
+            className="w-full sm:basis-1/2 md:basis-1/4 lg:basis-1/6 px-1 ml-5"
           >
             <SongCard
-              className={
-                currentSong?.id === song.id
-                  ? "shadow-lg shadow-indigo-500/70"
-                  : ""
-              }
+              className={currentSong?.id === song.id ? "shadow-lg shadow-indigo-500/70" : ""}
               image={song.image}
               title={song.title}
               artist={song.username}

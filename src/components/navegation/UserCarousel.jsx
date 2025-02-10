@@ -10,36 +10,34 @@ import UserCard from "../cards/UserCard";
 import { useRouter } from "next/navigation";
 
 const UserCarousel = ({ users }) => {
-
   if (!users || !users.length) {
-    return <div>No hay usuarios disponibles</div>;
+    return <div className="text-gray-400 p-4">No hay usuarios disponibles</div>;
   }
 
-  // Ordenar usuarios del más reciente al más antiguo
   const sortedUsers = [...users].sort(
     (a, b) => new Date(b.created_at) - new Date(a.created_at)
   );
 
-  const router = useRouter()
+  const router = useRouter();
 
   return (
-    <Carousel className="flex w-full max-w-6xl mt-4">
-      <CarouselContent>
+    <Carousel className="w-full max-w-6xl mt-4">
+      <CarouselContent className="py-2">
         {sortedUsers.map((user, index) => (
           <CarouselItem
             key={`${user.id}-${index}`}
-            className="px-10 md:basis-1/5 flex-2"
+            className="w-full sm:basis-1/3 md:basis-1/4 lg:basis-1/6 px-2 ml-5"
           >
             <UserCard
               avatar={user.avatar ?? "/avatars/default-avatar.jpg"}
               username={user.username}
-              onClick={() => router.push(`/profile/${user.id}`) }
+              onClick={() => router.push(`/profile/${user.id}`)}
             />
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="bg-slate-50" />
-      <CarouselNext className="bg-slate-50" />
+      <CarouselPrevious className="bg-slate-50 hover:bg-slate-100" />
+      <CarouselNext className="bg-slate-50 hover:bg-slate-100" />
     </Carousel>
   );
 };
