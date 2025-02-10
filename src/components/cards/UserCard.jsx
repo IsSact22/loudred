@@ -18,7 +18,7 @@ const UserCard = ({ avatar, username, onClick }) => {
         </div>
   
         {/* Nombre de usuario */}
-        <p className="mt-2 text-sm text-white font-semibold truncate">{username}</p>
+        <p className="mt-4 text-sm text-white font-semibold truncate">{username}</p>
       </div>
     );
   };

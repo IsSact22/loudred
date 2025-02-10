@@ -36,7 +36,7 @@ const SongCarousel = ({ songs }) => {
         {sortedSongs.map((song) => (
           <CarouselItem
             key={song.id} // Mejor usar solo el ID único
-            className="md:basis-1/5 lg:basis-1/6 flex-shrink-0 "
+            className="w-full sm:w-1/2 md:basis-1/5 lg:basis-1/6 "
           >
             <SongCard
               className={

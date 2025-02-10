@@ -19,32 +19,90 @@ export async function GET(req) {
     }
 
     try {
-      // Búsqueda de usuarios
+      // Búsqueda de usuarios solo por nombre de usuario con información completa
       const [users] = await connection.execute(
-        `SELECT id AS userId, name, lastname, username 
+        `SELECT id, name, lastname, username, roleId, avatar, created_at 
          FROM User 
          WHERE username LIKE ?`,
         [`%${search}%`]
       );
 
-      // Búsqueda de canciones
+      // Formatear usuarios con sus canciones
+      const usersWithSongs = await Promise.all(users.map(async (user) => {
+        const [songs] = await connection.execute(
+          `SELECT 
+            Songs.id AS songId,
+            Songs.title,
+            Songs.validate,
+            Songs.createdAt,
+            Songs.categoryId,
+            categories.name AS categoryName,
+            Image.fileName AS imageFileName,
+            Music.fileName AS musicFileName
+          FROM Songs
+          LEFT JOIN categories ON Songs.categoryId = categories.id
+          LEFT JOIN Image ON Songs.id = Image.songId
+          LEFT JOIN Music ON Songs.id = Music.songId
+          WHERE Songs.userId = ?`,
+          [user.id]
+        );
+        return {
+          ...user,
+          songs: songs.map(song => ({
+            songId: song.songId,
+            title: song.title,
+            validate: song.validate,
+            createdAt: song.createdAt,
+            categoryId: song.categoryId,
+            categoryName: song.categoryName || null,
+            image: song.imageFileName ? `${song.imageFileName}` : null,
+            music: song.musicFileName ? `${song.musicFileName}` : null,
+          }))
+        };
+      }));
+
+      // Búsqueda de canciones solo por título con información completa
       const [songs] = await connection.execute(
-        `SELECT Songs.id AS songId, Songs.title AS songTitle, User.username 
-         FROM Songs 
-         LEFT JOIN User ON Songs.userId = User.id
-         WHERE Songs.title LIKE ?`,
+        `SELECT 
+          s.id, 
+          s.title, 
+          s.userId,
+          u.username AS username, 
+          s.categoryId, 
+          c.name AS categoryName, 
+          s.validate, 
+          s.createdAt,
+          i.fileName AS imageFileName,
+          m.fileName AS musicFileName
+        FROM Songs s
+        LEFT JOIN categories c ON s.categoryId = c.id
+        LEFT JOIN Image i ON s.id = i.songId
+        LEFT JOIN Music m ON s.id = m.songId
+        LEFT JOIN User u ON s.userId = u.id
+        WHERE s.title LIKE ?`,
         [`%${search}%`]
       );
 
-      // Generar mensajes en caso de que no se encuentren resultados
+      const formattedSongs = songs.map(song => ({
+        id: song.id,
+        title: song.title,
+        userId: song.userId,
+        username: song.username,
+        categoryId: song.categoryId,
+        categoryName: song.categoryName,
+        validate: song.validate,
+        createdAt: song.createdAt,        
+        image: song.imageFileName ? `${song.imageFileName}` : null,
+        music: song.musicFileName ? `${song.musicFileName}` : null,
+      }));
+
       let message;
-      if (users.length === 0 && songs.length === 0) {
+      if (usersWithSongs.length === 0 && formattedSongs.length === 0) {
         message = "No se encontraron resultados.";
       }
 
-      // Respuesta con ambos resultados
       return new Response(
-        JSON.stringify({ users, songs, message }),
+        JSON.stringify({ users: usersWithSongs, songs: formattedSongs, message }),
         { status: 200, headers: { "Content-Type": "application/json" } }
       );
     } finally {

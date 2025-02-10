@@ -60,19 +60,19 @@ export default function FavoritesPage() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-white p-6">
-        <div className="text-red-400 text-xl mb-4">Error cargando favoritos</div>
-        <button
-          className="text-red-300 hover:text-red-400"
-          onClick={() => window.location.reload()}
-        >
-          Intentar nuevamente
-        </button>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="min-h-screen bg-slate-950 text-white p-6">
+  //       <div className="text-red-400 text-xl mb-4">Error cargando favoritos</div>
+  //       <button
+  //         className="text-red-300 hover:text-red-400"
+  //         onClick={() => window.location.reload()}
+  //       >
+  //         Intentar nuevamente
+  //       </button>
+  //     </div>
+  //   );
+  // }
 
 
   return (
