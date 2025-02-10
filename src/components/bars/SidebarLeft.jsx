@@ -6,6 +6,7 @@ import { broadcastLogout } from "@/src/utils/authChannel";
 import { toast } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useSidebar } from "@/src/contexts/sidebarContext"; // 🔹 Usa el contexto
 
 // Iconos
 import {
@@ -18,9 +19,11 @@ import {
   HiOutlineViewGridAdd,
 } from "react-icons/hi";
 
-const SidebarLeft = ({ isOpen, setIsOpen }) => {
-  const pathname = usePathname(); // Detecta la ruta actual
+const SidebarLeft = () => {
+  const pathname = usePathname();
   const { data: session } = useSession();
+  const { isLeftSidebarOpen, setLeftSidebarOpen } = useSidebar(); // 🔹 Ahora lo tomamos del contexto
+
   const userRoleId = session?.user?.role?.id;
 
   const menuItems = [
@@ -30,13 +33,7 @@ const SidebarLeft = ({ isOpen, setIsOpen }) => {
     { name: "Subir", path: "/upload", icon: <HiOutlineCloudUpload /> },
     { name: "Ajustes", path: "/settings", icon: <HiOutlineCog /> },
     ...(userRoleId === 2
-      ? [
-          {
-            name: "Administrador",
-            path: "/admin",
-            icon: <HiOutlineViewGridAdd />,
-          },
-        ]
+      ? [{ name: "Administrador", path: "/admin", icon: <HiOutlineViewGridAdd /> }]
       : []),
     { name: "Salir", key: "logout", icon: <HiOutlineLogout /> },
   ];
@@ -55,10 +52,7 @@ const SidebarLeft = ({ isOpen, setIsOpen }) => {
           >
             Sí
           </button>
-          <button
-            onClick={() => toast.dismiss(t.id)}
-            className="bg-gray-500 text-white py-1 px-4 rounded"
-          >
+          <button onClick={() => toast.dismiss(t.id)} className="bg-gray-500 text-white py-1 px-4 rounded">
             No
           </button>
         </div>
@@ -70,17 +64,17 @@ const SidebarLeft = ({ isOpen, setIsOpen }) => {
     <div className="absolute top-0">
       <div
         className={`bg-gradient-to-b from-purple-900 to-purple-950 text-white h-screen transition-all duration-300 ${
-          isOpen ? "w-64" : "w-16"
+          isLeftSidebarOpen ? "w-64" : "w-16"
         } relative`}
       >
         <button
           className="absolute top-8 right-[-16px] bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg focus:outline-none z-10"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setLeftSidebarOpen(!isLeftSidebarOpen)} // 🔹 Usa `setLeftSidebarOpen`
         >
           ☰
         </button>
 
-        {isOpen && (
+        {isLeftSidebarOpen && (
           <div>
             <div className="flex items-center justify-between px-4 py-4">
               <h1 className="text-2xl font-bold">
@@ -90,7 +84,7 @@ const SidebarLeft = ({ isOpen, setIsOpen }) => {
                   width={150}
                   height={75}
                   className={`mt-4 ml-6 transition-opacity duration-300 ${
-                    !isOpen ? "opacity-0" : "opacity-100"
+                    !isLeftSidebarOpen ? "opacity-0" : "opacity-100"
                   }`}
                 />
               </h1>

@@ -2,64 +2,72 @@
 import SidebarRight from "@/src/components/bars/SidebarRight";
 import SidebarLeft from "@/src/components/bars/SidebarLeft";
 import CaptchaModal from "@/src/partials/auth/components/CaptchaModal";
-import { SidebarProvider } from "@/src/contexts/sidebarContext";
+import { SidebarProvider, useSidebar } from "@/src/contexts/sidebarContext";
 import { useCaptchaStore } from "@/src/stores/captchaStore";
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { HiMusicNote } from "react-icons/hi";
+
 
 const AppLayout = ({ children }) => {
-  const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
+  const { isLeftSidebarOpen, isRightSidebarOpen, setRightSidebarOpen, setLeftSidebarOpen } = useSidebar();
   const { showModal } = useCaptchaStore();
   const pathname = usePathname();
-
-  // Estado para manejar la animación de transición
   const [fadeIn, setFadeIn] = useState(false);
 
   useEffect(() => {
-    setFadeIn(false); // Oculta el contenido al cambiar de página
-    const timeout = setTimeout(() => setFadeIn(true), 50); // Activa la animación después de un breve retraso
-
+    setFadeIn(false);
+    const timeout = setTimeout(() => setFadeIn(true), 50);
     return () => clearTimeout(timeout);
-  }, [pathname]); // Se ejecuta en cada cambio de ruta
+  }, [pathname]);
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    <div
+      className={`grid h-screen w-full overflow-hidden transition-all duration-500 ${
+        isLeftSidebarOpen ? "grid-cols-[16rem_1fr]" : "grid-cols-[40px_1fr]"  // Aumento de la franja
+      } ${isRightSidebarOpen ? "md:grid-cols-[auto_1fr_20rem]" : "md:grid-cols-[auto_1fr]"}`}
+    >
       <CaptchaModal isOpen={showModal} />
 
-      <SidebarProvider>
-        {/* Sidebar izquierdo */}
-        <div
-          className={`relative left-0 top-0 bottom-0 z-20 h-screen transition-all duration-300 ${
-            isLeftSidebarOpen ? "w-64" : "w-16"
-          }`}
-        >
-          <SidebarLeft
-            isOpen={isLeftSidebarOpen}
-            setIsOpen={setIsLeftSidebarOpen}
-          />
-        </div>
+      {/* Sidebar izquierdo */}
+      <div
+        className={`bg-gray-900 h-full transition-all duration-300 ${isLeftSidebarOpen ? "w-64" : "w-16"} border-r border-gray-700`}
+      >
+        <SidebarLeft />
+      </div>
 
-        {/* Contenido principal con transición */}
-        <div
-          key={pathname} // Asegura que el contenido se re-renderice al cambiar la ruta
-          className={`flex-1 relative overflow-hidden transition-all duration-700 ease-in-out`}
-        >
-          <div
-            className={`absolute w-full h-full transition-all duration-700 ease-in-out transform ${
-              fadeIn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-            }`}
-          >
-            {children}
-          </div>
-        </div>
+      {/* Contenido principal con animación */}
+      <div
+        className={`relative overflow-hidden transition-all duration-700 ease-in-out ${
+          fadeIn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+        }`}
+      >
+        {children}
+      </div>
 
-        {/* Sidebar derecho */}
-        <div className="h-screen w-80 relative right-0 top-0 z-20 bg-gradient-to-b from-purple-900 to-purple-950 text-white">
+      {/* Sidebar derecho */}
+      {isRightSidebarOpen && (
+        <div className="h-full w-80 bg-gradient-to-b from-purple-900 to-purple-950 text-white fixed right-0 top-0 z-30">
           <SidebarRight />
         </div>
-      </SidebarProvider>
+      )}
+
+      {/* Botón para abrir/cerrar SidebarRight en móviles */}
+      <button
+        onClick={() => setRightSidebarOpen((prev) => !prev)} // Alterna el estado
+        className="absolute top-4 right-4 z-40 bg-red-600 text-white p-2 rounded-full md:hidden"
+      >
+        <HiMusicNote />
+
+      </button>
     </div>
   );
 };
 
-export default AppLayout;
+export default function LayoutWrapper({ children }) {
+  return (
+    <SidebarProvider>
+      <AppLayout>{children}</AppLayout>
+    </SidebarProvider>
+  );
+}

@@ -16,8 +16,7 @@ export default function AuthLayout({ children }) {
 
   useEffect(() => {
     setShowModal(true);
-  }
-  , [setShowModal]);
+  }, [setShowModal]);
 
   return (
     <div
@@ -31,7 +30,7 @@ export default function AuthLayout({ children }) {
         shadow2={isRegister ? "shadow-indigo-loud/50" : "shadow-lavender/50"}
         imageSrc={isRegister ? "/assets/loudred-logo3.png" : "/assets/loudred-logo4.png"}
       />
-      <main>{children}</main>
+      <main className="pt-16 md:pt-0 px-4">{children}</main>
     </div>
   );
 }

@@ -61,11 +61,11 @@ export default function Home() {
 
   return (
     <div className="flex h-screen bg-slate-950 flex-1 flex-col justify-start p-6">
-      <div className="w-full max-w-2xl mt-2 mb-4 ml-8">
+      <div className="w-full max-w-2xl mt-2 mb-4">
         <SearchBar onSearch={handleSearch} />
       </div>
 
-      <div className="mt-10 ml-10">
+      <div className="ml-10 mt-10">
         <p className="text-white text-2xl">Agregados recientemente</p>
         {loadingSongs || loadingSearch ? (
           <p className="mt-4 text-white">Cargando canciones...</p>
@@ -76,7 +76,7 @@ export default function Home() {
         )}
       </div>
 
-      <div className="mt-20 ml-10">
+      <div className="ml-10 mt-20">
         <p className="text-white text-2xl">Nuevos usuarios</p>
         {loadingUsers || loadingSearch ? (
           <p className="mt-4 text-white">Cargando usuarios...</p>

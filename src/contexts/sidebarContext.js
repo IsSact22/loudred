@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 // Crear contexto
 const SidebarContext = createContext();
@@ -9,6 +9,23 @@ const SidebarContext = createContext();
 export const SidebarProvider = ({ children }) => {
   const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(true);
   const [isRightSidebarOpen, setRightSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    // Ocultar ambos sidebars en móviles y mostrarlos en pantallas grandes
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setLeftSidebarOpen(false);
+        setRightSidebarOpen(false);
+      } else {
+        setLeftSidebarOpen(true);
+        setRightSidebarOpen(true);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <SidebarContext.Provider
