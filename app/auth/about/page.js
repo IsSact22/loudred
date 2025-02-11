@@ -26,7 +26,7 @@ const AboutPage = () => {
               HOLA 
             </h1>
             <h2 className="text-2xl flex font-semibold text-purple-800 mt-4">
-              ¡Somos el equipo <h2 className="ml-2 mr-2 text-pink-600">C A L I</h2> !
+              ¡Somos el equipo <span className="ml-2 mr-2 text-pink-600">C A L I</span> !
             </h2>
             <div className="text-slate-900 mt-3 text-justify">
               <p className="mt-1">
