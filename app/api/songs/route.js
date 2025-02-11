@@ -88,6 +88,19 @@ export async function POST(req) {
     const imagesPath = path.join(uploadsPath, 'images');
     const musicsPath = path.join(uploadsPath, 'music');
 
+    const ensureDirectoryExists= (dirPath)=> {
+      if (!fs.existsSync(dirPath)){
+        fs.mkdirSync(dirPath, {recursive:true});
+        console.log(`Directorio creado correctamente: ${dirPath}`)
+      }else{
+        console.log(`El directorio ya existe: ${dirPath}`)
+      }
+    }
+
+    //Asegurar de que existen los directorios
+    ensureDirectoryExists(imagesPath);
+    ensureDirectoryExists(musicsPath);
+
     //Generar un nombre único para ambos archivos
     const uniqueFilename= uuidv4();
     // Subir imagen
