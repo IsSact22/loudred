@@ -53,12 +53,12 @@ const SearchBar = ({ placeholder = "Buscar", onSearch, suggestions = [] }) => {
 
       {/* Ventanita de sugerencias */}
       {showSuggestions && query && filteredSuggestions.length > 0 && (
-        <ul className="absolute z-10 w-full mt-1 bg-red-rusty/70 shadow rounded-lg border border-gray-200">
+        <ul className="absolute z-10 w-full mt-1 bg-red-rusty/50 shadow rounded-lg border border-white overflow-hidden">
           {filteredSuggestions.map((song) => (
             <li
               key={song.id || song.title}
               onClick={() => handleSuggestionClick(song.title)}
-              className="p-2 hover:bg-white hover:text-black cursor-pointer text-white font-medium"
+              className="p-2 hover:bg-white hover:text-black cursor-pointer text-white font-medium backdrop-blur-sm"
             >
               {song.title}
             </li>
