@@ -143,7 +143,7 @@ export default function RegisterForm() {
             {/* link para iniciar sesión */}
             <p className="mt-4 text-purple-700 font-bold text-center">
               ¿Ya tienes cuenta?{' '}
-              <Link href="/auth/login" className="text-red-400 font-bold hover:underline">
+              <Link href="/auth/login" className="text-red-rusty font-bold hover:underline">
                 Inicia sesión
               </Link>
             </p>

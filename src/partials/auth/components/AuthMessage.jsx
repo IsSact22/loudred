@@ -25,7 +25,7 @@ const AuthMessage = ({ action }) => {
       <p className={`text-6xl font-semibold mb-6 ${isLogin ? "text-purple-800" : "text-white"}`}>
         contenido
       </p>
-      <p className="text-6xl text-red-rusty">
+      <p className="text-6xl text-red-rusty font-medium">
         {isLogin ? "Inicia sesión ya" : "Regístrate ahora"}
       </p>
     </div>

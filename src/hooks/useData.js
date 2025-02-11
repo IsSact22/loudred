@@ -24,7 +24,7 @@ export function useData(
     {
       onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
         if (error.status !== 404) return;
-        if (retryCount >= 2) return;
+        if (retryCount >= 1) return;
         setTimeout(() => revalidate({ retryCount }), 2000);
       },
     }
