@@ -66,7 +66,7 @@ export default function MusicPlayer() {
           <Button
             variant="outline"
             size="icon"
-            className="p-1 hover:bg-red-500/20"
+            className="p-1 hover:bg-red-500/20 hover:text-white"
             onClick={handleSkipBack}
           >
             <SkipBack className="h-3 w-3" />
@@ -74,7 +74,7 @@ export default function MusicPlayer() {
           <Button
             variant="outline"
             size="icon"
-            className="p-1 hover:bg-red-500/20"
+            className="p-1 hover:bg-red-500/20 hover:text-white"
             onClick={togglePlayPause}
           >
             {isPlaying ? (
@@ -86,7 +86,7 @@ export default function MusicPlayer() {
           <Button
             variant="outline"
             size="icon"
-            className="p-1 hover:bg-red-500/20"
+            className="p-1 hover:bg-red-500/20 hover:text-white"
             onClick={handleSkipForward}
           >
             <SkipForward className="h-3 w-3" />
