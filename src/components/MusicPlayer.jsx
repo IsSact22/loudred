@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { FaRandom } from "react-icons/fa";
 import Link from "next/link";
 import { useMusicPlayer } from "@/src/hooks/useMusicPlayer";
+import Image from "next/image";
 
 export default function MusicPlayer() {
   const {
@@ -27,7 +28,9 @@ export default function MusicPlayer() {
 
   return (
     <div className="w-full max-w-[18rem] mx-auto bg-slate-950/80 rounded-lg shadow-lg shadow-red-500/50 overflow-hidden mt-10">
-      <img
+      <Image
+        width={500}
+        height={500}
         className="w-full h-56 object-cover"
         src={currentSong.image ?? "/placeholder.svg"}
         alt={currentSong.title}

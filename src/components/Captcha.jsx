@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useData } from "@/src/hooks/useData";
 import { Button } from "@/components/ui/button";
 import { toast } from 'react-hot-toast';
+import Image from "next/image";
 
 export default function Captcha({ onSuccess }) {
   const [selectedImages, setSelectedImages] = useState(new Set());
@@ -53,7 +54,9 @@ export default function Captcha({ onSuccess }) {
                 : "border border-red-600"
             }`}
           >
-            <img
+            <Image
+              width={500}
+              height={500}
               src={image.url}
               alt={`Imagen ${index + 1}`}
               className="max-w-full max-h-full object-contain"
