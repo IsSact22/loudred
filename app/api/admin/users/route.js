@@ -36,11 +36,29 @@ export async function GET(req) {
     });
 
     // Consultar todos los usuarios
-    const [users] = await connection.execute("SELECT id, name, lastname, username, roleId, avatar, created_at FROM User");
+    const [users] = await connection.execute(
+      "SELECT id, name, lastname, username, roleId, avatar, created_at FROM User"
+    );
     await connection.end();
 
-    return new Response(JSON.stringify(users), {
+    // Definimos la URL base para servir archivos subidos mediante nuestro endpoint
+    const baseFileUrl = "/api/uploads";
+
+    // Formateamos la URL del avatar, si existe y si comienza con "/uploads"
+    const formattedUsers = users.map((user) => {
+      let formattedAvatar = user.avatar;
+      if (formattedAvatar && formattedAvatar.startsWith("/uploads")) {
+        formattedAvatar = `${baseFileUrl}${formattedAvatar.replace(
+          /^\/uploads/,
+          ""
+        )}`;
+      }
+      return { ...user, avatar: formattedAvatar };
+    });
+
+    return new Response(JSON.stringify(formattedUsers), {
       status: 200,
+      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Error al obtener usuarios:", error);

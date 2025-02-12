@@ -97,20 +97,21 @@ export async function DELETE(req, { params }) {
     }
   }
 
-//get de una sola canción
-  export async function GET(req, {params}) {
+  //get de una sola canción
+  export async function GET(req, { params }) {
+    // Extraer el id sin await, ya que params ya es un objeto
     const { id } = await params;
     const songId = id;
-  
+
     try {
-      // Configuración de conexión a la base de datos
+      // Conexión a la base de datos
       const connection = await mysql.createConnection({
         host: process.env.DB_HOST,
         user: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE,
       });
-  
+
       // Validación del ID de la canción
       if (!songId || isNaN(Number(songId))) {
         return new Response(
@@ -118,44 +119,46 @@ export async function DELETE(req, { params }) {
           { status: 400, headers: { "Content-Type": "application/json" } }
         );
       }
-  
+
       // Consultar la canción por ID con su categoría, imagen y música
       const [songResult] = await connection.execute(
         `
-        SELECT 
-          s.id, 
-          s.title, 
-          s.userId,
-          u.username AS username, 
-          s.categoryId, 
-          c.name AS categoryName, 
-          s.validate, 
-          s.createdAt,
-          i.fileName AS imageFileName,
-          m.fileName AS musicFileName
-        FROM Songs s
-        LEFT JOIN categories c ON s.categoryId = c.id
-        LEFT JOIN Image i ON s.id = i.songId
-        LEFT JOIN Music m ON s.id = m.songId
-        LEFT JOIN \`user\` u ON s.userId = u.id
-        WHERE s.id = ?
-        `,
+      SELECT 
+        s.id, 
+        s.title, 
+        s.userId,
+        u.username AS username, 
+        s.categoryId, 
+        c.name AS categoryName, 
+        s.validate, 
+        s.createdAt,
+        i.fileName AS imageFileName,
+        m.fileName AS musicFileName
+      FROM Songs s
+      LEFT JOIN categories c ON s.categoryId = c.id
+      LEFT JOIN Image i ON s.id = i.songId
+      LEFT JOIN Music m ON s.id = m.songId
+      LEFT JOIN \`user\` u ON s.userId = u.id
+      WHERE s.id = ?
+      `,
         [songId]
       );
-  
+
       if (songResult.length === 0) {
         await connection.end();
-        return new Response(
-          JSON.stringify({ error: "La canción no existe" }),
-          { status: 404, headers: { "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ error: "La canción no existe" }), {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        });
       }
-  
+
       const song = songResult[0];
-  
       await connection.end();
-  
-      // Estructurar la respuesta
+
+      // Definir la URL base para servir archivos (endpoint que lee archivos dinámicos)
+      const baseFileUrl = "/api/uploads";
+
+      // Formatear la ruta de imagen y música, removiendo el prefijo "/uploads" y concatenándolo con la URL base.
       const response = {
         id: song.id,
         title: song.title,
@@ -164,11 +167,15 @@ export async function DELETE(req, { params }) {
         categoryId: song.categoryId,
         categoryName: song.categoryName,
         validate: song.validate,
-        createdAt: song.createdAt,        
-        image: song.imageFileName ? `${song.imageFileName}` : null,
-        music: song.musicFileName ? `${song.musicFileName}` : null,
+        createdAt: song.createdAt,
+        image: song.imageFileName
+          ? `${baseFileUrl}${song.imageFileName.replace(/^\/uploads/, "")}`
+          : null,
+        music: song.musicFileName
+          ? `${baseFileUrl}${song.musicFileName.replace(/^\/uploads/, "")}`
+          : null,
       };
-  
+
       return new Response(JSON.stringify(response), {
         status: 200,
         headers: { "Content-Type": "application/json" },
@@ -181,4 +188,5 @@ export async function DELETE(req, { params }) {
       );
     }
   }
+
   

@@ -24,6 +24,12 @@ export default function ProfilePage() {
   const { playSong, setPlaylist } = usePlayerActions();
   const { currentSong, isPlaying } = usePlayerStore();
 
+  const baseFileUrl = "/api/uploads";
+  const avatarUrl =
+    session?.user?.avatar && session.user.avatar.startsWith("/uploads")
+      ? `${baseFileUrl}${session.user.avatar.replace(/^\/uploads/, "")}`
+      : session?.user?.avatar || "/avatars/default-avatar.jpg";
+
   useEffect(() => {
     if (session?.user?.id && songData?.songs) {
       const filteredSongs = songData.songs.filter(
@@ -64,7 +70,6 @@ export default function ProfilePage() {
   useEffect(() => {
     setPlaylist(userSongs);
   }, [userSongs, setPlaylist]);
-  
 
   if (loadingSongs) {
     return (
@@ -89,7 +94,7 @@ export default function ProfilePage() {
               height={500}
               alt="avatar"
               className="rounded-full w-full h-full object-cover border-2 border-red-500"
-              src={session?.user?.avatar || "/avatars/default-avatar.jpg"}
+              src={avatarUrl}
             />
           </div>
 

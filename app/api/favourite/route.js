@@ -77,59 +77,69 @@ export async function POST(req) {
 // Obtener canciones de favoritos
 export async function GET(req) {
   try {
-      const userId = req.nextUrl.searchParams.get('userId');
+    const userId = req.nextUrl.searchParams.get("userId");
 
-      if (!userId) {
-          return new Response(
-              JSON.stringify({ error: "Se requiere userId." }),
-              { status: 400, headers: { "Content-Type": "application/json" } }
-          );
-      }
-
-      // Obtener la playlist de Favoritos del usuario
-      const playlist = await prisma.playlist.findFirst({
-          where: { userId: parseInt(userId), name: "Favoritos" },
-          include: { 
-              Songs: {
-                  include: {
-                      categories: true,  // Incluir información de la categoría
-                      Image: true,       // Incluir imágenes
-                      Music: true        // Incluir archivos de audio
-                  }
-              }
-          },
+    if (!userId) {
+      return new Response(JSON.stringify({ error: "Se requiere userId." }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
       });
+    }
 
-      if (!playlist) {
-          return new Response(
-              JSON.stringify({ error: "No se encontró la playlist de Favoritos." }),
-              { status: 404, headers: { "Content-Type": "application/json" } }
-          );
-      }
+    // Obtener la playlist de Favoritos del usuario usando Prisma
+    const playlist = await prisma.playlist.findFirst({
+      where: { userId: parseInt(userId), name: "Favoritos" },
+      include: {
+        Songs: {
+          include: {
+            categories: true, // Incluir información de la categoría
+            Image: true, // Incluir imágenes
+            Music: true, // Incluir archivos de audio
+          },
+        },
+      },
+    });
 
-      // Transformar la respuesta para incluir la información relevante
-      const songs = playlist.Songs.map(song => ({
-          id: song.id,
-          title: song.title,
-          validate: song.validate,
-          createdAt: song.createdAt,
-          userId: song.userId,
-          categoryId: song.categoryId,
-          categoryName: song.categories?.name || null,
-          image: song.Image.length > 0 ? `${song.Image[0].fileName}` : null,
-          music: song.Music.length > 0 ? `${song.Music[0].fileName}` : null,
-      }));
-
+    if (!playlist) {
       return new Response(
-          JSON.stringify({ songs }),
-          { status: 200, headers: { "Content-Type": "application/json" } }
+        JSON.stringify({ error: "No se encontró la playlist de Favoritos." }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
       );
+    }
+
+    // Definimos la URL base para servir archivos subidos mediante el endpoint
+    // Esto transformará rutas que comienzan con "/uploads" en, por ejemplo, "/api/uploads/..."
+    const baseFileUrl = "/api/uploads";
+
+    // Transformamos la respuesta para incluir la información relevante
+    const songs = playlist.Songs.map((song) => ({
+      id: song.id,
+      title: song.title,
+      validate: song.validate,
+      createdAt: song.createdAt,
+      userId: song.userId,
+      categoryId: song.categoryId,
+      categoryName: song.categories?.name || null,
+      image:
+        song.Image.length > 0
+          ? `${baseFileUrl}${song.Image[0].fileName.replace(/^\/uploads/, "")}`
+          : null,
+      music:
+        song.Music.length > 0
+          ? `${baseFileUrl}${song.Music[0].fileName.replace(/^\/uploads/, "")}`
+          : null,
+    }));
+
+    return new Response(JSON.stringify({ songs }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
-      console.error("Error al obtener canciones de favoritos", error);
-      return new Response(
-          JSON.stringify({ error: "Error interno del servidor." }),
-          { status: 500, headers: { "Content-Type": "application/json" } }
-      );
+    console.error("Error al obtener canciones de favoritos", error);
+    return new Response(
+      JSON.stringify({ error: "Error interno del servidor." }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 }
 

@@ -21,12 +21,13 @@ function validateNameField(field, fieldName) {
 
 // READ UNO POR UNO CON CANCIONES QUE HAN SUBIDO
 export async function GET(req, { params }) {
+  // Obtenemos el id del usuario desde params
   const { id } = await params;
   const userId = id;
   const { search } = Object.fromEntries(new URL(req.url).searchParams);
 
   try {
-    // Configuración de conexión a la base de datos
+    // Conexión a la base de datos
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USERNAME,
@@ -35,78 +36,86 @@ export async function GET(req, { params }) {
     });
 
     try {
-      if (userId) {
-        if (isNaN(Number(userId))) {
-          return new Response(
-            JSON.stringify({ error: "El ID proporcionado no es válido" }),
-            { status: 400, headers: { "Content-Type": "application/json" } }
-          );
-        }
-
-        // Buscar el usuario por ID
-        const [user] = await connection.execute(
-          "SELECT id, name, lastname, username, roleId, avatar, created_at FROM User WHERE id = ?",
-          [userId]
+      if (userId && isNaN(Number(userId))) {
+        return new Response(
+          JSON.stringify({ error: "El ID proporcionado no es válido" }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
         );
-
-        if (user.length === 0) {
-          return new Response(
-            JSON.stringify({ error: "Usuario no encontrado" }),
-            { status: 404, headers: { "Content-Type": "application/json" } }
-          );
-        }
-
-        // Consultar canciones con imagen y música
-        const [songs] = await connection.execute(
-          `
-          SELECT 
-            Songs.id AS songId,
-            Songs.title,
-            Songs.validate,
-            Songs.createdAt,
-            Songs.categoryId,
-            categories.name AS categoryName,
-            Image.fileName AS imageFileName,
-            Music.fileName AS musicFileName
-          FROM Songs
-          LEFT JOIN categories ON Songs.categoryId = categories.id
-          LEFT JOIN Image ON Songs.id = Image.songId
-          LEFT JOIN Music ON Songs.id = Music.songId
-          WHERE Songs.userId = ? AND Songs.validate = 1 AND Songs.title LIKE ?
-          `,
-          [userId, `%${search || ""}%`]
-        );
-
-        const formattedSongs = songs.map((song) => ({
-          songId: song.songId,
-          title: song.title,
-          validate: song.validate,
-          createdAt: song.createdAt,
-          categoryId: song.categoryId,
-          categoryName: song.categoryName || null,
-          image: song.imageFileName ? `${song.imageFileName}` : null,
-          music: song.musicFileName ? `${song.musicFileName}` : null,
-        }));
-
-        const message = formattedSongs.length === 0 
-          ? (search 
-            ? "El usuario no tiene canciones que coincidan con la búsqueda."
-            : "El usuario no tiene canciones disponibles aún.")
-          : undefined;
-
-        const response = {
-          ...user[0],
-          songs: formattedSongs,
-          message,
-        };
-
-        return new Response(JSON.stringify(response), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        });
       }
 
-      // Caso de búsqueda global (sin cambios)
+      // Buscar el usuario por ID
+      const [user] = await connection.execute(
+        "SELECT id, name, lastname, username, roleId, avatar, created_at FROM User WHERE id = ?",
+        [userId]
+      );
+
+      if (user.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "Usuario no encontrado" }),
+          { status: 404, headers: { "Content-Type": "application/json" } }
+        );
+      }
+
+      // Consultar canciones con imagen y música
+      const [songs] = await connection.execute(
+        `
+        SELECT 
+          Songs.id AS songId,
+          Songs.title,
+          Songs.validate,
+          Songs.createdAt,
+          Songs.categoryId,
+          categories.name AS categoryName,
+          Image.fileName AS imageFileName,
+          Music.fileName AS musicFileName
+        FROM Songs
+        LEFT JOIN categories ON Songs.categoryId = categories.id
+        LEFT JOIN Image ON Songs.id = Image.songId
+        LEFT JOIN Music ON Songs.id = Music.songId
+        WHERE Songs.userId = ? AND Songs.validate = 1 AND Songs.title LIKE ?
+        `,
+        [userId, `%${search || ""}%`]
+      );
+
+      // Definimos la URL base para servir archivos subidos mediante nuestro endpoint,
+      // es decir, para las rutas que no estén en la carpeta public (ej. los uploads)
+      const baseFileUrl = "/api/uploads";
+
+      const formattedSongs = songs.map((song) => ({
+        songId: song.songId,
+        title: song.title,
+        validate: song.validate,
+        createdAt: song.createdAt,
+        categoryId: song.categoryId,
+        categoryName: song.categoryName || null,
+        image: song.imageFileName
+          ? `${baseFileUrl}${song.imageFileName.replace(/^\/uploads/, "")}`
+          : null,
+        music: song.musicFileName
+          ? `${baseFileUrl}${song.musicFileName.replace(/^\/uploads/, "")}`
+          : null,
+      }));
+
+      // Para el avatar:
+      // Si el avatar contiene "default-avatar" se asume que es el avatar predeterminado
+      // y se sirve desde la carpeta public (sin transformación).
+      // En caso contrario, se transforma la ruta para apuntar al endpoint.
+      const formattedAvatar = user[0].avatar
+        ? user[0].avatar.includes("default-avatar")
+          ? user[0].avatar
+          : `${baseFileUrl}${user[0].avatar.replace(/^\/uploads/, "")}`
+        : null;
+
+      const formattedUser = {
+        ...user[0],
+        avatar: formattedAvatar,
+        songs: formattedSongs,
+      };
+
+      return new Response(JSON.stringify(formattedUser), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
     } finally {
       await connection.end();
     }
@@ -199,25 +208,33 @@ export async function POST(req, context) {
       const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
       const avatarExtension = avatar.name.split(".").pop().toLowerCase();
       if (!allowedExtensions.includes(avatarExtension)) {
-        return new Response(JSON.stringify({ message: "Formato de imagen no permitido" }), { status: 400 });
+        return new Response(
+          JSON.stringify({ message: "Formato de imagen no permitido" }),
+          { status: 400 }
+        );
       }
-      const uploadsPath = path.join(process.cwd(), "public/avatars");
+      // Ahora la ruta será dentro de uploads/avatars
+      const uploadsPath = path.join(process.cwd(), "uploads", "avatars");
       if (!existsSync(uploadsPath)) {
         mkdirSync(uploadsPath, { recursive: true });
       }
-      let avatarPath= null;
+      let avatarPath = null;
       const uniqueFilename = crypto.randomUUID();
       const newAvatarFilename = `${uniqueFilename}.${avatarExtension}`;
       const avatarUploadPath = path.join(uploadsPath, newAvatarFilename);
       const avatarBytes = await avatar.arrayBuffer();
       const avatarBuffer = Buffer.from(avatarBytes);
-      try{
+      try {
         await writeFile(avatarUploadPath, avatarBuffer);
-        avatarPath = `/avatars/${newAvatarFilename}`;
-      }catch(error){
-        console.error("Error al guardar el avatar: ", error)
+        // Guardamos la ruta con el prefijo /uploads
+        avatarPath = `/uploads/avatars/${newAvatarFilename}`;
+      } catch (error) {
+        console.error("Error al guardar el avatar: ", error);
         return new Response(
-          JSON.stringify({ success: false, message: "Error al guardar el avatar" }),
+          JSON.stringify({
+            success: false,
+            message: "Error al guardar el avatar",
+          }),
           { status: 500, headers: { "Content-Type": "application/json" } }
         );
       }
@@ -245,8 +262,6 @@ export async function POST(req, context) {
     if (connection) await connection.end();
   }
 }
-
-
 
 //DELETE
 export async function DELETE(req, { params }) {

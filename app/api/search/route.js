@@ -27,39 +27,65 @@ export async function GET(req) {
         [`%${search}%`]
       );
 
-      // Formatear usuarios con sus canciones
-      const usersWithSongs = await Promise.all(users.map(async (user) => {
-        const [songs] = await connection.execute(
-          `SELECT 
-            Songs.id AS songId,
-            Songs.title,
-            Songs.validate,
-            Songs.createdAt,
-            Songs.categoryId,
-            categories.name AS categoryName,
-            Image.fileName AS imageFileName,
-            Music.fileName AS musicFileName
-          FROM Songs
-          LEFT JOIN categories ON Songs.categoryId = categories.id
-          LEFT JOIN Image ON Songs.id = Image.songId
-          LEFT JOIN Music ON Songs.id = Music.songId
-          WHERE Songs.userId = ?`,
-          [user.id]
-        );
-        return {
-          ...user,
-          songs: songs.map(song => ({
+      // Definir la URL base para archivos dinámicos
+      const baseFileUrl = "/api/uploads";
+
+      // Formatear usuarios, transformando el avatar si corresponde
+      const usersWithSongs = await Promise.all(
+        users.map(async (user) => {
+          // Si el avatar comienza con "/uploads", se transforma la URL;
+          // en caso contrario, se deja como está (por ejemplo, si es el default y está en public)
+          const formattedAvatar =
+            user.avatar && user.avatar.startsWith("/uploads")
+              ? `${baseFileUrl}${user.avatar.replace(/^\/uploads/, "")}`
+              : user.avatar;
+
+          // Consultar las canciones del usuario
+          const [songs] = await connection.execute(
+            `SELECT 
+              Songs.id AS songId,
+              Songs.title,
+              Songs.validate,
+              Songs.createdAt,
+              Songs.categoryId,
+              categories.name AS categoryName,
+              Image.fileName AS imageFileName,
+              Music.fileName AS musicFileName
+            FROM Songs
+            LEFT JOIN categories ON Songs.categoryId = categories.id
+            LEFT JOIN Image ON Songs.id = Image.songId
+            LEFT JOIN Music ON Songs.id = Music.songId
+            WHERE Songs.userId = ?`,
+            [user.id]
+          );
+
+          // Formatear las rutas de imagen y música de las canciones
+          const formattedSongs = songs.map((song) => ({
             songId: song.songId,
             title: song.title,
             validate: song.validate,
             createdAt: song.createdAt,
             categoryId: song.categoryId,
             categoryName: song.categoryName || null,
-            image: song.imageFileName ? `${song.imageFileName}` : null,
-            music: song.musicFileName ? `${song.musicFileName}` : null,
-          }))
-        };
-      }));
+            image:
+              song.imageFileName && song.imageFileName.startsWith("/uploads")
+                ? `${baseFileUrl}${song.imageFileName.replace(
+                    /^\/uploads/,
+                    ""
+                  )}`
+                : song.imageFileName,
+            music:
+              song.musicFileName && song.musicFileName.startsWith("/uploads")
+                ? `${baseFileUrl}${song.musicFileName.replace(
+                    /^\/uploads/,
+                    ""
+                  )}`
+                : song.musicFileName,
+          }));
+
+          return { ...user, avatar: formattedAvatar, songs: formattedSongs };
+        })
+      );
 
       // Búsqueda de canciones solo por título con información completa
       const [songs] = await connection.execute(
@@ -83,7 +109,7 @@ export async function GET(req) {
         [`%${search}%`]
       );
 
-      const formattedSongs = songs.map(song => ({
+      const formattedSongs = songs.map((song) => ({
         id: song.id,
         title: song.title,
         userId: song.userId,
@@ -91,9 +117,15 @@ export async function GET(req) {
         categoryId: song.categoryId,
         categoryName: song.categoryName,
         validate: song.validate,
-        createdAt: song.createdAt,        
-        image: song.imageFileName ? `${song.imageFileName}` : null,
-        music: song.musicFileName ? `${song.musicFileName}` : null,
+        createdAt: song.createdAt,
+        image:
+          song.imageFileName && song.imageFileName.startsWith("/uploads")
+            ? `${baseFileUrl}${song.imageFileName.replace(/^\/uploads/, "")}`
+            : song.imageFileName,
+        music:
+          song.musicFileName && song.musicFileName.startsWith("/uploads")
+            ? `${baseFileUrl}${song.musicFileName.replace(/^\/uploads/, "")}`
+            : song.musicFileName,
       }));
 
       let message;
@@ -102,7 +134,11 @@ export async function GET(req) {
       }
 
       return new Response(
-        JSON.stringify({ users: usersWithSongs, songs: formattedSongs, message }),
+        JSON.stringify({
+          users: usersWithSongs,
+          songs: formattedSongs,
+          message,
+        }),
         { status: 200, headers: { "Content-Type": "application/json" } }
       );
     } finally {
@@ -116,3 +152,4 @@ export async function GET(req) {
     );
   }
 }
+

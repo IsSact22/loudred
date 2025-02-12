@@ -1,10 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import mysql from "mysql2/promise";
-// import { v4 as uuidv4 } from "uuid";
-// import { writeFile } from "fs/promises";
-// import path from "path";
-// import { dir } from "console";
-// import { buffer } from "stream/consumers";
 
 const prisma = new PrismaClient();
 
@@ -84,7 +79,7 @@ export async function POST(req) {
     const {v4:uuidv4} = require('uuid');
     const {writeFile} = require('fs/promises');
 
-    const uploadsPath = path.join(process.cwd(), 'public/uploads');
+    const uploadsPath = path.join(process.cwd(), 'uploads');
     const imagesPath = path.join(uploadsPath, 'images');
     const musicsPath = path.join(uploadsPath, 'music');
 
@@ -143,46 +138,7 @@ export async function POST(req) {
       }
     }
 
-    // let imagePath = null;
-    // if (image) {
-    //   const newImageFilename = `${uuidv4()}.${image.name.split(".").pop()}`;
-    //   const imageUploadPath = path.join(process.cwd(), "public/uploads/images", newImageFilename);
-
-    //   const imageBytes = await image.arrayBuffer();
-    //   const imageBuffer = Buffer.from(imageBytes);
-
-    //   try {
-    //     await writeFile(imageUploadPath, imageBuffer);
-    //     imagePath = `/uploads/images/${newImageFilename}`;
-    //   } catch (error) {
-    //     console.error("Error al guardar la imagen:", error);
-    //     return new Response(
-    //       JSON.stringify({ success: false, message: "Error al guardar la imagen" }),
-    //       { status: 500, headers: { "Content-Type": "application/json" } }
-    //     );
-    //   }
-    // }
-
-    // // Subir audio (ahora música) si existe
-    // let musicPath = null;
-    // if (music) {
-    //   const newMusicFilename = `${uuidv4()}.${music.name.split(".").pop()}`;
-    //   const musicUploadPath = path.join(process.cwd(), "public/uploads/music", newMusicFilename);
-
-    //   const audioBytes = await music.arrayBuffer();
-    //   const audioBuffer = Buffer.from(audioBytes);
-
-    //   try {
-    //     await writeFile(musicUploadPath, audioBuffer);
-    //     musicPath = `/uploads/music/${newMusicFilename}`;
-    //   } catch (error) {
-    //     console.error("Error al guardar la canción:", error);
-    //     return new Response(
-    //       JSON.stringify({ success: false, message: "Error al guardar la canción" }),
-    //       { status: 500, headers: { "Content-Type": "application/json" } }
-    //     );
-    //   }
-    // }
+    
 
     // Registrar los archivos de imagen y música en la base de datos, si existen
     if (imagePath) {
@@ -220,7 +176,6 @@ export async function POST(req) {
     );
   }
 }
-
 
 //función read para las canciones
 
@@ -264,16 +219,17 @@ export async function GET(req) {
     }
 
     const [songs] = await connection.execute(query, queryParams);
-
     await connection.end();
 
     if (songs.length === 0) {
-      return new Response(
-        JSON.stringify({ error: "No hay canciones aún!" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "No hay canciones aún!" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
+    // Definimos la URL base para el endpoint que sirve los archivos subidos.
+    const baseFileUrl = "/api/uploads";
     const formattedSongs = songs.map((song) => ({
       id: song.songId,
       title: song.title,
@@ -283,8 +239,15 @@ export async function GET(req) {
       username: song.username,
       categoryId: song.categoryId,
       categoryName: song.categoryName,
-      image: song.imageFileName ? `${song.imageFileName}` : null,
-      music: song.musicFileName ? `${song.musicFileName}` : null,
+      // Si en la BD se guardó algo como "/uploads/images/archivo.jpg", lo transformamos en:
+      // "/api/uploads/images/archivo.jpg"
+      image: song.imageFileName
+        ? `${baseFileUrl}${song.imageFileName.replace(/^\/uploads/, "")}`
+        : null,
+      // Lo mismo para la música:
+      music: song.musicFileName
+        ? `${baseFileUrl}${song.musicFileName.replace(/^\/uploads/, "")}`
+        : null,
     }));
 
     return new Response(JSON.stringify({ songs: formattedSongs }), {
@@ -299,3 +262,45 @@ export async function GET(req) {
     );
   }
 }
+
+
+// let imagePath = null;
+    // if (image) {
+    //   const newImageFilename = `${uuidv4()}.${image.name.split(".").pop()}`;
+    //   const imageUploadPath = path.join(process.cwd(), "public/uploads/images", newImageFilename);
+
+    //   const imageBytes = await image.arrayBuffer();
+    //   const imageBuffer = Buffer.from(imageBytes);
+
+    //   try {
+    //     await writeFile(imageUploadPath, imageBuffer);
+    //     imagePath = `/uploads/images/${newImageFilename}`;
+    //   } catch (error) {
+    //     console.error("Error al guardar la imagen:", error);
+    //     return new Response(
+    //       JSON.stringify({ success: false, message: "Error al guardar la imagen" }),
+    //       { status: 500, headers: { "Content-Type": "application/json" } }
+    //     );
+    //   }
+    // }
+
+    // // Subir audio (ahora música) si existe
+    // let musicPath = null;
+    // if (music) {
+    //   const newMusicFilename = `${uuidv4()}.${music.name.split(".").pop()}`;
+    //   const musicUploadPath = path.join(process.cwd(), "public/uploads/music", newMusicFilename);
+
+    //   const audioBytes = await music.arrayBuffer();
+    //   const audioBuffer = Buffer.from(audioBytes);
+
+    //   try {
+    //     await writeFile(musicUploadPath, audioBuffer);
+    //     musicPath = `/uploads/music/${newMusicFilename}`;
+    //   } catch (error) {
+    //     console.error("Error al guardar la canción:", error);
+    //     return new Response(
+    //       JSON.stringify({ success: false, message: "Error al guardar la canción" }),
+    //       { status: 500, headers: { "Content-Type": "application/json" } }
+    //     );
+    //   }
+    // }
