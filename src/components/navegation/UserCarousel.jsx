@@ -10,6 +10,9 @@ import UserCard from "../cards/UserCard";
 import { useRouter } from "next/navigation";
 
 const UserCarousel = ({ users }) => {
+
+  const router = useRouter();
+
   if (!users || !users.length) {
     return <div className="text-gray-400 p-4">No hay usuarios disponibles</div>;
   }
@@ -17,8 +20,6 @@ const UserCarousel = ({ users }) => {
   const sortedUsers = [...users].sort(
     (a, b) => new Date(b.created_at) - new Date(a.created_at)
   );
-
-  const router = useRouter();
 
   return (
     <Carousel className="w-full max-w-6xl mt-4">

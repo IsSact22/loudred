@@ -6,13 +6,11 @@ import { useIsClient } from "@uidotdev/usehooks";
 import { useSessionDecision } from "@/src/hooks/useSessionDecision";
 // Next
 import { SessionProvider, useSession } from "next-auth/react";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 // React
 import { useEffect } from "react";
 // Store
 import { useSessionStore } from "@/src/stores/sessionStore";
-// Toast
-import toast from "react-hot-toast";
 
 export const CoreProvider = ({ children }) => {
   return (
@@ -27,22 +25,12 @@ export const SessionStatus = ({ children }) => {
   const { handleHome } = useSessionDecision();
   const { isLogging, setIsLogging, showModal, setShowModal } = useSessionStore();
   const pathname = usePathname();
-  const router = useRouter();
   const isClient = useIsClient();
-  const searchParams = useSearchParams();
-  const from = searchParams.get("from");
 
   useEffect(() => {
     if (!isClient) return;
 
     const logoutReason = sessionStorage.getItem("logoutReason");
-
-    if (from === "error") {
-      toast.error("Necesitas iniciar sesión para acceder a esa página.");
-      const params = new URLSearchParams(searchParams.toString());
-      params.delete("from");
-      router.replace(`${pathname}?${params.toString()}`);
-    }
 
     if (isLogging && logoutReason === "manual") {
       handleHome();
@@ -59,7 +47,7 @@ export const SessionStatus = ({ children }) => {
     if (pathname !== "/auth/login" && showModal) {
       handleHome();
     }
-  }, [isClient, from, isLogging, pathname, showModal]);
+  }, [isClient, isLogging, pathname, showModal]);
 
   if (status === "loading") {
     return (
@@ -80,6 +68,7 @@ export const SessionStatus = ({ children }) => {
   return (
     <>
       <SessionModal isOpen={showModal}/>
+      
       {children}
     </>
   );
