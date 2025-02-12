@@ -6,16 +6,18 @@ export default function EditUserModal({ isOpen, onClose, editMethods, onSubmitEd
   const { handleSubmit } = editMethods;
   
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Editar Usuario">
-      <FormProvider {...editMethods}>
-        <UserForm
-          register={editMethods.register}
-          handleSubmit={handleSubmit}
-          onSubmit={onSubmitEdit}
-          isEditing={true}
-          buttonText="Guardar Cambios"
-        />
-      </FormProvider>
-    </Modal>
+    <div className="text-black">
+      <Modal isOpen={isOpen} onClose={onClose} title="Editar Usuario">
+        <FormProvider {...editMethods}>
+          <UserForm
+            register={editMethods.register}
+            handleSubmit={handleSubmit}
+            onSubmit={onSubmitEdit}
+            isEditing={true}
+            buttonText="Guardar Cambios"
+          />
+        </FormProvider>
+      </Modal>
+    </div>
   );
 }
