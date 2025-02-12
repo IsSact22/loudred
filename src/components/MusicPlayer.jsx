@@ -1,3 +1,5 @@
+"use client";
+
 import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
@@ -5,6 +7,7 @@ import { FaRandom } from "react-icons/fa";
 import Link from "next/link";
 import { useMusicPlayer } from "@/src/hooks/useMusicPlayer";
 import Image from "next/image";
+import { useEffect } from "react";
 
 export default function MusicPlayer() {
   const {
@@ -22,10 +25,23 @@ export default function MusicPlayer() {
     isShuffled,
   } = useMusicPlayer();
 
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !currentSong) return;
+
+    if (isPlaying) {
+      audio.play().catch((error) => {
+        console.error("Error al intentar reproducir:", error);
+        setPlayingState(false);
+      });
+    } else {
+      audio.pause();
+    }
+  }, [isPlaying, currentSong]);
+
   if (!currentSong) {
     return <div className="m-4">Selecciona una canción para comenzar</div>;
   }
-
   return (
     <div className="w-full max-w-[18rem] mx-auto bg-slate-950/80 rounded-lg shadow-lg shadow-red-500/50 overflow-hidden mt-10">
       <Image
