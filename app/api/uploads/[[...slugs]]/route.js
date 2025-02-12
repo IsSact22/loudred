@@ -3,7 +3,8 @@ import path from "path";
 import { promises as fs } from "fs";
 
 export async function GET(request, { params }) {
-  const slugs = await params.slugs || [];
+  const params2 = await params
+  const slugs = await params2.slugs || [];
   const filePath = path.join(process.cwd(), "uploads", ...slugs);
 
   try {
