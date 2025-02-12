@@ -7,7 +7,7 @@ import { RemoveFavButton } from "../buttons/RemoveFavButton";
 import Image from "next/image";
 
 export function PlaylistCard({ song, onPlay, userId, onRemove }) {
-  console.log(song);
+
   return (
     <div className="flex items-center p-4 bg-gray-800 rounded-lg shadow-md text-white gap-4">
       {/* Mostrar el botón de eliminar solo en la vista de favoritos */}

@@ -141,7 +141,6 @@ export default function ProfilePage() {
                 onConfirmDelete={handleRemoveSong}
                 deleteActionLabel="Eliminar permanentemente"
                 deleteConfirmationMessage="¿Estás seguro de eliminar esta canción? Esta acción no se puede deshacer."
-                isOwner={session?.user?.id === song.userId}
               />
             ))}
           </div>
