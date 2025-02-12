@@ -6,8 +6,6 @@ import { toast } from "react-hot-toast";
 import { useData } from "@/src/hooks/useData"; // Importamos useData
 
 export function RemoveFavButton({ song, userId, onRemove }) {
-  // Verificar que los valores sean correctos
-  console.log("Intentando eliminar:", { userId, songId: song?.id });
 
   // Configurar useData solo si userId y songId existen
   const { deleteData, isMutating } = useData(
