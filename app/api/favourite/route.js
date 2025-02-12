@@ -95,6 +95,10 @@ export async function GET(req) {
             categories: true, // Incluir información de la categoría
             Image: true, // Incluir imágenes
             Music: true, // Incluir archivos de audio
+            user: {
+              // Incluir la información del usuario asociado a la canción
+              select: { username: true },
+            },
           },
         },
       },
@@ -103,21 +107,24 @@ export async function GET(req) {
     if (!playlist) {
       return new Response(
         JSON.stringify({ error: "No se encontró la playlist de Favoritos." }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
+        {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        }
       );
     }
 
-    // Definimos la URL base para servir archivos subidos mediante el endpoint
-    // Esto transformará rutas que comienzan con "/uploads" en, por ejemplo, "/api/uploads/..."
+    // Definir la URL base para servir archivos subidos mediante el endpoint.
     const baseFileUrl = "/api/uploads";
 
-    // Transformamos la respuesta para incluir la información relevante
+    // Transformar la respuesta para incluir la información relevante
     const songs = playlist.Songs.map((song) => ({
       id: song.id,
       title: song.title,
       validate: song.validate,
       createdAt: song.createdAt,
       userId: song.userId,
+      username: song.user?.username || null, // Extraído de la relación
       categoryId: song.categoryId,
       categoryName: song.categories?.name || null,
       image:
@@ -138,7 +145,10 @@ export async function GET(req) {
     console.error("Error al obtener canciones de favoritos", error);
     return new Response(
       JSON.stringify({ error: "Error interno del servidor." }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
     );
   }
 }

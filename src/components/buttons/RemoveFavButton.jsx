@@ -9,7 +9,7 @@ export function RemoveFavButton({ song, userId, onRemove }) {
 
   // Configurar useData solo si userId y songId existen
   const { deleteData, isMutating } = useData(
-    userId && song?.id ? `/favourite?userId=${userId}&songId=${song.id}` : null
+    userId && song?.id ? `/favourite?userId=${userId}&songId=${song.id}` : null, {}, false
   );
 
   const handleDelete = async () => {
